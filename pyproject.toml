@@ -1,0 +1,14 @@
+[project]
+name = "mirna-curator"
+version = "0.1.0"
+description = ""
+authors = [{name="Andrew Green", email="agreen@ebi.ac.uk"}]
+license = {file = "LICENSE.txt"}
+readme = "README.md"
+
+dependencies = [
+  "polars>=1.12.0",
+  "docling>=2.4.0"
+]
+
+
