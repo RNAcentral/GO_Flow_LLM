@@ -18,11 +18,12 @@ jobs:
         with:
             tags: myimage:latest
             outputs: type=docker,dest=/tmp/myimage.tar
+
       - name: Upload artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: myimage
-            path: /tmp/myimage.tar
+        uses: actions/upload-artifact@v4
+        with:
+          name: myimage
+          path: /tmp/myimage.tar
 
 
   singularity-build:
