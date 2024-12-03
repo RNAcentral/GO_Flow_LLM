@@ -1,6 +1,7 @@
 
 
-FROM nvidia/cuda:12.2.2-devel-ubuntu22.04
+# FROM nvidia/cuda:12.2.2-devel-ubuntu22.04
+FROM debian:stable-slim
 WORKDIR /curator
 RUN set -x && \
     apt-get update \
