@@ -32,7 +32,8 @@ RUN pyenv install 3.11
 RUN  pyenv global 3.11
 
 FROM cuda_build_stage_1 AS cuda_build
-ARG CMAKE_ARGS="-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES=all -DGGML_CUDA_FORCE_MMQ=on"
+ARG CMAKE_ARGS="-DGGML_CUDA=on"
+#  -DCMAKE_CUDA_ARCHITECTURES=all -DGGML_CUDA_FORCE_MMQ=on"
 RUN pip install build wheel
 RUN python -m build --wheel 
 
