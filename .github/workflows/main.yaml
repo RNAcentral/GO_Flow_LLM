@@ -43,12 +43,7 @@ jobs:
         run: |
           singularity build go_flow_llm.sif docker-archive:///tmp/myimage.tar
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push to ghcr
         run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | singularity remote login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
           singularity push go_flow_llm.sif oras://ghcr.io/${GITHUB_REPOSITORY}:latest
