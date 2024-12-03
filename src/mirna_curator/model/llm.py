@@ -1,0 +1,187 @@
+from guidance.models import LlamaCpp
+
+from guidance.chat import (
+    ChatMLTemplate,
+    Llama2ChatTemplate,
+    Llama3ChatTemplate,
+    Phi3MiniChatTemplate,
+    Phi3SmallMediumChatTemplate,
+    Mistral7BInstructChatTemplate,
+    Gemma29BInstructChatTemplate,
+)
+
+TEMPLATE_LOOKUP = {
+    "chatml": ChatMLTemplate,
+    "llama2": Llama2ChatTemplate,
+    "llama3": Llama3ChatTemplate,
+    "phi3-mini": Phi3MiniChatTemplate,
+    "phi3-med": Phi3SmallMediumChatTemplate,
+    "mistral": Mistral7BInstructChatTemplate,
+    "gemma": Gemma29BInstructChatTemplate,
+}
+
+from huggingface_hub import HfFileSystem, hf_hub_download
+from pathlib import Path
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def download_split_file(repo_id, filenames):
+    """
+    Large models are split on hf-hub, this downloads and reconsitutes them for loading
+
+    We download each file in turn to a local dir, thenconcatenate it to one big file
+    Each downloaded file will be immediately deleted to save space
+
+    Parameters
+    ----------
+    repo_id : str
+        The name of the huggingface repo we will be pulling from
+    filenames : List[str]
+        The list of chunks to download
+
+    Returns
+    -------
+    List[str]
+        List of locally downloaded shards
+
+    Raises
+    ------
+        ValueError
+            When the number of downloaded shards does not match how many shard the
+            filenames claim there should be
+
+    """
+    expected_file_count = int(filenames[0].split("-of-")[-1].replace(".gguf", ""))
+    local_filenames = []
+    for remote_filename in filenames:
+        print(remote_filename)
+        local_path = hf_hub_download(
+            repo_id=repo_id, filename=Path(remote_filename).name
+        )
+        local_filenames.append(local_path)
+
+    if len(local_filenames) != expected_file_count:
+        raise ValueError(
+            "Number of downloaded shards does not match expected shards based on filename!"
+        )
+
+    return local_filenames
+
+
+def get_model(model_name: str, chat_template: str = None, quantization: str = None):
+    """
+    Load a llama.cpp model, either locally or by downloading from huggingface
+
+    Note - this will cache the models, so make sure the HF_HOME environment
+    variable is set appropriately.
+
+    Parameters:
+        model_name: str
+            The local filepath, or huggingface hub ID of the model to use
+
+        chat_template (optional): str
+            The chat template to use when formatting interactions with the model.
+            Defaults to chatml. For best results ensure this is set correctly
+
+        quantization (optional): str
+            What quantization type/level to use. This is required when loading from
+            a hf hub repo that contains multiple models.
+
+    Returns:
+        model: guidance.LlamaCpp
+            A guidance-wrapped Llama.cpp model instance
+
+    Raises:
+        FileNotFoundError:
+            When:
+                - the local file doesn not exist
+                - the model repo on huggingface does not exist
+                - The model repo contains no gguf files
+        ValueError:
+            When:
+                - When no quant type specified for a repo with multiple ggufs
+                - When the requested quant tyoe was not found in the repo
+
+
+
+    """
+    fs = HfFileSystem()
+
+    if Path(model_name).exists():
+        logging.debug("Loading local model from path %s", model_name)
+        # Don't need to do anything really
+        model_path = model_name
+    elif fs.exists(model_name):
+        logging.debug("Downloading a gguf file from hub, then loading it")
+        # Search the repo in hub for gguf files
+        gguf_files = fs.glob(f"{model_name}/**/*.gguf")
+
+        if len(gguf_files) == 0:
+            logging.error(
+                "There are no gguf files in the provided repo! Can't load anything"
+            )
+            raise FileNotFoundError(
+                "There are no gguf files in the provided repo! Can't load anything"
+            )
+        elif len(gguf_files) == 1:
+            remote_filename = Path(gguf_files[0]).name
+            logging.debug("Only one gguf file in the repo, loading %s", remote_filename)
+        else:
+            if quantization is None:
+                logging.error(
+                    "Must provide quantization type if you want to load from a repo with multiple quants!"
+                )
+                raise ValueError(
+                    "Must provide quantization type if you want to load from a repo with multiple quants!"
+                )
+            # Find the right quantization file types
+            matching_ggufs = list(
+                filter(lambda x: quantization.lower() in x.lower(), gguf_files)
+            )
+            if len(matching_ggufs) == 0:
+                logging.error(
+                    "Quantization %s was not found in repo %s. Can't load the model!",
+                    quantization,
+                    model_name,
+                )
+                raise ValueError(
+                    f"Quantization {quantization} was not found in repo {model_name}. Can't load the model!"
+                )
+            # If there's more than one matching the quantization, we have a split file
+            elif len(matching_ggufs) > 1:
+                logging.debug(
+                    "Right quantisation found, looks like a sharded file. Downloading shards..."
+                )
+                local_filenames = download_split_file(model_name, matching_ggufs)
+                ## Giving the first split as local path should work
+                model_path = list(filter(lambda x: "01-of" in x, local_filenames))[0]
+            else:
+                # Only one match, load directly
+                remote_filename = Path(matching_ggufs[0]).name
+                logging.debug(
+                    "Found the right quantisation, loading %s", remote_filename
+                )
+                model_path = hf_hub_download(
+                    repo_id=model_name, filename=remote_filename
+                )
+    else:
+        logging.error("Local model file does not exist, and is not a huggingface repo!")
+        raise FileNotFoundError(
+            "Local model file does not exist, and is not a huggingface repo!"
+        )
+
+    model = LlamaCpp(
+        model=model_path,
+        echo=False,
+        n_gpu_layers=-1,
+        n_ctx=8192,
+        flash_attention=True,
+        temperature=0.2,
+        chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
+        seed=-1,
+    )
+
+    return model
