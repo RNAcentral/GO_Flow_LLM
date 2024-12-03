@@ -34,7 +34,7 @@ RUN  pyenv global 3.11
 FROM cuda_build_stage_1 AS cuda_build
 ARG CMAKE_ARGS="-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES=all -DGGML_CUDA_FORCE_MMQ=on"
 RUN pip install build wheel
-RUN python -m pip wheel .
+RUN python -m build --wheel 
 
 FROM debian:stable-slim AS final
 COPY --from=cuda_build /src/dist/llama_cpp_python-0.3.2-cp311-cp311-linux_x86_64.whl .
