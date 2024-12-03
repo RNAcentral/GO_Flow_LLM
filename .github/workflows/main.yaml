@@ -27,7 +27,10 @@ jobs:
 
 
   singularity-build:
-    runs-on: quay.io/singularity/singularity:v3.8.1
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/singularity/singularity:v3.8.1
+      options: --privileged
     needs: docker-build
     steps:
       - name: Download artifact
@@ -46,6 +49,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -name: Push to ghcr
+      - name: Push to ghcr
         run: |
-          singularity push go_flow_llm.sif oras://ghcr.io/${github_repository}:latest
+          singularity push go_flow_llm.sif oras://ghcr.io/${GITHUB_REPOSITORY}:latest
