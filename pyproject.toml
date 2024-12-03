@@ -10,11 +10,12 @@ dependencies = [
   "polars>=1.12.0",
   "requests>=2.32.3",
   "pyjats>=0.0.2",
-  "epmc-xml>=0.1.4",
+  "epmc-xml>=0.1.7",
   "guidance>=0.1.16",
   "llama-cpp-python>=0.3.2",
   "huggingface_hub>=0.26.2",
-  "docling==2.4.0",
+  "pydantic>=2.9.2",
+  "connectorx>=0.4.0"
 ]
 
 
