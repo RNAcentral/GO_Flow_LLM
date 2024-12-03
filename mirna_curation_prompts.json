@@ -1,0 +1,85 @@
+{
+    "prompts": [
+        {
+            "name": "hasExperimentalEvidence",
+            "type": "condition_prompt_boolean",
+            "prompt": "Does the paper have experimental evidence? This must be from reporter assays, in-vivo protein level measurements, qRT-PCR, Western Blot or similar techniques.",
+            "target_section": "methods"
+        },
+        {
+            "name" : "isComputationalPredictionOnly",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper only make a computational target prediction? This would mean no experiments have been done in vitro or in vivo, the paper may mention in silico though.",
+            "target_section": "methods"
+        },
+        {
+            "name" : "hasFunctionalInteraction",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper present evidence of a functional interatction between miRNA and mRNA? This must be in the form of a reporter assay",
+            "target_section" : "results"
+        },
+        {
+            "name" : "hasBindingAssay",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper have a functional interaction determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
+            "target_section" : "results"
+        },
+        {
+            "name" : "hasEndogenousEffect",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper present a change in the endogenous target gene expression? This must be from a Western Blot, or qRT-PCR",
+            "target_section" : "results"
+        },
+        {
+            "name" : "hasComputationalPrediction",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper make a computational target prediction in addition to the binding assays?",
+            "target_section": "results"
+        },
+        {
+            "name" : "hasMiRNAEffect",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper show that the inhibition or addition of the miRNA affects the endogenous level of the target mRNA level? ",
+            "target_section": "results"
+        },
+        {
+            "name" : "hasProteinLevelDecrease",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper report a decrease in the endogenous levels of the target protein following inhibition or addition of the miRNA?",
+            "target_section" : "results"
+        },
+        {
+            "name" : "hasmRNALevelDecrease",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper report a decrease in the endogenous levels of the target gene mRNA following the inhibition or addition of the miRNA?",
+            "target_section": "results"
+        },
+        {
+            "name" : "no_annotation",
+            "type" : "terminal_short_circuit"
+        },
+        {
+            "name" : "validated_binding_only",
+            "type" : "terminal_full"
+        },
+        {
+            "name" : "validated_binding_plus_destabilisation",
+            "type" : "terminal_full"
+        },
+        {
+            "name" : "validated_binding_plus_trans_inhibition",
+            "type" : "terminal_full"
+        },
+        {
+            "name" : "validated_binding_plus_decreased_expression",
+            "type" : "terminal_bp_only",
+            "additionalNodes": ["hasProteinLevelDecrease", "hasmRNALevelDecrease"]
+        }
+    ],
+    "detectors" : [
+        {
+            "type" : "AE",
+            "prompt": ""
+        }
+    ]
+}

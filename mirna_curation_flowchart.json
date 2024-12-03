@@ -1,0 +1,143 @@
+{
+    "nodes": {
+      "experimental_evidence": {
+        "type": "decision",
+        "data": {
+          "desc": "Experimental Evidence?",
+          "condition": "hasExperimentalEvidence"
+        },
+        "transitions": {
+          "true": "functional_interaction",
+          "false": "computational_target"
+        }
+      },
+      "computational_target": {
+        "type": "decision",
+        "data": {
+          "desc": "Computational target prediction only?",
+          "condition": "isComputationalPredictionOnly"
+        },
+        "transitions": {
+          "true": "no_annotation",
+          "false": "mirna_mrna_binding"
+        }
+      },
+      "functional_interaction": {
+        "type": "decision",
+        "data": {
+          "desc": "Functional interaction by reporter assay?",
+          "condition": "hasFunctionalInteraction"
+        },
+        "transitions": {
+          "true": "effect_endogenous_1",
+          "false": "mirna_mrna_binding"
+        }
+      },
+      "mirna_mrna_binding": {
+        "type": "decision",
+        "data": {
+          "desc": "miRNA-mRNA binding assay?",
+          "condition": "hasBindingAssay"
+        },
+        "transitions": {
+          "true": "effect_endogenous_2",
+          "false": "computational_prediction"
+        }
+      },
+      "effect_endogenous_1": {
+        "type": "decision",
+        "data": {
+          "desc": "Effect on endogenous target gene expression?",
+          "condition": "hasEndogenousEffect"
+        },
+        "transitions": {
+          "true": "mirna_changes",
+          "false": "validated_binding_only"
+        }
+      },
+      "effect_endogenous_2": {
+        "type": "decision",
+        "data": {
+          "desc": "Effect on endogenous target gene expression?",
+          "condition": "hasEndogenousEffect"
+        },
+        "transitions": {
+          "true": "mirna_changes",
+          "false": "no_annotation"
+        }
+      },
+      "computational_prediction": {
+        "type": "decision",
+        "data": {
+          "desc": "Computational target prediction?",
+          "condition": "hasComputationalPrediction"
+        },
+        "transitions": {
+          "true": "effect_endogenous_3",
+          "false": "no_annotation"
+        }
+      },
+      "effect_endogenous_3": {
+        "type": "decision",
+        "data": {
+          "desc": "Effect on endogenous target gene expression?",
+          "condition": "hasEndogenousEffect"
+        },
+        "transitions": {
+          "true": "no_validated_binding",
+          "false": "no_annotation"
+        }
+      },
+      "mirna_changes": {
+        "type": "decision",
+        "data": {
+          "desc": "miRNA inhibition or addition changes endogenous target mRNA level?",
+          "condition": "hasMiRNAEffect"
+        },
+        "transitions": {
+          "true": "validated_binding_mrna",
+          "false": "validated_binding_translation"
+        }
+      },
+
+
+      "no_annotation": {
+        "type": "terminal",
+        "data": {
+          "desc": "No annotation",
+          "terminal": "no_annotation"
+        }
+      },
+
+      "validated_binding_only": {
+        "type": "terminal",
+        "data": {
+          "desc": "Validated binding only",
+          "terminal" : "validated_binding_only"
+
+        }
+      },
+      "validated_binding_mrna": {
+        "type": "terminal",
+        "data": {
+          "desc": "Validated binding + evidence of mRNA destabilization",
+          "terminal" : "validated_binding_plus_destabilisation"
+        }
+      },
+      "validated_binding_translation": {
+        "type": "terminal",
+        "data": {
+          "desc": "Validated binding + evidence of inhibition of translation",
+          "terminal" : "validated_binding_plus_trans_inhibition"
+        }
+      },
+      "no_validated_binding": {
+        "type": "terminal",
+        "data": {
+          "desc": "No validated binding. Decreased expression of target",
+          "terminal" : "validated_binding_plus_decreased_expression"
+        }
+      }
+    },
+    "startNode": "experimental_evidence"
+  }
