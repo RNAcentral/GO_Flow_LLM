@@ -15,7 +15,8 @@ dependencies = [
   "llama-cpp-python>=0.3.2",
   "huggingface_hub>=0.26.2",
   "pydantic>=2.9.2",
-  "connectorx>=0.4.0"
+  "connectorx>=0.4.0",
+  "click>=8.1.7"
 ]
 
 
