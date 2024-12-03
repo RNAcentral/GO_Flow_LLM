@@ -1,0 +1,89 @@
+schema = """
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Flowchart Schema",
+  "type": "object",
+  "required": ["nodes", "startNode"],
+  "properties": {
+    "nodes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": {
+          "type": "object",
+          "required": ["type", "data"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["decision", "terminal"]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "desc": {
+                  "type": "string"
+                },
+                "condition": {
+                  "type": "string"
+                }
+              },
+              "required": ["condition"]
+            },
+            "transitions": {
+              "type": "object",
+              "properties": {
+                "true": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_]+$"
+                },
+                "false": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_]+$"
+                },
+                "next": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_]+$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "startNode": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]+$"
+    }
+  }
+}
+"""
+from enum import Enum
+from typing import Dict, Optional
+from pydantic import BaseModel, Field, constr
+
+
+class NodeType(str, Enum):
+    decision = "decision"  ## These are where we make decision
+    terminal = "terminal"  ## These are where we make classifications
+
+
+class NodeData(BaseModel):
+    desc: Optional[str] = None  ## Text description of the node
+    condition: Optional[str] = None  ## Prompt to lookup for conditions
+    terminal: Optional[str] = None  ## Terminal to look up for final classification
+
+
+class NodeTransitions(BaseModel):
+    true: Optional[constr(pattern=r"^[a-zA-Z0-9_]+$")] = None
+    false: Optional[constr(pattern=r"^[a-zA-Z0-9_]+$")] = None
+    next: Optional[constr(pattern=r"^[a-zA-Z0-9_]+$")] = None
+
+
+class Node(BaseModel):
+    type: NodeType
+    data: NodeData
+    transitions: Optional[NodeTransitions] = None
+
+
+class CurationFlowchart(BaseModel):
+    nodes: Dict[str, Node]
+    startNode: constr(pattern=r"^[a-zA-Z0-9_]+$")
