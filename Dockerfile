@@ -1,7 +1,7 @@
 
 
-# FROM nvidia/cuda:12.2.2-devel-ubuntu22.04
-FROM debian:stable-slim
+FROM nvidia/cuda:12.2.2-devel-ubuntu22.04
+# FROM debian:stable-slim
 WORKDIR /curator
 RUN set -x && \
     apt-get update \
@@ -28,7 +28,7 @@ ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
 RUN pyenv install 3.11 
 RUN  pyenv global 3.11
     
-RUN pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu122
+RUN CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu122
 
 COPY pyproject.toml .
 
