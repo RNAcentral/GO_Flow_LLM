@@ -38,6 +38,7 @@ RUN pip install build wheel
 RUN python -m build --wheel .
 
 FROM debian:stable-slim AS final
+WORKDIR /curator
 COPY --from=cuda_build /curator/dist/llama_cpp_python-0.3.2-cp311-cp311-linux_x86_64.whl .
 
 RUN set -x && \
