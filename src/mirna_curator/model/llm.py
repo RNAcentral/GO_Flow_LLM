@@ -177,7 +177,7 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
         model=model_path,
         echo=False,
         n_gpu_layers=-1,
-        n_ctx=8192,
+        n_ctx=16384,
         flash_attention=True,
         temperature=0.2,
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
