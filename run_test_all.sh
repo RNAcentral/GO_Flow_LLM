@@ -16,6 +16,8 @@
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
 
+source /homes/agreen/.bashrc
+
 module load cuda
 
 pyenv activate mirna-curator
