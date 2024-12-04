@@ -7,7 +7,7 @@ Load all the questions and run them all across all the dev set of papers
 from mirna_curator.flowchart.flow_prompts import CurationPrompts
 from mirna_curator.llm_functions.conditions import prompted_flowchart_step_bool
 from mirna_curator.model.llm import get_model
-# import click
+import click
 import polars as pl
 from guidance import user, assistant, select, gen
 
@@ -53,10 +53,10 @@ def run_one_paper(pmcid, prompts, llm):
         result_dict[prompt.name] = result
     return result_dict
 
-# @click.command()
-# @click.argument("curation_prompts_path")
-# @click.argument("paper_set_path")
-# @click.argument("model_name")
+@click.command()
+@click.argument("curation_prompts_path")
+@click.argument("paper_set_path")
+@click.argument("model_name")
 def main(curation_prompts_path, paper_set_path, model_name):
     curation_prompts_json = open(curation_prompts_path, "r").read()
     prompt_object = CurationPrompts.model_validate_json(curation_prompts_json)
@@ -72,4 +72,4 @@ def main(curation_prompts_path, paper_set_path, model_name):
 
 
 if __name__ == "__main__":
-    main("mirna_curation_prompts.json", "development_set.parquet", "afg1/phi-3.1-medium")
+    main()
