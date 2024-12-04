@@ -10,7 +10,7 @@ from mirna_curator.model.llm import get_model
 import click
 import polars as pl
 from guidance import user, assistant, select, gen
-from functools import partial
+from functools import partial, wraps
 
 from epmc_xml import fetch
 
