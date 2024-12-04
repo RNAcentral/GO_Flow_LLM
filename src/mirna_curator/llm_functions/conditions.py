@@ -42,7 +42,7 @@ def prompted_flowchart_step_bool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    print(llm)
+    # print(llm)
 
     return llm["answer"] == "yes"
 
