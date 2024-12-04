@@ -14,55 +14,12 @@ from functools import partial, wraps
 from tqdm import tqdm
 from epmc_xml import fetch
 
-def progress_wrapper(func, total=None, desc=None):
-    """
-    Wraps a function with a tqdm progress bar.
-    Works with regular functions, partial functions, and Polars map_elements.
-    
-    Args:
-        func: The function to wrap
-        total: Total number of iterations (required for partial functions or Polars)
-        desc: Description for the progress bar
-    """
-    # Create a progress bar that persists across function calls
-    pbar = None
-    
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        nonlocal pbar
-        
-        # Initialize progress bar if it doesn't exist
-        if pbar is None:
-            # If first arg is iterable (not Polars Series), use its length
-            if args and hasattr(args[0], '__len__') and not isinstance(args[0], pl.Series):
-                total_items = len(args[0])
-            elif total is not None:
-                total_items = total
-            else:
-                raise ValueError("Must provide either an iterable or specify total")
-            
-            pbar = tqdm(total=total_items, desc=desc or func.__name__)
-        
-        # Handle different cases
-        if args and hasattr(args[0], '__len__') and not isinstance(args[0], pl.Series):
-            # Case 1: Regular iterable processing
-            new_args = (tqdm(args[0], total=len(args[0]), desc=desc),) + args[1:]
-            result = func(*new_args, **kwargs)
-            pbar.close()
-            pbar = None  # Reset for potential reuse
-        else:
-            # Case 2: Single element processing (Polars map_elements or partial function)
-            result = func(*args, **kwargs)
-            pbar.update(1)
-            
-            # For partial functions that process everything at once
-            if total is not None and total == 1:
-                pbar.close()
-                pbar = None  # Reset for potential reuse
-        
-        return result
-    
-    return wrapper
+def w_pbar(pbar, func):
+    def foo(*args, **kwargs):
+        pbar.update(1)
+        return func(*args, **kwargs)
+
+    return foo
 
 def run_one_paper(pmcid, prompts, llm):
     article = fetch.article(pmcid)
@@ -117,7 +74,8 @@ def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, 
 
     papers = pl.read_parquet(paper_set_path)
 
-    process_one = progress_wrapper(partial(run_one_paper, prompts=prompt_object.prompts, llm=llm), total=papers.height, desc="Running all decisions...")
+    pbar = tqdm(total=len(papers), desc='Running all decisions', colour='green')
+    process_one = w_pbar(pbar, partial(run_one_paper, prompts=prompt_object.prompts, llm=llm))
 
     papers = papers.with_columns(res=pl.col("PMCID").map_elements(process_one)).unnest("res")
 
