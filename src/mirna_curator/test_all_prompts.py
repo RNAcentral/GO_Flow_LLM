@@ -77,7 +77,7 @@ def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, 
     pbar = tqdm(total=len(papers), desc='Running all decisions', colour='green')
     process_one = w_pbar(pbar, partial(run_one_paper, prompts=prompt_object.prompts, llm=llm))
 
-    papers = papers.with_columns(res=pl.col("PMCID").map_elements(process_one, return_dtype=dict)).unnest("res")
+    papers = papers.with_columns(res=pl.col("PMCID").map_elements(process_one, return_dtype=pl.Struct)).unnest("res")
 
     print(papers)
 
