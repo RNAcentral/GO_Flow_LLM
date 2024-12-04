@@ -11,7 +11,7 @@ import click
 import polars as pl
 from guidance import user, assistant, select, gen
 from functools import partial, wraps
-
+from tqdm import tqdm
 from epmc_xml import fetch
 
 def progress_wrapper(func, total=None, desc=None):
