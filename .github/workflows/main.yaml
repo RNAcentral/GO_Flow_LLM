@@ -3,6 +3,7 @@ name: Build Docker Image and convert
 on:
   push:
     branches: ['main']
+    paths: ['.package_rebuild']
     
 jobs:
   docker-build:
