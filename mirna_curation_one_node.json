@@ -1,0 +1,30 @@
+{
+    "nodes": {
+      "experimental_evidence": {
+        "type": "decision",
+        "data": {
+          "desc": "Experimental Evidence?",
+          "condition": "hasExperimentalEvidence"
+        },
+        "transitions": {
+          "true": "functional_interaction",
+          "false": "computational_target"
+        }
+      },
+      "computational_target": {
+        "type": "decision",
+        "data": {
+          "desc": "Computational target prediction only?",
+          "condition": "isComputationalPredictionOnly"
+        }
+      },
+      "functional_interaction": {
+        "type": "decision",
+        "data": {
+          "desc": "Functional interaction by reporter assay?",
+          "condition": "hasFunctionalInteraction"
+        }
+      }
+    },
+    "startNode": "experimental_evidence"
+  }
