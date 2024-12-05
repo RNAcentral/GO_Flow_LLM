@@ -18,6 +18,8 @@
 
 source /homes/agreen/.bashrc
 
+export HF_HOME=/hps/nobackup/agb/rnacentral/agreen/hf_cache
+export PYENV_ROOT=/hps/nobackup/agb/rnacentral/agreen/ARISE/.pyenv
 export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)
