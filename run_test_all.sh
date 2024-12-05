@@ -18,6 +18,11 @@
 
 source /homes/agreen/.bashrc
 
+export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)
+
+
 module load cuda
 
 pyenv activate mirna-curator
