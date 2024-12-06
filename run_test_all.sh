@@ -3,7 +3,7 @@
 #Submit this script with: sbatch thefilename
 #For more details about each parameter, please check SLURM sbatch documentation https://slurm.schedmd.com/sbatch.html
 
-#SBATCH --time=4:30:00   # walltime
+#SBATCH --time=5:30:00   # walltime
 #SBATCH --ntasks=1   # number of tasks
 #SBATCH --cpus-per-task=24   # number of CPUs Per Task i.e if your code is multi-threaded
 #SBATCH --nodes=1   # number of nodes
@@ -25,6 +25,6 @@ pyenv activate mirna-curator
 time python src/mirna_curator/test_all_prompts.py \
 mirna_curation_prompts.json \
 development_set.parquet \
-bartowski/Phi-3.1-mini-128k-instruct-GGUF \
-dev_set_with_decisions_phi3_mini.parquet \
---template phi3-mini
+bartowski/Phi-3-medium-128k-instruct-GGUF \
+dev_set_with_decisions_1.parquet \
+--template phi3-med
