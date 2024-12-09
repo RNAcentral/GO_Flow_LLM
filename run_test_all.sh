@@ -3,9 +3,9 @@
 #Submit this script with: sbatch thefilename
 #For more details about each parameter, please check SLURM sbatch documentation https://slurm.schedmd.com/sbatch.html
 
-#SBATCH --time=10:30:00   # walltime
+#SBATCH --time=12:00:00   # walltime
 #SBATCH --ntasks=1   # number of tasks
-#SBATCH --cpus-per-task=24   # number of CPUs Per Task i.e if your code is multi-threaded
+#SBATCH --cpus-per-task=12   # number of CPUs Per Task i.e if your code is multi-threaded
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --gres=gpu:a100:1
 #SBATCH --mem=32G   # memory per node
