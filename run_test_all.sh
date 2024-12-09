@@ -26,5 +26,5 @@ time python src/mirna_curator/test_all_prompts.py \
 mirna_curation_prompts.json \
 development_set.parquet \
 bartowski/Llama-3.3-70B-Instruct-GGUF \
-dev_set_with_decisions_1.parquet \
+dev_set_with_decisions_llama3.3_70B.parquet \
 --template phi3-med 
