@@ -25,6 +25,6 @@ pyenv activate mirna-curator
 time python src/mirna_curator/test_all_prompts.py \
 mirna_curation_prompts.json \
 development_set.parquet \
-bartowski/Phi-3-medium-128k-instruct-GGUF \
+bartowski/Llama-3.3-70B-Instruct-GGUF \
 dev_set_with_decisions_1.parquet \
 --template phi3-med 
