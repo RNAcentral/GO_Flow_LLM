@@ -10,15 +10,14 @@ import sqlite3
 
 import typing as ty
 
-
+@guidance
 def prompted_flowchart_step_bool(
     llm: guidance.models.Model,
     article_text: str,
     step_prompt: str,
     temperature_reasoning: ty.Optional[float] = 0.4,
     temperature_selection: ty.Optional[float] = 0.1,
-    store_reasoning: ty.Optional[sqlite3.Connection] = None,
-) -> bool:
+) -> guidance.models.Model:
     """
     Use the given prompt on the article text to answer a yes/no question,
     returning a boolean
@@ -42,10 +41,10 @@ def prompted_flowchart_step_bool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
+
     # print(llm)
 
-    return llm["answer"] == "yes"
-
+    return llm
 
 def prompted_flowchart_terminal():
     """
