@@ -118,6 +118,8 @@ class ComputationGraph:
             
             ## Move to the next node...
             graph_node = graph_node.transitions[node_result]
+            if graph_node.type == "terminal":
+                visited_nodes.append(graph_node.name)
             node_idx += 1
 
         print(visited_nodes)
