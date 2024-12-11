@@ -26,6 +26,7 @@ class ComputationNode:
 class ComputationGraph:
     def __init__(self, flowchart: CurationFlowchart):
         self.construct_nodes(flowchart)
+        self.loaded_sections = []
 
     def construct_nodes(self, flowchart: CurationFlowchart) -> None:
         """
@@ -80,31 +81,36 @@ class ComputationGraph:
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
             )[0]
 
-            ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
-            if not prompt.target_section in article.sections.keys():
-                check_subtitles = [
-                    prompt.target_section in section_name
-                    for section_name in article.sections.keys()
-                ]
-                if not any(check_subtitles):
-                    with user():
-                        llm += (
-                            f"We are looking for the closest section heading to {prompt.target_section} from "
-                            f"the following possbilities: {article.sections.keys()}. Which one is closest?"
-                        )
-                    with assistant():
-                        llm += select(
-                            article.sections.keys(), name="target_section_name"
-                        )
-                    target_section_name = llm["target_section_name"]
-                else:
-                    target_section_name = list(article.sections.keys())[
-                        check_subtitles.index(True)
+            ## see if we already have the target section loaded - this should speed things up provided we can reuse the context
+            if not prompt.target_section in self.loaded_sections:
+                ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
+                if not prompt.target_section in article.sections.keys():
+                    check_subtitles = [
+                        prompt.target_section in section_name
+                        for section_name in article.sections.keys()
                     ]
+                    if not any(check_subtitles):
+                        with user():
+                            llm += (
+                                f"We are looking for the closest section heading to {prompt.target_section} from "
+                                f"the following possbilities: {article.sections.keys()}. Which one is closest?"
+                            )
+                        with assistant():
+                            llm += select(
+                                article.sections.keys(), name="target_section_name"
+                            )
+                        target_section_name = llm["target_section_name"]
+                    else:
+                        target_section_name = list(article.sections.keys())[
+                            check_subtitles.index(True)
+                        ]
 
-            node_result = graph_node.function(
-                llm, article.sections[target_section_name], prompt.prompt
+            ## Now we load a section to the context only once, we have to get the node result here.
+            llm += graph_node.function(
+                article.sections[target_section_name], prompt.prompt
             )
+            node_result = llm['answer'] == "yes"
+
             print(node_result)
             graph_node = graph_node.transitions[node_result]
             print(graph_node)
