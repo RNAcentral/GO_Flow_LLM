@@ -43,6 +43,12 @@
             "target_section": "results"
         },
         {
+            "name" : "measuresmRNALevel",
+            "type" : "condition_prompt_boolean",
+            "prompt" : "Does the paper measure mRNA level, or only protein level?",
+            "target_section" : "results"
+        },
+        {
             "name" : "hasProteinLevelDecrease",
             "type" : "condition_prompt_boolean",
             "prompt" : "Does the paper report a decrease in the endogenous levels of the target protein following inhibition or addition of the miRNA?",
@@ -60,26 +66,39 @@
         },
         {
             "name" : "validated_binding_only",
-            "type" : "terminal_full"
+            "type" : "terminal_full",
+            "annotation": "GO:0035195",
+            "detector": "target"
         },
         {
             "name" : "validated_binding_plus_destabilisation",
-            "type" : "terminal_full"
+            "type" : "terminal_full",
+            "annotation": "GO:0035279",
+            "detector": "target"
         },
         {
             "name" : "validated_binding_plus_trans_inhibition",
-            "type" : "terminal_full"
+            "type" : "terminal_full",
+            "annotation": "GO:0035278",
+            "detector": "target"
         },
         {
             "name" : "validated_binding_plus_decreased_expression",
-            "type" : "terminal_bp_only",
-            "additionalNodes": ["hasProteinLevelDecrease", "hasmRNALevelDecrease"]
+            "type" : "terminal_conditional",
+            "additionalNodes": ["measuresmRNALevel","hasProteinLevelDecrease", "hasmRNALevelDecrease"],
+            "detector": "target",
+            "annotation_map": {
+                "GO:0035195": [0,1,0],
+                "GO:0035278": [1,0,1],
+                "GO:0035279": [1,1,0]
+            }
         }
     ],
     "detectors" : [
         {
+            "name": "target",
             "type" : "AE",
-            "prompt": ""
+            "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
         }
     ]
 }
