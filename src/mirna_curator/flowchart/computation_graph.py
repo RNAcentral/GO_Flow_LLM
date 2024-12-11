@@ -111,14 +111,9 @@ class ComputationGraph:
             )
             node_result = llm['answer'] == "yes"
 
-            print(node_result)
+            
+            ## Move to the next node...
             graph_node = graph_node.transitions[node_result]
-            print(graph_node)
-
-            print(article.sections.keys())
-            print(prompt)
             node_idx += 1
-            if node_idx == 3:
-                break
 
         pass
