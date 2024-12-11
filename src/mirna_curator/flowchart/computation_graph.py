@@ -76,10 +76,13 @@ class ComputationGraph:
         graph_node = self._nodes[self.start_node.name]
 
         node_idx = 0
+        visited_nodes = []
+        visit_results = []
         while graph_node.node_type == "internal":
             prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
             )[0]
+            visited_nodes.append(graph_node.name)
 
             ## see if we already have the target section loaded - this should speed things up provided we can reuse the context
             if not prompt.target_section in self.loaded_sections:
@@ -110,10 +113,13 @@ class ComputationGraph:
                 article.sections[target_section_name], prompt.prompt
             )
             node_result = llm['answer'] == "yes"
+            visit_results.append(node_result)
 
             
             ## Move to the next node...
             graph_node = graph_node.transitions[node_result]
             node_idx += 1
 
+        print(visited_nodes)
+        print(visit_results)
         pass
