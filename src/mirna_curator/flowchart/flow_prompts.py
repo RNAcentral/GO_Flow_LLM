@@ -9,6 +9,7 @@ class Prompt(BaseModel):
         "terminal_short_circuit",
         "terminal_full",
         "terminal_bp_only",
+        "terminal_conditional",
     ]
     prompt: str = ""
     target_section: Optional[str] = None
