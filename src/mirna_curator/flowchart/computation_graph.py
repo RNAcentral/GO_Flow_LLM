@@ -72,7 +72,7 @@ class ComputationGraph:
 
         self.start_node = self._nodes[flowchart.startNode]
 
-    def execute_graph(self, llm: Model, article: Article, prompts: CurationPrompts):
+    def execute_graph(self, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
         graph_node = self._nodes[self.start_node.name]
 
         node_idx = 0
@@ -110,7 +110,7 @@ class ComputationGraph:
 
             ## Now we load a section to the context only once, we have to get the node result here.
             llm += graph_node.function(
-                article.sections[target_section_name], prompt.prompt
+                article.sections[target_section_name], prompt.prompt, rna_id
             )
             node_result = llm['answer'] == "yes"
             visit_results.append(node_result)
@@ -124,5 +124,5 @@ class ComputationGraph:
 
         print(visited_nodes)
         print(visit_results)
-        print(llm)
+        # print(llm)
         pass

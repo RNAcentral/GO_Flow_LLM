@@ -15,6 +15,7 @@ def prompted_flowchart_step_bool(
     llm: guidance.models.Model,
     article_text: str,
     step_prompt: str,
+    rna_id: str,
     temperature_reasoning: ty.Optional[float] = 0.4,
     temperature_selection: ty.Optional[float] = 0.1,
 ) -> guidance.models.Model:
@@ -26,13 +27,13 @@ def prompted_flowchart_step_bool(
     with user():
         llm += f"You will be asked a yes/no question about the following text: \n{article_text}\n\n"
 
-        llm += f"Question: {step_prompt}\n"
+        llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += "Explain your reasoning step by step, and answer yes or no"
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=512), temperature_reasoning)
+            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>"]), temperature_reasoning)
             + "\n"
         )
 

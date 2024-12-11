@@ -32,7 +32,7 @@ def main():
 
     graph = ComputationGraph(cf)
 
-    graph.execute_graph(llm, article, prompts)
+    graph.execute_graph(llm, article, "miR-10a", prompts)
     pass
 
 
