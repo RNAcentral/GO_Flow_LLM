@@ -13,7 +13,7 @@ def main():
     # )
 
     llm = get_model(
-        "afg1/phi-3.1-medium", chat_template="phi3-med", quantization="q4_k_m"
+        "bartowski/Phi-3-medium-128k-instruct-GGUF", chat_template="phi3-med", quantization="q4_k_m"
     )
 
     # abstract = abstracts[0]
@@ -25,6 +25,7 @@ def main():
     # print(pmcids[0])
 
     article = fetch.article("PMC4113387")
+
 
     cf = curation.CurationFlowchart.parse_file("mirna_curation_flowchart.json")
     prompts = flow_prompts.CurationPrompts.parse_file("mirna_curation_prompts.json")
