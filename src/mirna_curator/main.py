@@ -1,4 +1,4 @@
-from mirna_curator.apis import litscan
+# from mirna_curator.apis import litscan
 from mirna_curator.model.llm import get_model
 from mirna_curator.llm_functions.abstract_filtering import assess_abstract
 from mirna_curator.flowchart import curation, flow_prompts
