@@ -45,12 +45,15 @@ def lookup_rnac_names(rna_id):
     rnacentral_ids = rnacentral_ids.filter(pl.col("source").is_in(["MIRBASE"]))
     urs, taxid = rna_id.split('_')
     rnc_data = rnacentral_ids.filter((pl.col("urs") == urs) & (pl.col("taxid") == int(taxid))).collect()
-    mirbase_id = rnc_data.get_column("external_id").to_list()[0]
-    alt_id = rnc_data.get_column("synonym").to_list()[0]
-    short_alt = "-".join(alt_id.split("-")[1:3])
-
-    return f"{mirbase_id}|{alt_id}|{short_alt}"
-
+    if len(rnc_data) == 0:
+        id_string = rna_id
+    else:
+        mirbase_id = rnc_data.get_column("external_id").to_list()[0]
+        alt_id = rnc_data.get_column("synonym").to_list()[0]
+        short_alt = "-".join(alt_id.split("-")[1:3])
+        id_string = f"{mirbase_id}|{alt_id}|{short_alt}"
+    
+    return id_string
 
 def expand_extension(ext):
     if ext is None:
