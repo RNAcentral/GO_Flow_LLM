@@ -24,7 +24,7 @@ def main():
 
     # print(pmcids[0])
 
-    article = fetch.article("PMC4113387")
+    article = fetch.article("PMC2760133")
 
 
     cf = curation.CurationFlowchart.parse_file("mirna_curation_flowchart.json")
@@ -32,7 +32,7 @@ def main():
 
     graph = ComputationGraph(cf)
 
-    graph.execute_graph(llm, article, "miR-10a", prompts)
+    graph.execute_graph(llm, article, "let-7c", prompts)
     pass
 
 
