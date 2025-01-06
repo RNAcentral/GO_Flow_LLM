@@ -4,6 +4,7 @@ import requests
 from sklearn.model_selection import train_test_split
 from functools import lru_cache
 from pathlib import Path
+from epmc_xml import fetch
 
 def is_open_access(pmcid):
     url = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextXML"
@@ -11,6 +12,23 @@ def is_open_access(pmcid):
     paper_url = url.format(pmcid=pmcid)
     r = requests.get(paper_url)
     return r.status_code == 200
+
+@lru_cache
+def _get_article(pmcid):
+    return fetch.article(pmcid)
+
+def search_protein_id(args):
+    pmcid, gene_id = args
+    regex = re.compile(f".*{gene_id}.*")
+    sect = "discussion"
+    article = _get_article(pmcid)
+    section_text = article.get_sections()[sect]
+    section_paragraphs = section_text.strip().split(" ")
+    mentioning_sentences = []
+    for para in section_paragraphs:
+        if regex.search(para) is not None:
+            mentioning_sentences.append(para)
+    return mentioning_sentences
 
 @lru_cache
 def lookup_rnac_names(rna_id):
