@@ -107,6 +107,8 @@ class ComputationGraph:
                         target_section_name = list(article.sections.keys())[
                             check_subtitles.index(True)
                         ]
+                else:
+                    target_section_name = prompt.target_section
 
             ## Now we load a section to the context only once, we have to get the node result here.
             if target_section_name in self.loaded_sections:
