@@ -41,7 +41,7 @@ def search_protein_id(args):
 
 @lru_cache
 def lookup_rnac_names(rna_id):
-    rnacentral_ids = pl.scan_csv("id_mapping.tsv", separator='\t', has_header=False, new_columns=["urs", "source", "external_id", "taxid", "type", "synonym"])
+    rnacentral_ids = pl.scan_csv("data/id_mapping.tsv", separator='\t', has_header=False, new_columns=["urs", "source", "external_id", "taxid", "type", "synonym"])
     rnacentral_ids = rnacentral_ids.filter(pl.col("source").is_in(["MIRBASE"]))
     urs, taxid = rna_id.split('_')
     rnc_data = rnacentral_ids.filter((pl.col("urs") == urs) & (pl.col("taxid") == int(taxid))).collect()
@@ -219,12 +219,12 @@ def assign_classes(df):
 
     
 
-raw = pl.read_csv("bhf_ucl_annotations.tsv", separator='\t', has_header=False, columns=[1,2,3,4,10], new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"])
+raw = pl.read_csv("data/bhf_ucl_annotations.tsv", separator='\t', has_header=False, columns=[1,2,3,4,10], new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"])
 raw = raw.with_columns(pl.col("pmid").str.split(':').list.last())
 raw = raw.with_columns(res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct)).unnest("res")
 
 pmid_pmcid_mapping = pl.scan_csv(
-        "PMID_PMCID_DOI.csv",
+        "data/PMID_PMCID_DOI.csv",
     )
 
 raw = raw.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
@@ -233,9 +233,9 @@ targets = raw.unique("pmid").explode("targets").filter(pl.col("targets").is_not_
 
 cached_targets = True
 if cached_targets and Path("cached_target_data.parquet").exists():
-    targets = pl.read_parquet("cached_target_data.parquet")
+    targets = pl.read_parquet("data/cached_target_data.parquet")
 else:
-    uniprot_ids = pl.read_csv("idmapping_uniprot.tsv", separator='\t')
+    uniprot_ids = pl.read_csv("data/idmapping_uniprot.tsv", separator='\t')
     targets = targets.join(uniprot_ids, left_on="targets", right_on="Entry")
     targets = targets.with_columns(pl.col("Gene Names").str.split(' ')).explode("Gene Names")
     targets = targets.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
@@ -243,22 +243,22 @@ else:
         open_access=pl.col("PMCID").map_elements(is_open_access, return_dtype=pl.Boolean)
     ).filter(pl.col("open_access"))
     targets = targets.with_columns(pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String))
-    targets.write_parquet("cached_target_data.parquet")
+    targets.write_parquet("data/cached_target_data.parquet")
 
 targets = targets.with_columns(pl.col("rna_id").str.split("|")).explode("rna_id")
 
-if not Path("paper_and_targets.csv").exists():
+if not Path("data/paper_and_targets.csv").exists():
     paper_searching = targets.group_by("PMCID").agg(pl.col("Gene Names").unique(), pl.col("rna_id").unique()).sort(by="PMCID")
     paper_searching = paper_searching.with_columns(res = pl.struct("PMCID", "Gene Names", "rna_id").map_elements(identify_used_ids, return_dtype=pl.Struct))
     paper_searching = paper_searching.unnest("res")
-    paper_searching.select(["PMCID", "used_protein_id", "used_rna_id"]).write_csv("paper_and_targets.csv")
+    paper_searching.select(["PMCID", "used_protein_id", "used_rna_id"]).write_csv("data/paper_and_targets.csv")
     # After writing, manually check and fix anything missing
 else:
-    paper_searching = pl.read_csv("paper_and_targets.csv")
+    paper_searching = pl.read_csv("data/paper_and_targets.csv")
 
 
 enriched_target_data = raw.select(["pmid","PMCID", "go_term", "extension", "qualifier"]).join(paper_searching, on="PMCID", how="inner")
 
 classification_data = pl.DataFrame(assign_classes(enriched_target_data))#.filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
-classification_data.write_parquet("paper_classification_data.parquet")
+classification_data.write_parquet("data/paper_classification_data.parquet")
 print(classification_data)
