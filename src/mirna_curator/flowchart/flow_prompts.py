@@ -23,4 +23,4 @@ class Detector(BaseModel):
 
 class CurationPrompts(BaseModel):
     prompts: List[Prompt]
-    detectors: List[Detector]
+    detector: Detector
