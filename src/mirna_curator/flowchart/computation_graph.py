@@ -120,7 +120,6 @@ class ComputationGraph:
                 self.loaded_sections.append(target_section_name)
             node_result = llm['answer'] == "yes"
             visit_results.append(node_result)
-            print(llm)
 
             
             ## Move to the next node...
@@ -131,5 +130,4 @@ class ComputationGraph:
 
         print(visited_nodes)
         print(visit_results)
-        print(llm)
         pass
