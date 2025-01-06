@@ -257,26 +257,8 @@ else:
     paper_searching = pl.read_csv("paper_and_targets.csv")
 
 
-print(targets)
+enriched_target_data = raw.select(["pmid","PMCID", "go_term", "extension", "qualifier"]).join(paper_searching, on="PMCID", how="inner")
 
-classification_data = pl.DataFrame(assign_classes(raw))#.filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
-## Not sure why this is needed...
-classification_data =  classification_data.unique()
-
-pmid_pmcid_mapping = pl.scan_csv(
-    "PMID_PMCID_DOI.csv",
-)
-
-pmid_go_pmcid = classification_data.lazy().join(
-    pmid_pmcid_mapping, left_on="pmid", right_on="PMID"
-).filter(pl.col("PMCID").is_not_null())
-
-pmid_go_pmcid = pmid_go_pmcid.with_columns(
-    open_access=pl.col("PMCID").map_elements(is_open_access, return_dtype=pl.Boolean)
-)
-
-
-miRNA_articles_oa = pmid_go_pmcid.filter(pl.col("open_access")).collect()
-miRNA_articles_oa.write_parquet("miRNA_articles_oa_new.parquet")
-
-print(miRNA_articles_oa)
+classification_data = pl.DataFrame(assign_classes(enriched_target_data))#.filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
+classification_data.write_parquet("paper_classification_data.parquet")
+print(classification_data)
