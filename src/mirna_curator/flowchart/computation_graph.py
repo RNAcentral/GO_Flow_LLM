@@ -109,11 +109,18 @@ class ComputationGraph:
                         ]
 
             ## Now we load a section to the context only once, we have to get the node result here.
-            llm += graph_node.function(
-                article.sections[target_section_name], prompt.prompt, rna_id
-            )
+            if target_section_name in self.loaded_sections:
+                llm += graph_node.function(
+                    "" , prompt.prompt, rna_id
+                )    
+            else:
+                llm += graph_node.function(
+                    article.sections[target_section_name], prompt.prompt, rna_id
+                )
+                self.loaded_sections.append(target_section_name)
             node_result = llm['answer'] == "yes"
             visit_results.append(node_result)
+            print(llm)
 
             
             ## Move to the next node...

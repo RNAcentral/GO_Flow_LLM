@@ -25,8 +25,10 @@ def prompted_flowchart_step_bool(
     """
 
     with user():
-        llm += f"You will be asked a yes/no question about the following text: \n{article_text}\n\n"
-
+        if len(article_text) > 0:
+            llm += f"You will be asked a yes/no question about the following text: \n{article_text}\n\n"
+        else:
+            llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += "Explain your reasoning step by step, and answer yes or no"
