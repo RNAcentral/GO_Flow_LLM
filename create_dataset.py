@@ -5,7 +5,8 @@ from sklearn.model_selection import train_test_split
 from functools import lru_cache
 from pathlib import Path
 from epmc_xml import fetch
-
+from ratelimit.exception import RateLimitException
+import time
 def is_open_access(pmcid):
     url = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextXML"
 
@@ -15,7 +16,15 @@ def is_open_access(pmcid):
 
 @lru_cache
 def _get_article(pmcid):
-    return fetch.article(pmcid)
+    try:
+        art = fetch.article(pmcid)
+        time.sleep(0.1)
+    except RateLimitException:
+        print("Ratelimit exceeded, having a 5 second nap")
+        time.sleep(5)
+        art = fetch.article(pmcid)
+
+    return art
 
 def search_protein_id(args):
     pmcid, gene_id = args
