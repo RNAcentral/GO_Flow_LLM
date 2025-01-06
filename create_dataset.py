@@ -227,6 +227,7 @@ pmid_pmcid_mapping = pl.scan_csv(
         "PMID_PMCID_DOI.csv",
     )
 
+raw = raw.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
 
 targets = raw.unique("pmid").explode("targets").filter(pl.col("targets").is_not_null())
 
