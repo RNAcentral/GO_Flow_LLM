@@ -40,12 +40,9 @@ def prompted_flowchart_step_bool(
         )
 
     with assistant():
-        llm += "So the final answer is " + with_temperature(
-            select(["yes", "no"], name="answer"), temperature_selection
+        llm += "So the final answer is: " + with_temperature(
+            select(["Yes", "No"], name="answer"), temperature_selection
         )
-
-
-    # print(llm)
 
     return llm
 
