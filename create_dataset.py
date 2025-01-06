@@ -222,7 +222,11 @@ def assign_classes(df):
 raw = pl.read_csv("bhf_ucl_annotations.tsv", separator='\t', has_header=False, columns=[1,2,3,4,10], new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"])
 raw = raw.with_columns(pl.col("pmid").str.split(':').list.last())
 raw = raw.with_columns(res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct)).unnest("res")
-# raw = raw.with_columns(rna_names=pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String))
+
+pmid_pmcid_mapping = pl.scan_csv(
+        "PMID_PMCID_DOI.csv",
+    )
+
 
 targets = raw.unique("pmid").explode("targets").filter(pl.col("targets").is_not_null())
 
@@ -233,11 +237,6 @@ else:
     uniprot_ids = pl.read_csv("idmapping_uniprot.tsv", separator='\t')
     targets = targets.join(uniprot_ids, left_on="targets", right_on="Entry")
     targets = targets.with_columns(pl.col("Gene Names").str.split(' ')).explode("Gene Names")
-    
-
-    pmid_pmcid_mapping = pl.scan_csv(
-        "PMID_PMCID_DOI.csv",
-    )
     targets = targets.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
     targets = targets.with_columns(
         open_access=pl.col("PMCID").map_elements(is_open_access, return_dtype=pl.Boolean)
