@@ -231,6 +231,7 @@ else:
     uniprot_ids = pl.read_csv("idmapping_uniprot.tsv", separator='\t')
     targets = targets.join(uniprot_ids, left_on="targets", right_on="Entry")
     targets = targets.with_columns(pl.col("Gene Names").str.split(' ')).explode("Gene Names")
+    
 
     pmid_pmcid_mapping = pl.scan_csv(
         "PMID_PMCID_DOI.csv",
@@ -239,6 +240,7 @@ else:
     targets = targets.with_columns(
         open_access=pl.col("PMCID").map_elements(is_open_access, return_dtype=pl.Boolean)
     ).filter(pl.col("open_access"))
+    targets = targets.with_columns(pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String))
     targets.write_parquet("cached_target_data.parquet")
 
 
