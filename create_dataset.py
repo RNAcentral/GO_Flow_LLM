@@ -163,15 +163,17 @@ def assign_classes(df):
     """
     Loop over the dataframe, look at what is known about a paper's annotations and make a classification on that basis
     """
-    pmids_done = []
+    pmcids_done = []
     r_cols = []
 
     for row in df.iter_rows(named=True):
-        if row['pmid'] in pmids_done:
+        if row['PMCID'] in pmcids_done:
             continue
-        
+        rdata = {}
+        rdata["protein_id"] = row["used_protein_id"]
+        rdata["rna_id"] = row["used_rna_id"]
         if row['go_term'] == "GO:0035195":
-            rdata = expand_extension(row["extension"])
+            # rdata = expand_extension(row["extension"])
             paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
@@ -181,11 +183,11 @@ def assign_classes(df):
                 annotation_class = 4
             rdata["class"] = annotation_class
             rdata['go_term'] = row['go_term']
-            pmids_done.append(row['pmid'])
-            rdata["pmid"] = row['pmid']
+            pmcids_done.append(row['PMCID'])
+            rdata["PMCID"] = row['PMCID']
             r_cols.append(rdata)
         elif row['go_term'] == "GO:0035278":
-            rdata = expand_extension(row["extension"])
+            # rdata = expand_extension(row["extension"])
             paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
@@ -195,22 +197,22 @@ def assign_classes(df):
                 annotation_class = 4
             rdata["class"] = annotation_class
             rdata['go_term'] = row['go_term']
-            pmids_done.append(row['pmid'])
-            rdata["pmid"] = row['pmid']
+            pmcids_done.append(row['PMCID'])
+            rdata["PMCID"] = row['PMCID']
             r_cols.append(rdata)
         elif row['go_term'] == "GO:0035279":
-            rdata = expand_extension(row["extension"])
+            # rdata = expand_extension(row["extension"])
             paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
             if 'enables' in qualifiers and 'GO:1903231' in go_terms:
                 annotation_class = 2
             else:
-                annotation_class = 4
+                annotation_class = 4 
             rdata["class"] = annotation_class
             rdata['go_term'] = row['go_term']
-            pmids_done.append(row['pmid'])
-            rdata["pmid"] = row['pmid']
+            pmcids_done.append(row['pmid'])
+            rdata["PMCID"] = row['PMCID']
         
             r_cols.append(rdata)
     return r_cols
