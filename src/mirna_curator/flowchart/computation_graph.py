@@ -41,7 +41,7 @@ class ComputationGraph:
                 node_type = "internal"
             elif flow_node_props.type == NodeType("terminal"):
                 function = prompted_flowchart_terminal
-                prompt = None
+                prompt = flow_node_props.data.terminal
                 node_type = "terminal"
             ## Initialise node with empty transitions dict
             this_node = ComputationNode(
@@ -126,6 +126,24 @@ class ComputationGraph:
             graph_node = graph_node.transitions[node_result]
             if graph_node.node_type == "terminal":
                 visited_nodes.append(graph_node.name)
+                prompt = list(
+                filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
+                print(prompt)
+
+                detector = list(filter(lambda d: d.name == prompt.detector, prompts.detectors))[0]
+                ## Now we load a section to the context only once, we have to get the node result here.
+                if target_section_name in self.loaded_sections:
+                    llm += graph_node.function(
+                        "" , detector.prompt, rna_id
+                    )    
+                else:
+                    llm += graph_node.function(
+                        article.sections[target_section_name], detector.prompt, rna_id
+                    )
+                    self.loaded_sections.append(target_section_name)
+                print(graph_node)
+
+
             node_idx += 1
 
         print(visited_nodes)
