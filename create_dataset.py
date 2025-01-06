@@ -2,6 +2,8 @@ import polars as pl
 import re
 import requests
 from sklearn.model_selection import train_test_split
+from functools import lru_cache
+from pathlib import Path
 
 def is_open_access(pmcid):
     url = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextXML"
@@ -10,6 +12,17 @@ def is_open_access(pmcid):
     r = requests.get(paper_url)
     return r.status_code == 200
 
+@lru_cache
+def lookup_rnac_names(rna_id):
+    rnacentral_ids = pl.scan_csv("id_mapping.tsv", separator='\t', has_header=False, new_columns=["urs", "source", "external_id", "taxid", "type", "synonym"])
+    rnacentral_ids = rnacentral_ids.filter(pl.col("source").is_in(["MIRBASE"]))
+    urs, taxid = rna_id.split('_')
+    rnc_data = rnacentral_ids.filter((pl.col("urs") == urs) & (pl.col("taxid") == int(taxid))).collect()
+    mirbase_id = rnc_data.get_column("external_id").to_list()[0]
+    alt_id = rnc_data.get_column("synonym").to_list()[0]
+    short_alt = "-".join(alt_id.split("-")[1:3])
+
+    return f"{mirbase_id}|{alt_id}|{short_alt}"
 
 
 def expand_extension(ext):
