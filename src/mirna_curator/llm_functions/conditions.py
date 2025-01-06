@@ -49,9 +49,35 @@ def prompted_flowchart_step_bool(
 
     return llm
 
-def prompted_flowchart_terminal():
+def prompted_flowchart_terminal(llm: guidance.models.Model,
+                                article_text: str,
+                                detector_prompt: str,
+                                rna_id: str,
+                                temperature_reasoning: ty.Optional[float] = 0.4,
+                                temperature_selection: ty.Optional[float] = 0.1,):
     """
     Use the LLM to find the targets and AEs for the GO annotation
 
     """
+    with user():
+        if len(article_text) > 0:
+            llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
+        else:
+            llm += "\n\n"
+        
+        llm += (f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
+                "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
+        )
+    with assistant():
+        llm += ( "Reasoning: " 
+            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>"]), temperature_reasoning)
+            + "\n"
+        )
+    with assistant():
+        llm += "Protein name: " + with_temperature(
+            gen(max_tokens=5, name="protein_name"), temperature_selection
+        )
+
+    return llm
+
     pass
