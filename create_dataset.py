@@ -249,21 +249,14 @@ targets = targets.with_columns(pl.col("rna_id").str.split("|")).explode("rna_id"
 
 if not Path("paper_and_targets.csv").exists():
     paper_searching = targets.group_by("PMCID").agg(pl.col("Gene Names").unique(), pl.col("rna_id").unique()).sort(by="PMCID")
-    pl.Config.set_tbl_rows(1000)
-    print(targets)
-    print(paper_searching)
-
-    genes = paper_searching.filter(pl.col("PMCID") == "PMC3735565").get_column("Gene Names").to_list()[0]
-    rnas  = paper_searching.filter(pl.col("PMCID") == "PMC3735565").get_column("rna_id").to_list()[0]
-
     paper_searching = paper_searching.with_columns(res = pl.struct("PMCID", "Gene Names", "rna_id").map_elements(identify_used_ids, return_dtype=pl.Struct))
-
     paper_searching = paper_searching.unnest("res")
     paper_searching.select(["PMCID", "used_protein_id", "used_rna_id"]).write_csv("paper_and_targets.csv")
+    # After writing, manually check and fix anything missing
 else:
     paper_searching = pl.read_csv("paper_and_targets.csv")
 
-print(paper_searching)
+
 print(targets)
 
 classification_data = pl.DataFrame(assign_classes(raw))#.filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
