@@ -16,6 +16,7 @@ class Prompt(BaseModel):
 
 
 class Detector(BaseModel):
+    name: str
     type: Literal["AE"]
     prompt: str = ""
 
