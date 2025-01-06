@@ -55,6 +55,63 @@ def lookup_rnac_names(rna_id):
     
     return id_string
 
+
+def identify_used_ids(args):
+    print(args)
+    pmcid = args['PMCID']
+    genes = args['Gene Names']
+    rnas = args["rna_id"]
+    
+    article = _get_article(pmcid)
+    full_text = "\n\n".join(list(article.get_sections().values()))
+    sentences = full_text.split('.')
+
+    used_rna_id = None
+    used_prot_id = None
+    if len(rnas) == 1:
+        ## Then the URS was unresolved, we should pass 
+        ## it back as-is for later manual fixing
+        used_rna_id = rnas[0]
+    else:
+        # Find the most mentioned RNA ID:
+        rna_mentions = {rna: 0 for rna in rnas}
+        for sentence in sentences:
+            for rna in rnas:
+                r = re.search(f".*{rna}.*", sentence, re.IGNORECASE)
+                if r is not None:
+                    rna_mentions[rna] += 1
+
+    if genes[0] is None:
+        used_prot_id = "N/A"
+    else:
+    # Find the most mentioned protein:
+        prot_mentions = {prot: 0 for prot in genes}
+        for sentence in sentences:
+            for prot in genes:
+                r = re.search(f".*{prot}.*", sentence, re.IGNORECASE)
+                if r is not None:
+                    prot_mentions[prot] += 1
+                    # print(sentence)
+    ## Select the most specific RNA Identifier we can
+    ## based on its length
+
+    def select_id(mentions):
+        selected_id = None
+        for k in sorted(mentions.keys(), key=lambda x: len(x), reverse=True):
+            ## Selects the longest key that has nonzero mentions
+            if mentions[k] > 0:
+                selected_id = k
+                break
+        ## Returns none if none of the ids was found
+        return selected_id
+
+    if used_rna_id is None:
+        used_rna_id = select_id(rna_mentions)
+    if used_prot_id is None:
+        used_prot_id = select_id(prot_mentions)
+
+    return {"used_protein_id": used_prot_id, "used_rna_id": used_rna_id}
+
 def expand_extension(ext):
     if ext is None:
         return {
