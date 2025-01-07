@@ -123,12 +123,12 @@ def main(config: Optional[str] = None,
 
     curation_input = pl.read_parquet(input_data)
     logger.info(f"Loaded input data from {input_data}")
-    logger.info(f"Processing {curation_input.height} papers")
+    logger.info(f"Processing up to {curation_input.height} papers")
     curation_output = []
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
-        article = fetch(row["PMCID"])
+        article = fetch.article(row["PMCID"])
         curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row.rna_id} - Curation Result: {curation_result}")
         curation_output.append({"PMCID": row["PMCID"], "rna_id": row["rna_id"], "curation_result": curation_result})
