@@ -14,12 +14,22 @@ from mirna_curator.llm_functions.conditions import (
 )
 
 def find_section_heading(llm, target, possibles):
+    augmentations = {
+        "methods": ("Bear in mind this section is likely to contain details on the experimental "
+                    "techniques used."
+        ),
+        "results": ("Bear in mind this section is likely to contain the results of the experiments, "
+                    "but may also contain the discussion of those results."
+        ),
+    }
     with user():
         llm += (
             f"We are looking for the closest section heading to '{target}' from "
             f"the following possbilities: {','.join(possibles)}. "
             "Which of the available headings most likely to contain the information "
-            f"we would expect from a section titled '{target}'?"
+            f"we would expect from a section titled '{target}'? "
+            f"{augmentations.get(target, '')}"
+
         )
     with assistant():
         llm += select(
@@ -169,4 +179,5 @@ class ComputationGraph:
 
         }
         trace = str(llm)
+        self.loaded_sections = []
         return trace, result
