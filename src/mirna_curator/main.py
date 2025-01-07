@@ -10,6 +10,7 @@ import logging
 from functools import wraps
 from typing import Optional, Callable
 import json
+import polars as pl
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -97,8 +98,6 @@ def main(config: Optional[str] = None,
         context_length=context_length,
     )
 
-    article = fetch.article("PMC2760133")
-
     try:
         cur_flowchart_string = open(flowchart, "r").read()
         cf = curation.CurationFlowchart.model_validate_json(cur_flowchart_string)
@@ -116,9 +115,18 @@ def main(config: Optional[str] = None,
 
     graph = ComputationGraph(cf)
 
-    curation_result = graph.execute_graph(llm, article, "let-7c", prompt_data)
-    print(curation_result)
-    pass
+    curation_input = pl.read_parquet(input_data)
+    curation_output = []
+    for i, row in curation_input.iterrows(named=True):
+        article = fetch(row["pmcid"])
+        curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
+        logger.info(f"RNA ID: {row.rna_id} - Curation Result: {curation_result}")
+        curation_output.append({"pmcid": row["pmcid"], "rna_id": row["rna_id"], "curation_result": curation_result})
+  
+
+    curation_output_df = pl.DataFrame(curation_output)
+    curation_output_df.write_parquet(output_data)
+
 
 
 if __name__ == "__main__":
