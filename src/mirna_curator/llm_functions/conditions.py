@@ -31,7 +31,7 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += "Explain your reasoning step by step, and answer yes or no"
+        llm += "Explain your reasoning step by step, but do not give the final answer yet.\n"
 
     with assistant():
         llm += (
@@ -40,7 +40,7 @@ def prompted_flowchart_step_bool(
         )
 
     with assistant():
-        llm += f"So the final answer to the question '{step_prompt}', based on my reasoning above is: " + with_temperature(
+        llm += f"Therefore, the final answer to the question '{step_prompt}', based on my reasoning above is: " + with_temperature(
             select(["Yes", "No"], name="answer"), temperature_selection
         )
 
