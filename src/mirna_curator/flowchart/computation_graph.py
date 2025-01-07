@@ -1,7 +1,7 @@
 import typing as ty
 from dataclasses import dataclass
 from guidance.models._model import Model
-from guidance import user, assistant, select
+from guidance import user, assistant, select, gen
 from epmc_xml.article import Article
 
 # from pydantic import BaseModel
@@ -29,9 +29,10 @@ def find_section_heading(llm, target, possibles):
             "Which of the available headings most likely to contain the information "
             f"we would expect from a section titled '{target}'? "
             f"{augmentations.get(target, '')}"
-
         )
+        llm += "\n think about it briefly, then make a selection.\n"
     with assistant():
+        llm += f"The section heading {target} implies " + gen() + " therefore the most likely section heading is: "
         llm += select(
             possibles, name="target_section_name"
         )
