@@ -161,4 +161,5 @@ class ComputationGraph:
             "aes": aes
 
         }
-        return result
+        trace = str(llm)
+        return trace, result
