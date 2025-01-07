@@ -80,6 +80,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option("--chat_template", help="The chat template for the model")
 @click.option("--input_data", help="The input data (PMCID and detected RNA ID) for the process")
 @click.option("--output_data", help="The output data (curation result) for the process")
+@click.option("--max_papers", help="The maximum number of papers to process")
 @mutually_exclusive_with_config()
 def main(config: Optional[str] = None,
          model_path: Optional[str] = None,
@@ -89,7 +90,8 @@ def main(config: Optional[str] = None,
          quantization: Optional[str] = None,
          chat_template: Optional[str] = None,
          input_data: Optional[str] = None,
-         output_data: Optional[str] = None):
+         output_data: Optional[str] = None,
+         max_papers: Optional[int] = None):
     
     llm = get_model(
         model_path,
@@ -118,6 +120,8 @@ def main(config: Optional[str] = None,
     curation_input = pl.read_parquet(input_data)
     curation_output = []
     for i, row in curation_input.iterrows(named=True):
+        if max_papers is not None and i >= max_papers:
+            break
         article = fetch(row["pmcid"])
         curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row.rna_id} - Curation Result: {curation_result}")
