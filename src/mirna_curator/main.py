@@ -99,6 +99,7 @@ def main(config: Optional[str] = None,
         quantization=quantization,
         context_length=context_length,
     )
+    logger.info(f"Loaded model from {model_path}")
 
     try:
         cur_flowchart_string = open(flowchart, "r").read()
@@ -107,6 +108,7 @@ def main(config: Optional[str] = None,
         logger.fatal(e)
         logger.fatal("Error loading flowchart, aborting")
         exit()
+    logger.info(f"Loaded flowchart from {flowchart}")
     try:
         prompt_string = open(prompts, "r").read()
         prompt_data = flow_prompts.CurationPrompts.model_validate_json(prompt_string)
@@ -114,10 +116,14 @@ def main(config: Optional[str] = None,
         logger.fatal(e)
         logger.fatal("Error loading prompts, aborting")
         exit()
+    logger.info(f"Loaded prompts from {prompts}")
 
     graph = ComputationGraph(cf)
+    logger.info("Constructed computation graph")
 
     curation_input = pl.read_parquet(input_data)
+    logger.info(f"Loaded input data from {input_data}")
+    logger.info(f"Processing {curation_input.height} papers")
     curation_output = []
     for i, row in curation_input.iter_rows(named=True):
         if max_papers is not None and i >= max_papers:
