@@ -125,7 +125,7 @@ def main(config: Optional[str] = None,
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing {curation_input.height} papers")
     curation_output = []
-    for i, row in curation_input.iter_rows(named=True):
+    for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
         article = fetch(row["pmcid"])
