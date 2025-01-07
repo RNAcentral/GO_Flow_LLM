@@ -72,7 +72,7 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
         )
     with assistant():
         llm += "Protein name: " + with_temperature(
-            gen(max_tokens=5, name="protein_name"), temperature_selection
+            gen(max_tokens=10, name="protein_name"), temperature_selection
         )
 
     return llm
