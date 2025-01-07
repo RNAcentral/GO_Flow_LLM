@@ -131,6 +131,8 @@ class ComputationGraph:
                 prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
                 print(prompt)
+                if prompt.name == "no_annotation":
+                    break
 
                 detector = list(filter(lambda d: d.name == prompt.detector, prompts.detectors))[0]
                 ## Now we load a section to the context only once, we have to get the node result here.
@@ -150,4 +152,5 @@ class ComputationGraph:
 
         print(visited_nodes)
         print(visit_results)
+        print(llm)
         pass
