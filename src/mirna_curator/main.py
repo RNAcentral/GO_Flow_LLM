@@ -119,7 +119,7 @@ def main(config: Optional[str] = None,
 
     curation_input = pl.read_parquet(input_data)
     curation_output = []
-    for i, row in curation_input.iterrows(named=True):
+    for i, row in curation_input.iter_rows(named=True):
         if max_papers is not None and i >= max_papers:
             break
         article = fetch(row["pmcid"])
