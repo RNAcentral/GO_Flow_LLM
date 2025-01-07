@@ -130,7 +130,6 @@ class ComputationGraph:
                 visited_nodes.append(graph_node.name)
                 prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
-                print(prompt)
                 if prompt.name == "no_annotation":
                     break
 
