@@ -32,9 +32,11 @@ def main():
 
     graph = ComputationGraph(cf)
 
-    graph.execute_graph(llm, article, "let-7c", prompts)
+    curation_result = graph.execute_graph(llm, article, "let-7c", prompts)
+    print(curation_result)
     pass
 
 
 if __name__ == "__main__":
     main()
+# 

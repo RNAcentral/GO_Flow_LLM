@@ -131,7 +131,11 @@ class ComputationGraph:
                 prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
                 if prompt.name == "no_annotation":
+                    annotation = None
                     break
+                else:
+                    annotation = prompt.annotation
+                aes = {}
 
                 detector = list(filter(lambda d: d.name == prompt.detector, prompts.detectors))[0]
                 ## Now we load a section to the context only once, we have to get the node result here.
@@ -144,12 +148,17 @@ class ComputationGraph:
                         article.sections[target_section_name], detector.prompt, rna_id
                     )
                     self.loaded_sections.append(target_section_name)
-                print(graph_node)
+                aes[detector.name] = llm["protein_name"].strip()
+                
 
 
             node_idx += 1
 
-        print(visited_nodes)
-        print(visit_results)
-        print(llm)
-        pass
+        result = {
+            "visited_nodes": visited_nodes,
+            "visit_results": visit_results,
+            "annotation" : annotation,
+            "aes": aes
+
+        }
+        return result
