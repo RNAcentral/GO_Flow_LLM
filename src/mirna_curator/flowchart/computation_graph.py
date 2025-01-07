@@ -13,6 +13,18 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_terminal,
 )
 
+def find_section_heading(llm, target, possibles):
+    with user():
+        llm += (
+            f"We are looking for the closest section heading to {target} from "
+            f"the following possbilities: {possibles}. Which one is closest?"
+        )
+    with assistant():
+        llm += select(
+            possibles, name="target_section_name"
+        )
+    target_section_name = llm["target_section_name"]
+    return target_section_name
 
 @dataclass
 class ComputationNode:
@@ -93,17 +105,7 @@ class ComputationGraph:
                         for section_name in article.sections.keys()
                     ]
                     if not any(check_subtitles):
-                        with user():
-                            llm += (
-                                f"We are looking for the closest section heading to {prompt.target_section} from "
-                                f"the following possbilities: {article.sections.keys()}. Which one is closest?"
-                            )
-                        with assistant():
-                            llm += select(
-                                article.sections.keys(), name="target_section_name"
-                            )
-                        target_section_name = llm["target_section_name"]
-                        llm.reset()
+                        target_section_name = find_section_heading(llm, prompt.target_section, article.sections.keys())
                     else:
                         target_section_name = list(article.sections.keys())[
                             check_subtitles.index(True)
