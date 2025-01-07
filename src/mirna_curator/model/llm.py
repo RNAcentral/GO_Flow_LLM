@@ -57,9 +57,13 @@ def download_split_file(repo_id, filenames):
     expected_file_count = int(filenames[0].split("-of-")[-1].replace(".gguf", ""))
     local_filenames = []
     for remote_filename in filenames:
-        print(remote_filename)
+        remote_filepath = Path(remote_filename)
+        if len(remote_filepath.parts) > 3:
+            subdir = remote_filepath.parts[-2]
+        else:
+            subdir = None
         local_path = hf_hub_download(
-            repo_id=repo_id, filename=Path(remote_filename).name
+            repo_id=repo_id, filename=Path(remote_filename).name, subfolder=subdir
         )
         local_filenames.append(local_path)
 
@@ -121,7 +125,6 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
         logging.debug("Downloading a gguf file from hub, then loading it")
         # Search the repo in hub for gguf files
         gguf_files = fs.glob(f"{model_name}/**/*.gguf")
-
         if len(gguf_files) == 0:
             logging.error(
                 "There are no gguf files in the provided repo! Can't load anything"
@@ -169,10 +172,10 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
                     remote_filename = remote_filepath / shard_files[0]
 
                 logging.debug(
-                    "Found the right quantisation, loading %s", remote_filename
+                    "Found the right quantisation, loading %s", remote_filepath
                 )
                 model_path = hf_hub_download(
-                    repo_id=model_name, filename=remote_filename
+                    repo_id=model_name, filename=remote_filepath.name
                 )
     else:
         logging.error("Local model file does not exist, and is not a huggingface repo!")
