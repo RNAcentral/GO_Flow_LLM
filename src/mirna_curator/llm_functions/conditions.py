@@ -45,7 +45,7 @@ def prompted_flowchart_step_bool(
         )
 
     return llm
-
+@guidance
 def prompted_flowchart_terminal(llm: guidance.models.Model,
                                 article_text: str,
                                 detector_prompt: str,
