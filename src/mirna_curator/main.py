@@ -52,10 +52,10 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
             # If config file is provided, read it and update kwargs
             if config_file is not None:
                 try:
-                    with open(config_file, "r") as f:
-                        config = json.load(f)
-                    # Update kwargs with config values
-                    kwargs.update(config)
+                    with open(config_file, "r") as file_handle:
+                        config = json.load(file_handle)
+                        # Update kwargs with config values
+                        kwargs.update(config)
                 except Exception as e:
                     raise click.UsageError(f"Error reading config file: {str(e)}")
 
