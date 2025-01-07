@@ -16,8 +16,10 @@ from mirna_curator.llm_functions.conditions import (
 def find_section_heading(llm, target, possibles):
     with user():
         llm += (
-            f"We are looking for the closest section heading to {target} from "
-            f"the following possbilities: {possibles}. Which one is closest?"
+            f"We are looking for the closest section heading to '{target}' from "
+            f"the following possbilities: {','.join(possibles)}. "
+            "Which of the available headings most likely to contain the information "
+            "we would expect from a section titled '{target}'?"
         )
     with assistant():
         llm += select(
