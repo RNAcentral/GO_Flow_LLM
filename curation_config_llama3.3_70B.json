@@ -1,0 +1,10 @@
+{
+    "model_path":  "bartowski/Llama-3.3-70B-Instruct-GGUF",
+    "flowchart": "mirna_curation_flowchart.json",
+    "prompts": "mirna_curation_prompts.json",
+    "context_length": 32768,
+    "quantization": "q4_k_m",
+    "chat_template": "llama3",
+    "input_data": "development_set.parquet",
+    "output_data": "development_results.parquet"
+}
