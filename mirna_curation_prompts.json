@@ -62,7 +62,8 @@
         },
         {
             "name" : "no_annotation",
-            "type" : "terminal_short_circuit"
+            "type" : "terminal_short_circuit",
+            "annotation": ""
         },
         {
             "name" : "validated_binding_only",
