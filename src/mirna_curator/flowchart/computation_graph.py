@@ -106,7 +106,7 @@ class ComputationGraph:
                         for section_name in article.sections.keys()
                     ]
                     if not any(check_subtitles):
-                        target_section_name = find_section_heading(llm, prompt.target_section, article.sections.keys())
+                        target_section_name = find_section_heading(llm, prompt.target_section, list(article.sections.keys()))
                     else:
                         target_section_name = list(article.sections.keys())[
                             check_subtitles.index(True)
