@@ -128,10 +128,10 @@ def main(config: Optional[str] = None,
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
-        article = fetch(row["pmcid"])
+        article = fetch(row["PMCID"])
         curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row.rna_id} - Curation Result: {curation_result}")
-        curation_output.append({"pmcid": row["pmcid"], "rna_id": row["rna_id"], "curation_result": curation_result})
+        curation_output.append({"PMCID": row["PMCID"], "rna_id": row["rna_id"], "curation_result": curation_result})
   
 
     curation_output_df = pl.DataFrame(curation_output)
