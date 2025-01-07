@@ -130,7 +130,7 @@ def main(config: Optional[str] = None,
             break
         article = fetch.article(row["PMCID"])
         curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
-        logger.info(f"RNA ID: {row.rna_id} - Curation Result: {curation_result}")
+        logger.info(f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}")
         curation_output.append({"PMCID": row["PMCID"], "rna_id": row["rna_id"], "curation_result": curation_result})
   
 
