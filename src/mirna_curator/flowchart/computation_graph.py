@@ -120,7 +120,7 @@ class ComputationGraph:
                     article.sections[target_section_name], prompt.prompt, rna_id
                 )
                 self.loaded_sections.append(target_section_name)
-            node_result = llm['answer'] == "yes"
+            node_result = llm['answer'].lower() == "yes"
             visit_results.append(node_result)
 
             
