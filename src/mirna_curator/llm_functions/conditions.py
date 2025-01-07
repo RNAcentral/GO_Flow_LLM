@@ -31,11 +31,11 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += "Explain your reasoning step by step, but do not give the final answer yet.\n"
+        llm += "Explain your reasoning step by step, but do not give the final answer yet, and be concise.\n"
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>"]), temperature_reasoning)
+            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>"]), temperature_reasoning)
             + "\n"
         )
 
@@ -67,12 +67,12 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
         )
     with assistant():
         llm += ( "Reasoning: " 
-            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>"]), temperature_reasoning)
+            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>"]), temperature_reasoning)
             + "\n"
         )
     with assistant():
         llm += "Protein name: " + with_temperature(
-            gen(max_tokens=10, name="protein_name"), temperature_selection
+            gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         )
 
     return llm
