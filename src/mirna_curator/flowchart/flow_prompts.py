@@ -14,6 +14,7 @@ class Prompt(BaseModel):
     prompt: str = ""
     target_section: Optional[str] = None
     detector: Optional[str] = None
+    annotation: Optional[str] = None
 
 
 class Detector(BaseModel):
