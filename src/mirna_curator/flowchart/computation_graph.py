@@ -24,6 +24,7 @@ def find_section_heading(llm, target, possibles):
             possibles, name="target_section_name"
         )
     target_section_name = llm["target_section_name"]
+    print(llm)
     return target_section_name
 
 @dataclass
