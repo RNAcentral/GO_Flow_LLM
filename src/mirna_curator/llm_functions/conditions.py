@@ -31,16 +31,21 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += "Explain your reasoning step by step, but do not give the final answer yet, and be concise.\n"
+        llm += "Explain your reasoning step by step, be concise.\n"
 
     with assistant():
         llm += (
             with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>"]), temperature_reasoning)
             + "\n"
         )
+    
+    with user():
+        llm += ("Based on the reasoning above, what is your final answer to the question? "
+                "Ensure that the final answer you give is consistent with any answer at the end of your reasoning.\n"
+        )
 
     with assistant():
-        llm += f"Therefore, the final answer to the question '{step_prompt}', based on my reasoning above is: " + with_temperature(
+        llm += f"The final answer to the question '{step_prompt}', based on my reasoning above is: " + with_temperature(
             select(["Yes", "No"], name="answer"), temperature_selection
         )
 
