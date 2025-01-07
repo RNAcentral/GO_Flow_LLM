@@ -103,6 +103,7 @@ class ComputationGraph:
                                 article.sections.keys(), name="target_section_name"
                             )
                         target_section_name = llm["target_section_name"]
+                        llm.reset()
                     else:
                         target_section_name = list(article.sections.keys())[
                             check_subtitles.index(True)
@@ -127,6 +128,7 @@ class ComputationGraph:
             ## Move to the next node...
             graph_node = graph_node.transitions[node_result]
             if graph_node.node_type == "terminal":
+                aes = {}
                 visited_nodes.append(graph_node.name)
                 prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
@@ -135,7 +137,7 @@ class ComputationGraph:
                     break
                 else:
                     annotation = prompt.annotation
-                aes = {}
+                
 
                 detector = list(filter(lambda d: d.name == prompt.detector, prompts.detectors))[0]
                 ## Now we load a section to the context only once, we have to get the node result here.
