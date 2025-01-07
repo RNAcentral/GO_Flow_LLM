@@ -17,7 +17,7 @@ def prompted_flowchart_step_bool(
     step_prompt: str,
     rna_id: str,
     temperature_reasoning: ty.Optional[float] = 0.4,
-    temperature_selection: ty.Optional[float] = 0.1,
+    temperature_selection: ty.Optional[float] = 0.4,
 ) -> guidance.models.Model:
     """
     Use the given prompt on the article text to answer a yes/no question,
@@ -46,7 +46,7 @@ def prompted_flowchart_step_bool(
 
     with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
-            select(["**yes**", "**no**"], name="answer"), temperature_selection
+            select(["yes", "no"], name="answer"), temperature_selection
         )
 
     return llm

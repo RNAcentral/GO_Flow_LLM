@@ -7,5 +7,5 @@
     "chat_template": "llama3",
     "input_data": "development_set.parquet",
     "output_data": "development_results.parquet",
-    "max_papers": 5
+    "max_papers": 1
 }
