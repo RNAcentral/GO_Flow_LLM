@@ -64,6 +64,7 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
         
         llm += (f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
                 "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
+                "When stating the protein name, do not add additional formatting or an explanation of the name.\n"
         )
     with assistant():
         llm += ( "Reasoning: " 
