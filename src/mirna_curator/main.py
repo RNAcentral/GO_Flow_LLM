@@ -78,6 +78,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option("--quantization", help="The quantization for the model")
 @click.option("--chat_template", help="The chat template for the model")
 @click.option("--input_data", help="The input data (PMCID and detected RNA ID) for the process")
+@click.option("--output_data", help="The output data (curation result) for the process")
 @mutually_exclusive_with_config()
 def main(config: Optional[str] = None,
          model_path: Optional[str] = None,
@@ -86,26 +87,27 @@ def main(config: Optional[str] = None,
          context_length: Optional[int] = 16384,
          quantization: Optional[str] = None,
          chat_template: Optional[str] = None,
-         input_data: Optional[str] = None):
+         input_data: Optional[str] = None,
+         output_data: Optional[str] = None):
     
     llm = get_model(
-        # "bartowski/Phi-3-medium-128k-instruct-GGUF", chat_template="phi3-med", quantization="q4_k_m"
-        "bartowski/Llama-3.3-70B-Instruct-GGUF",
-        chat_template="llama3",
-        quantization="q4_k_m",
+        model_path,
+        chat_template=chat_template,
+        quantization=quantization,
+        context_length=context_length,
     )
 
     article = fetch.article("PMC2760133")
 
     try:
-        cur_flowchart_string = open("mirna_curation_flowchart.json", "r").read()
+        cur_flowchart_string = open(flowchart, "r").read()
         cf = curation.CurationFlowchart.model_validate_json(cur_flowchart_string)
     except ValidationError as e:
         logger.fatal(e)
         logger.fatal("Error loading flowchart, aborting")
         exit()
     try:
-        prompt_string = open("mirna_curation_prompts.json", "r").read()
+        prompt_string = open(prompts, "r").read()
         prompt_data = flow_prompts.CurationPrompts.model_validate_json(prompt_string)
     except ValidationError as e:
         logger.fatal(e)
