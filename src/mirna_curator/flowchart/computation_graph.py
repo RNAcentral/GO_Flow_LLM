@@ -19,7 +19,7 @@ def find_section_heading(llm, target, possibles):
             f"We are looking for the closest section heading to '{target}' from "
             f"the following possbilities: {','.join(possibles)}. "
             "Which of the available headings most likely to contain the information "
-            "we would expect from a section titled '{target}'?"
+            f"we would expect from a section titled '{target}'?"
         )
     with assistant():
         llm += select(
