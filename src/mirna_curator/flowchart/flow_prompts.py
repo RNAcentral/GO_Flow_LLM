@@ -13,6 +13,7 @@ class Prompt(BaseModel):
     ]
     prompt: str = ""
     target_section: Optional[str] = None
+    detector: Optional[str] = None
 
 
 class Detector(BaseModel):
@@ -23,4 +24,4 @@ class Detector(BaseModel):
 
 class CurationPrompts(BaseModel):
     prompts: List[Prompt]
-    detector: Detector
+    detectors: List[Detector]
