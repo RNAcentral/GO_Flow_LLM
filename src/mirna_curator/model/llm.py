@@ -163,7 +163,11 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
                 model_path = list(filter(lambda x: "01-of" in x, local_filenames))[0]
             else:
                 # Only one match, load directly
-                remote_filename = Path(matching_ggufs[0]).name
+                remote_filepath = Path(matching_ggufs[0])
+                if remote_filepath.is_dir():
+                    shard_files = list(sorted(remote_filepath.glob("*.gguf")))
+                    remote_filename = remote_filepath / shard_files[0]
+
                 logging.debug(
                     "Found the right quantisation, loading %s", remote_filename
                 )
