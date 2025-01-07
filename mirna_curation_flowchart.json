@@ -8,18 +8,7 @@
         },
         "transitions": {
           "true": "functional_interaction",
-          "false": "computational_target"
-        }
-      },
-      "computational_target": {
-        "type": "decision",
-        "data": {
-          "desc": "Computational target prediction only?",
-          "condition": "isComputationalPredictionOnly"
-        },
-        "transitions": {
-          "true": "no_annotation",
-          "false": "mirna_mrna_binding"
+          "false": "no_annotation"
         }
       },
       "functional_interaction": {
