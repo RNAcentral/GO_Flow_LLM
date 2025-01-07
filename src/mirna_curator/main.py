@@ -3,6 +3,7 @@ from mirna_curator.model.llm import get_model
 from mirna_curator.llm_functions.abstract_filtering import assess_abstract
 from mirna_curator.flowchart import curation, flow_prompts
 from mirna_curator.flowchart.computation_graph import ComputationGraph
+from pydantic import ValidationError
 
 from epmc_xml import fetch
 
@@ -26,9 +27,19 @@ def main():
 
     article = fetch.article("PMC2760133")
 
+    try:
+        cur_flowchart_string = open("mirna_curation_flowchart.json", 'r').read()
+        cf = curation.CurationFlowchart.model_validate_json(cur_flowchart_string)
+    except ValidationError as e:
+        print(e)
+        exit()
+    try:
+        prompt_string = open("mirna_curation_prompts.json", 'r').read()
+        prompts = flow_prompts.CurationPrompts.model_validate_json(prompt_string)
+    except ValidationError as e:
+        print(e)
+        exit()
 
-    cf = curation.CurationFlowchart.parse_file("mirna_curation_flowchart.json")
-    prompts = flow_prompts.CurationPrompts.parse_file("mirna_curation_prompts.json")
 
     graph = ComputationGraph(cf)
 
