@@ -35,7 +35,7 @@ def prompted_flowchart_step_bool(
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>"]), temperature_reasoning)
+            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
             + "\n"
         )
     
@@ -73,7 +73,7 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
         )
     with assistant():
         llm += ( "Reasoning: " 
-            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>"]), temperature_reasoning)
+            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
             + "\n"
         )
     with assistant():
