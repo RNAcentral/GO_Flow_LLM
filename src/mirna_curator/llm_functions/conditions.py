@@ -39,10 +39,10 @@ def prompted_flowchart_step_bool(
             + "\n"
         )
     
-    with user():
-        llm += ("Based on the reasoning above, what is your final answer to the question? "
-                "Ensure that the final answer you give is consistent with any answer at the end of your reasoning.\n"
-        )
+    # with user():
+    #     llm += ("Based on the reasoning above, what is your final answer to the question? "
+    #             "Ensure that the final answer you give is consistent with any answer at the end of your reasoning.\n"
+    #     )
 
     with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
