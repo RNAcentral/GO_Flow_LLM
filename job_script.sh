@@ -17,6 +17,7 @@
 
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
+source ~/.pyenv_setup
 
 pyenv activate mirna_curator
 
