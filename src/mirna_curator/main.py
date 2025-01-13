@@ -121,7 +121,7 @@ def main(config: Optional[str] = None,
     graph = ComputationGraph(cf)
     logger.info("Constructed computation graph")
 
-    curation_input = pl.read_parquet(input_data).filter(pl.col("class") == 1)
+    curation_input = pl.read_parquet(input_data)#.filter(pl.col("class") == 1)
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
     curation_output = []
