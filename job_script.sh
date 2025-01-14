@@ -10,8 +10,8 @@
 #SBATCH --gres=gpu:a100:1
 #SBATCH --mem=32G   # memory per node
 #SBATCH -J "go_flow_llm"   # job name
-#SBATCH -o "out_gfllm"   # job output file
-#SBATCH -e "err_gfllm"   # job error file
+#SBATCH -o "out_gfllm_disease"   # job output file
+#SBATCH -e "err_gfllm_disease"   # job error file
 #SBATCH --mail-user=agreen@ebi.ac.uk   # email address
 #SBATCH --mail-type=END
 
