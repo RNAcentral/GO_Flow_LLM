@@ -171,10 +171,13 @@ class ComputationGraph:
 
 
             node_idx += 1
-
+        all_nodes = list(self._nodes.keys())
+        result = {n : None for n in all_nodes}
+        result.update({f"{n}_result" : None for n in all_nodes})
+        for visited, visit_result in zip(visited_nodes, visit_results):
+            result[visited] = True
+            result[f"{visited}_result"] = visit_result
         result = {
-            "visited_nodes": visited_nodes,
-            "visit_results": visit_results,
             "annotation" : annotation,
             "aes": aes
 
