@@ -177,11 +177,11 @@ class ComputationGraph:
         for visited, visit_result in zip(visited_nodes, visit_results):
             result[visited] = True
             result[f"{visited}_result"] = visit_result
-        result = {
+        result.update({
             "annotation" : annotation,
             "aes": aes
 
-        }
+        })
         trace = str(llm)
         self.loaded_sections = []
         return trace, result
