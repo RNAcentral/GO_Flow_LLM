@@ -11,7 +11,7 @@ class EventFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         # Extract the event dictionary from the extra fields
         event_dict = {
-            "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "level": record.levelname,
         }
         
