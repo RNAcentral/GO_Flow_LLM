@@ -11,6 +11,7 @@ from functools import wraps
 from typing import Optional, Callable
 import json
 import polars as pl
+from mirna_curator.utils.tracing import EventLogger
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -93,13 +94,10 @@ def main(config: Optional[str] = None,
          output_data: Optional[str] = None,
          max_papers: Optional[int] = None):
     
-    llm = get_model(
-        model_path,
-        chat_template=chat_template,
-        quantization=quantization,
-        context_length=context_length,
-    )
+    llm = get_model(model_path,chat_template=chat_template,quantization=quantization,context_length=context_length,)
     logger.info(f"Loaded model from {model_path}")
+
+    curation_tracer = EventLogger()
 
     try:
         cur_flowchart_string = open(flowchart, "r").read()
@@ -128,6 +126,7 @@ def main(config: Optional[str] = None,
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
+        curation_tracer.set_paper_id(row["PMCID"])
         article = fetch.article(row["PMCID"])
         llm_trace, curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}")
