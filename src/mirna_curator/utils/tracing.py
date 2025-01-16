@@ -59,7 +59,7 @@ class EventLogger:
     
     def _get_current_filename(self) -> str:
         """Generate filename for current day's events"""
-        date_str = datetime.now().strftime("%Y-%m-%d")
+        date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         return str(self.output_dir / f"{self.filename_prefix}_{date_str}.ndjson")
     
     def set_paper_id(self, paper_id: str) -> None:
