@@ -14,6 +14,7 @@ import typing as ty
 def prompted_flowchart_step_bool(
     llm: guidance.models.Model,
     article_text: str,
+    load_article_text: bool,
     step_prompt: str,
     rna_id: str,
     temperature_reasoning: ty.Optional[float] = 0.4,
@@ -25,7 +26,7 @@ def prompted_flowchart_step_bool(
     """
 
     with user():
-        if len(article_text) > 0:
+        if load_article_text:
             llm += f"You will be asked a yes/no question about the following text: \n{article_text}\n\n"
         else:
             llm += "\n\n"
@@ -53,6 +54,7 @@ def prompted_flowchart_step_bool(
 @guidance
 def prompted_flowchart_terminal(llm: guidance.models.Model,
                                 article_text: str,
+                                load_article_text: bool,
                                 detector_prompt: str,
                                 rna_id: str,
                                 temperature_reasoning: ty.Optional[float] = 0.4,
@@ -62,7 +64,7 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
 
     """
     with user():
-        if len(article_text) > 0:
+        if load_article_text:
             llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         else:
             llm += "\n\n"
