@@ -93,7 +93,11 @@ class EventLogger:
         print(event_dict)
         try:
             # Log using standard logging with extra data
-            self.logger.info("", extra={"event_data": event_dict})
+            # self.logger.info("", extra={"event_data": event_dict})
+            with open(self._get_current_filename(), 'a', encoding=self.encoding) as f:
+                json.dump(event_dict, f)
+                f.write('\n')
+                f.flush()
             return True
         except Exception as e:
             # If primary logging fails, attempt emergency backup
@@ -102,6 +106,7 @@ class EventLogger:
                 with emergency_file.open('a', encoding=self.encoding) as f:
                     json.dump(event_dict, f)
                     f.write('\n')
+                    f.flush()
                 return True
             except:
                 return False
