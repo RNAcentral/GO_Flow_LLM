@@ -97,7 +97,6 @@ def main(config: Optional[str] = None,
     llm = get_model(model_path,chat_template=chat_template,quantization=quantization,context_length=context_length,)
     logger.info(f"Loaded model from {model_path}")
 
-    curation_tracer = EventLogger()
 
     try:
         cur_flowchart_string = open(flowchart, "r").read()
@@ -126,9 +125,9 @@ def main(config: Optional[str] = None,
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
-        curation_tracer.set_paper_id(row["PMCID"])
+        
         article = fetch.article(row["PMCID"])
-        llm_trace, curation_result = graph.execute_graph(llm, article, row["rna_id"], prompt_data)
+        llm_trace, curation_result = graph.execute_graph(row["PMCID"], llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}")
         logger.info(f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}")
         curation_output.append({"PMCID": row["PMCID"], "rna_id": row["rna_id"], "curation_result": curation_result})

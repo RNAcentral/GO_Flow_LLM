@@ -98,8 +98,9 @@ class ComputationGraph:
 
         self.start_node = self._nodes[flowchart.startNode]
 
-    def execute_graph(self, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
+    def execute_graph(self, paper_id: str, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
         curation_tracer = EventLogger()
+        curation_tracer.set_paper_id(paper_id)
         graph_node = self._nodes[self.start_node.name]
 
         node_idx = 0
