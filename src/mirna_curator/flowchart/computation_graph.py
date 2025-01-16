@@ -13,6 +13,8 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_terminal,
 )
 
+curation_tracer = EventLogger()
+
 def find_section_heading(llm, target, possibles):
     augmentations = {
         "methods": ("Bear in mind this section is likely to contain details on the experimental "
@@ -99,7 +101,6 @@ class ComputationGraph:
         self.start_node = self._nodes[flowchart.startNode]
 
     def execute_graph(self, paper_id: str, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
-        curation_tracer = EventLogger()
         curation_tracer.set_paper_id(paper_id)
         graph_node = self._nodes[self.start_node.name]
 
