@@ -13,6 +13,7 @@ from guidance import user, assistant, select, gen
 from functools import partial, wraps
 from tqdm import tqdm
 from epmc_xml import fetch
+import sqlite3
 
 def w_pbar(pbar, func):
     def foo(*args, **kwargs):
@@ -21,7 +22,7 @@ def w_pbar(pbar, func):
 
     return foo
 
-def run_one_paper(pmcid, prompts, llm):
+def run_one_paper(pmcid, prompts, llm, trace_connection):
     article = fetch.article(pmcid)
     result_dict = {}
     for prompt in prompts:
@@ -51,9 +52,9 @@ def run_one_paper(pmcid, prompts, llm):
         else:
             target_section_name = prompt.target_section
 
-        result = prompted_flowchart_step_bool(llm, article.sections[target_section_name], prompt.prompt)
+        llm = prompted_flowchart_step_bool(llm, article.sections[target_section_name], prompt.prompt)
 
-        result_dict[prompt.name] = result
+        result_dict[prompt.name] = llm['answer'] == "yes"
     return result_dict
 
 
@@ -65,9 +66,17 @@ def run_one_paper(pmcid, prompts, llm):
 @click.argument("output_path")
 @click.option("--quant", default="q4_k_m")
 @click.option("--template", default="chatml")
-def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, template):
+@click.option("--trace_storage", default=None)
+def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, template, trace_storage):
     curation_prompts_json = open(curation_prompts_path, "r").read()
     prompt_object = CurationPrompts.model_validate_json(curation_prompts_json)
+
+    if trace_storage is not None:
+        trace_connection = sqlite3.connect(trace_storage)
+        cur = trace_connection.cursor()
+        cur.execute("CREATE TABLE go_flow_llm_traces ")
+    else:
+        trace_connection = None
 
     # TODO: set this up to use CLI and lookup
     llm = get_model(model_name, chat_template=template, quantization=quant)
