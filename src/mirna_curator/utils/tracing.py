@@ -104,5 +104,3 @@ class EventLogger:
                 return True
             except:
                 return False
-
-# Example usage:
