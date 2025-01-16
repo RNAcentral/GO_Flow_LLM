@@ -5,7 +5,7 @@ condition in the flowchart
 """
 
 import guidance
-from guidance import gen, select, system, user, assistant, with_temperature
+from guidance import gen, select, system, user, assistant, with_temperature, substring
 import sqlite3
 
 import typing as ty
@@ -78,13 +78,18 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
         )
     with assistant():
         llm += ( "Reasoning: " 
-            + with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
+            + with_temperature(gen("detector_reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
             + "\n"
         )
     with assistant():
-        llm += "Protein name: " + with_temperature(
-            gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
-        )
+        llm += f"Protein name: {substring(article_text, name='protein_name')}"
+        # with_temperature(
+        #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
+        # )
+    with user():
+        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant piece of evidence.\n"
+    with assistant():
+        llm += f"The most relevant piece of evidence is: '{substring(article_text, name='detector_evidence')}'"
 
     return llm
 
