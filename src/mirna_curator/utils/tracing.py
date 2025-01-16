@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 import uuid
@@ -43,6 +43,7 @@ class EventLogger:
         
         ## Use a run instance uid
         self.run_id = str(uuid.uuid4())
+        self.paper_id = None
 
         # Create handler that writes to today's file
         handler = logging.FileHandler(
@@ -89,7 +90,7 @@ class EventLogger:
             "paper_id": self.paper_id,
             **event_data
         }
-        
+        print(event_dict)
         try:
             # Log using standard logging with extra data
             self.logger.info("", extra={"event_data": event_dict})
@@ -97,7 +98,7 @@ class EventLogger:
         except Exception as e:
             # If primary logging fails, attempt emergency backup
             try:
-                emergency_file = Path(f"emergency_events_{run_id}.ndjson")
+                emergency_file = Path(f"emergency_events_{self.run_id}.ndjson")
                 with emergency_file.open('a', encoding=self.encoding) as f:
                     json.dump(event_dict, f)
                     f.write('\n')
