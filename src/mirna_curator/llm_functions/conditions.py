@@ -39,18 +39,21 @@ def prompted_flowchart_step_bool(
             with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
             + "\n"
         )
-    
-    # with user():
-    #     llm += ("Based on the reasoning above, what is your final answer to the question? "
-    #             "Ensure that the final answer you give is consistent with any answer at the end of your reasoning.\n"
-    #     )
 
     with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
+    
+    with user():
+        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant piece of evidence.\n"
+
+    with assistant():
+        llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
+    
 
     return llm
+
 @guidance
 def prompted_flowchart_terminal(llm: guidance.models.Model,
                                 article_text: str,
