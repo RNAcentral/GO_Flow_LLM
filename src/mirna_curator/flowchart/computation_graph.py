@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from guidance.models._model import Model
 from guidance import user, assistant, select, gen
 from epmc_xml.article import Article
+from mirna_curator.utils.tracing import EventLogger
 
-# from pydantic import BaseModel
 from mirna_curator.flowchart.curation import NodeType, CurationFlowchart
 from mirna_curator.flowchart.flow_prompts import CurationPrompts
 
@@ -99,6 +99,7 @@ class ComputationGraph:
         self.start_node = self._nodes[flowchart.startNode]
 
     def execute_graph(self, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
+        curation_tracer = EventLogger()
         graph_node = self._nodes[self.start_node.name]
 
         node_idx = 0
@@ -130,14 +131,28 @@ class ComputationGraph:
             ## Now we load a section to the context only once, we have to get the node result here.
             if target_section_name in self.loaded_sections:
                 llm += graph_node.function(
-                    "" , prompt.prompt, rna_id
+                    article.sections[target_section_name], False, prompt.prompt, rna_id
                 )    
             else:
                 llm += graph_node.function(
-                    article.sections[target_section_name], prompt.prompt, rna_id
+                    article.sections[target_section_name], True, prompt.prompt, rna_id
                 )
                 self.loaded_sections.append(target_section_name)
+
             node_result = llm['answer'].lower().replace("*", "") == "yes"
+            node_evidence = llm['evidence']
+            node_reasoning = llm['reasoning']
+
+            curation_tracer.log_event(
+                "flowchart_internal",
+                step=graph_node.name,
+                evidence=node_evidence,
+                result=node_result,
+                reasoning=node_reasoning,
+                loaded_sections=self.loaded_sections,
+            )
+
+
             visit_results.append(node_result)
 
             
@@ -159,14 +174,25 @@ class ComputationGraph:
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += graph_node.function(
-                        "" , detector.prompt, rna_id
+                        article.sections[target_section_name], False , detector.prompt, rna_id
                     )    
                 else:
                     llm += graph_node.function(
-                        article.sections[target_section_name], detector.prompt, rna_id
+                        article.sections[target_section_name], True, detector.prompt, rna_id
                     )
                     self.loaded_sections.append(target_section_name)
                 aes[detector.name] = llm["protein_name"].strip()
+                target_name = llm["protein_name"].strip()
+                node_reasoning = llm['detector_reasoning']
+                node_evidence = llm['detector_evidence']
+                curation_tracer.log_event(
+                    "flowchart_terminal",
+                    step=graph_node.name,
+                    evidence=node_evidence,
+                    result=target_name,
+                    reasoning=node_reasoning,
+                    loaded_sections=self.loaded_sections,
+                )
                 
 
 
