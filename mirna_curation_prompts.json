@@ -27,7 +27,7 @@
         {
             "name" : "hasEndogenousEffect",
             "type" : "condition_prompt_boolean",
-            "prompt" : "Does the paper directly demonstrate changes in endogenous target gene expression under normal physiological conditions through either:\n1. Western blot showing protein level changes in untransfected, non-diseased cells/tissues, OR\n2. qRT-PCR measurements of mRNA levels in untransfected, non-diseased cells/tissues\n\nThe changes must be:\n- Measured after perturbation of the proposed regulator (e.g., knockdown, overexpression)\n- Conducted in cells/tissues where the gene is normally expressed under physiological conditions\n- Performed in non-diseased, non-transformed cell lines or healthy tissue samples\n\nThe following do NOT qualify:\n- Reporter assays or measurements in artificial systems\n- Measurements in disease states or disease-derived cell lines\n- Measurements in cells where the gene is not normally expressed",
+            "prompt" : "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes in untransfected cells/tissues, OR\n2. qRT-PCR measurements of mRNA levels in untransfected cells/tissues\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
             "target_section" : "results"
         },
         {
