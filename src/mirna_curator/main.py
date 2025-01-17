@@ -12,6 +12,7 @@ from typing import Optional, Callable
 import json
 import polars as pl
 from mirna_curator.utils.tracing import EventLogger
+from guidance import system, user
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -114,6 +115,20 @@ def main(config: Optional[str] = None,
         logger.fatal("Error loading prompts, aborting")
         exit()
     logger.info(f"Loaded prompts from {prompts}")
+    
+    ## Look for a system prompt in the prompts, and apply it if found
+    for prompt in prompt_data.prompts:
+        if prompt.type ==  "system":
+            print(prompt.prompt)
+            try:
+                with system():
+                    llm += prompt.prompt
+            except Exception as e:
+                logger.warning("Selected model does not have a system prompt mode, forward as user instead")
+                with user():
+                    llm += prompt.prompt
+
+            break
 
     graph = ComputationGraph(cf)
     logger.info("Constructed computation graph")
