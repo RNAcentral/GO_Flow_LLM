@@ -83,6 +83,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option("--input_data", help="The input data (PMCID and detected RNA ID) for the process")
 @click.option("--output_data", help="The output data (curation result) for the process")
 @click.option("--max_papers", help="The maximum number of papers to process")
+@click.option("--annot_class", help="Restrict processing to one class of annotation")
 @mutually_exclusive_with_config()
 def main(config: Optional[str] = None,
          model_path: Optional[str] = None,
@@ -93,7 +94,9 @@ def main(config: Optional[str] = None,
          chat_template: Optional[str] = None,
          input_data: Optional[str] = None,
          output_data: Optional[str] = None,
-         max_papers: Optional[int] = None):
+         max_papers: Optional[int] = None,
+         annot_class: Optional[int] = None,
+         ):
     
     llm = get_model(model_path,chat_template=chat_template,quantization=quantization,context_length=context_length,)
     logger.info(f"Loaded model from {model_path}")
@@ -133,7 +136,12 @@ def main(config: Optional[str] = None,
     graph = ComputationGraph(cf)
     logger.info("Constructed computation graph")
 
-    curation_input = pl.read_parquet(input_data)#.filter(pl.col("class") == 1)
+
+    curation_input = pl.read_parquet(input_data)
+    if annot_class is not None:
+        logger.info(f"Restricting processing to annotation class {annot_class}")
+        curation_input = curation_input.filter(pl.col("annot_class") == annot_class)
+        
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
     curation_output = []
