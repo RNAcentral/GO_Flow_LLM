@@ -83,7 +83,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option("--input_data", help="The input data (PMCID and detected RNA ID) for the process")
 @click.option("--output_data", help="The output data (curation result) for the process")
 @click.option("--max_papers", help="The maximum number of papers to process")
-@click.option("--annot_class", help="Restrict processing to one class of annotation")
+@click.option("--annot_class", help="Restrict processing to one class of annotation", type=int)
 @mutually_exclusive_with_config()
 def main(config: Optional[str] = None,
          model_path: Optional[str] = None,
