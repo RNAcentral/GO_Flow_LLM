@@ -140,7 +140,7 @@ def main(config: Optional[str] = None,
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
-        
+        logger.info("Starting curation for paper %s", row["PMCID"])
         article = fetch.article(row["PMCID"])
         llm_trace, curation_result = graph.execute_graph(row["PMCID"], llm, article, row["rna_id"], prompt_data)
         logger.info(f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}")
