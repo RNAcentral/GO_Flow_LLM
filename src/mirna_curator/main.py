@@ -41,10 +41,10 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
                 v is not None for v in kwargs_without_config.values()
             )
 
-            if config_file is not None and other_params_provided:
-                raise click.UsageError(
-                    "Config file cannot be used together with other CLI parameters."
-                )
+            # if config_file is not None and other_params_provided:
+            #     raise click.UsageError(
+            #         "Config file cannot be used together with other CLI parameters."
+            #     )
 
             if config_file is None and not other_params_provided:
                 raise click.UsageError(
