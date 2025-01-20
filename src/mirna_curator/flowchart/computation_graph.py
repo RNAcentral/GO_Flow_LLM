@@ -16,6 +16,16 @@ from mirna_curator.llm_functions.conditions import (
 curation_tracer = EventLogger()
 
 def find_section_heading(llm, target, possibles):
+    """
+    Finds the most likely section heading given the ones found in the paper.
+
+    This is not a guidance function, so the state of the LLM is not modified. 
+    I think that means we can clear/reset the LLM with no ill effects outside this function
+
+    
+    
+    """
+    llm.reset()
     augmentations = {
         "methods": ("Bear in mind this section is likely to contain details on the experimental "
                     "techniques used."
