@@ -149,7 +149,7 @@ class ComputationGraph:
                 "flowchart_internal",
                 step=graph_node.name,
                 evidence=node_evidence,
-                result=node_result,
+                result=llm['answer'].lower().replace("*", ""),
                 reasoning=node_reasoning,
                 loaded_sections=self.loaded_sections,
             )
