@@ -140,7 +140,7 @@ def main(config: Optional[str] = None,
     curation_input = pl.read_parquet(input_data)
     if annot_class is not None:
         logger.info(f"Restricting processing to annotation class {annot_class}")
-        curation_input = curation_input.filter(pl.col("annot_class") == annot_class)
+        curation_input = curation_input.filter(pl.col("class") == annot_class)
         
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
