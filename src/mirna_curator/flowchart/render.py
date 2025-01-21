@@ -13,11 +13,11 @@ def json_to_mermaid(flow_data):
                 if "true" in node["transitions"]:
                     condition = node["data"].get("condition", "true")
                     mermaid_lines.append(
-                        f"    {node_id} --> {node['transitions']['true']}: {node['data']['text']} (true)"
+                        f"    {node_id} --> {node['transitions']['true']}: {node['data']['desc']} (true)"
                     )
                 if "false" in node["transitions"]:
                     mermaid_lines.append(
-                        f"    {node_id} --> {node['transitions']['false']}: {node['data']['text']} (false)"
+                        f"    {node_id} --> {node['transitions']['false']}: {node['data']['desc']} (false)"
                     )
 
         elif node["type"] == "action":
