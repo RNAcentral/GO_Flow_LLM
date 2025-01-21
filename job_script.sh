@@ -3,7 +3,7 @@
 #Submit this script with: sbatch thefilename
 #For more details about each parameter, please check SLURM sbatch documentation https://slurm.schedmd.com/sbatch.html
 
-#SBATCH --time=2:00:00   # walltime
+#SBATCH --time=8:00:00   # walltime
 #SBATCH --ntasks=1   # number of tasks
 #SBATCH --cpus-per-task=24   # number of CPUs Per Task i.e if your code is multi-threaded
 #SBATCH --nodes=1   # number of nodes
