@@ -7,5 +7,5 @@
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_QwQ_prompt_refining.parquet",
-    "max_papers": 50
+    "max_papers": 500
 }
