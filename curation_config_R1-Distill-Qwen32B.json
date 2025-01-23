@@ -1,9 +1,9 @@
 {
-    "model_path":  "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+    "model_path":  "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF",
     "flowchart": "mirna_curation_flowchart_author_intent.json",
     "prompts": "mirna_curation_prompts.json",
     "context_length": 65536,
-    "quantization": "q6_k_l",
+    "quantization": "q6_k",
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_deepseek_qwen32B.parquet",
