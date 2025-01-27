@@ -6,7 +6,7 @@ import click
 
 from mirna_curator.flowchart import curation
 
-cf = curation.CurationFlowchart.model_validate_json(open("mirna_curation_flowchart.json", 'r').read())
+cf = curation.CurationFlowchart.model_validate_json(open("mirna_curation_flowchart_author_intent.json", 'r').read())
 
 # I hate this but it works for now
 def get_edges_count(recorded_df: pl.DataFrame, cf: curation.CurationFlowchart):
@@ -174,12 +174,14 @@ def create_miRNA_flowchart_viz(recorded_df: pl.DataFrame, expected_df: pl.DataFr
 def main(recorded_df, expected_df, filter_class):
     recorded_df = pl.read_parquet(recorded_df).unnest("curation_result")
     expected_df = pl.read_parquet(expected_df)
-    print(recorded_df)
+    
     if filter_class is not None:
         expected_df = expected_df.filter(pl.col("class") == filter_class)
-    fig = create_miRNA_flowchart_viz(recorded_df, expected_df, filter_class)
+    result_eval = recorded_df.join(expected_df, on="PMCID", how='inner')
+    print(result_eval.group_by("annotation").agg(pl.len()))
+    # fig = create_miRNA_flowchart_viz(recorded_df, expected_df, filter_class)
     
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
