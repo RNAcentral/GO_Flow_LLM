@@ -17,6 +17,25 @@ from guidance import system, user
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+import signal
+import traceback
+import sys
+curation_output = []
+def save_handler(signum, frame):
+    if curation_output:
+        curation_output_df = pl.DataFrame(curation_output)
+        curation_output_df.write_parquet("curation_results_partial.parquet")
+    if signum == signal.SIGTERM:
+        sys.exit(0)
+
+
+def traceback_handler(signum, frame):
+    traceback.print_stack(frame, file=sys.stderr)
+
+signal.signal(signal.SIGUSR1, traceback_handler)
+signal.signal(signal.SIGUSR2, save_handler)
+signal.signal(signal.SIGTERM, save_handler)
+
 def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     """
     Decorator to ensure CLI parameters are mutually exclusive with config file.
@@ -144,7 +163,6 @@ def main(config: Optional[str] = None,
         
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
-    curation_output = []
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
