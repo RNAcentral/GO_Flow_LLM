@@ -132,7 +132,7 @@
       "name": "diseaseModel",
       "type": "condition_prompt_boolean",
       "prompt": "Identify any language that indicates whether the study is focused on:\na) Understanding or treating disease/pathological conditions, or\nb) Understanding normal biological processes and functions\n\nSpecifically look for:\n1. Terms indicating disease or medical conditions\n2. References to patients, treatment, or therapeutic applications\n3. Discussion of pathological processes or dysfunction\n4. Language about public health burden or clinical significance\n5. Descriptions of normal biological processes or homeostasis\n\nBased on this analysis, is the paper's primary focus is on disease/pathology?",
-      "target_section": "introduction",
+      "target_section": "discussion",
       "detector": null,
       "annotation": null
     }
