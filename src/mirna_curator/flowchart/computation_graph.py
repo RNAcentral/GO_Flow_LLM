@@ -115,6 +115,15 @@ class ComputationGraph:
         curation_tracer.set_paper_id(paper_id)
         graph_node = self._nodes[self.start_node.name]
 
+        curation_tracer.log_event(
+                "flowchart_init",
+                step="starup_timestamp",
+                evidence="",
+                result="",
+                reasoning="",
+                loaded_sections=[],
+                timestamp=time(),
+        )
         node_idx = 0
         visited_nodes = []
         visit_results = []
