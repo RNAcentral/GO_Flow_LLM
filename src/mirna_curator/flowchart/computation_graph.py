@@ -44,8 +44,16 @@ def find_section_heading(llm, target, possibles):
             f"{augmentations.get(target, '')}"
         )
         llm += "\n think about it briefly, then make a selection.\n"
+        llm += ("In your reasoning:\n"
+            "- Skip obvious steps\n"
+            "- Structure as 'If A then B because C'\n"
+            "- Maximum 10 words per step\n"
+            "- Use symbols (→, =, ≠, etc.) instead of words if appropriate\n"
+            "- Abbreviate common terms (prob/probability, calc/calculate)\n"
+            "Your response should be clear but minimal. Show key logical steps only.\n"
+        )
     with assistant():
-        llm += f"The section heading {target} implies " + gen() + " therefore the most likely section heading is: "
+        llm += f"The section heading {target} implies " + gen(max_tokens=512) + " therefore the most likely section heading is: "
         llm += select(
             possibles, name="target_section_name"
         )
