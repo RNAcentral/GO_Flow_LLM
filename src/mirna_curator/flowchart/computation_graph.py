@@ -58,7 +58,15 @@ def find_section_heading(llm, target, possibles):
             possibles, name="target_section_name"
         )
     target_section_name = llm["target_section_name"]
-    print(llm)
+    curation_tracer.log_event(
+                "flowchart_section_choice",
+                step="choose_section",
+                evidence="",
+                result=target_section_name,
+                reasoning=llm['reasoning'],
+                loaded_sections=[],
+                timestamp=time(),
+            )
     return target_section_name
 
 @dataclass
