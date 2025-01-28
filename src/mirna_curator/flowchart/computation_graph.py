@@ -12,6 +12,7 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_step_bool,
     prompted_flowchart_terminal,
 )
+from time import time
 
 curation_tracer = EventLogger()
 
@@ -23,7 +24,7 @@ def find_section_heading(llm, target, possibles):
     I think that means we can clear/reset the LLM with no ill effects outside this function
 
     
-    
+
     """
     llm.reset()
     augmentations = {
@@ -162,6 +163,7 @@ class ComputationGraph:
                 result=llm['answer'].lower().replace("*", ""),
                 reasoning=node_reasoning,
                 loaded_sections=self.loaded_sections,
+                timestamp=time(),
             )
 
 
@@ -204,6 +206,7 @@ class ComputationGraph:
                     result=target_name,
                     reasoning=node_reasoning,
                     loaded_sections=self.loaded_sections,
+                    timestamp=time(),
                 )
                 
 
