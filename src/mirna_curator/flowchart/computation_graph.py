@@ -54,7 +54,7 @@ def find_section_heading(llm, target, possibles):
                 "Your response should be clear but minimal. Show key logical steps only.\n"
             )
         with assistant():
-            llm += f"The section heading {target} implies " + gen(max_tokens=512) + " therefore the most likely section heading is: "
+            llm += f"The section heading {target} implies " + gen('reasoning', max_tokens=512) + " therefore the most likely section heading is: "
             llm += select(
                 possibles, name="target_section_name"
             )
