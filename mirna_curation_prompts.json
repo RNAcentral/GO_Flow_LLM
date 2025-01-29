@@ -131,7 +131,7 @@
     {
       "name": "diseaseModel",
       "type": "condition_prompt_boolean",
-      "prompt": "Is the primary focus of this paper about the interaction of the miRNA and its target in the context of disease, or normal cell function?",
+      "prompt": "Did the researchers validate the core molecular interaction in normal cells/contexts, even if that was just one component of a larger disease-focused study?",
       "target_section": "introduction",
       "detector": null,
       "annotation": null
