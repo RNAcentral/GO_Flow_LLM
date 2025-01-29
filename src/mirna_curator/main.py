@@ -172,6 +172,7 @@ def main(config: Optional[str] = None,
             llm_trace, curation_result = graph.execute_graph(row["PMCID"], llm, article, row["rna_id"], prompt_data)
         except:
             logger.error("Paper %s has exceeded context limit, skipping", row['PMCID'])
+            print(llm)
             continue
         logger.info(f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}")
         logger.info(f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}")
