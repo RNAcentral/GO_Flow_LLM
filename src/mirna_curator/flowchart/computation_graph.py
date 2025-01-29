@@ -68,7 +68,8 @@ def find_section_heading(llm, target, possibles):
                     loaded_sections=[],
                     timestamp=time(),
                 )
-    except:
+    except Exception as e:
+        print(e)
         print(llm)
         exit()
     return target_section_name
