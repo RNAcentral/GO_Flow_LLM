@@ -27,46 +27,50 @@ def find_section_heading(llm, target, possibles):
 
     """
     llm.reset()
-    augmentations = {
-        "methods": ("Bear in mind this section is likely to contain details on the experimental "
-                    "techniques used."
-        ),
-        "results": ("Bear in mind this section is likely to contain the results of the experiments, "
-                    "but may also contain the discussion of those results."
-        ),
-    }
-    with user():
-        llm += (
-            f"We are looking for the closest section heading to '{target}' from "
-            f"the following possbilities: {','.join(possibles)}. "
-            "Which of the available headings most likely to contain the information "
-            f"we would expect from a section titled '{target}'? "
-            f"{augmentations.get(target, '')}"
-        )
-        llm += "\n think about it briefly, then make a selection.\n"
-        llm += ("In your reasoning:\n"
-            "- Skip obvious steps\n"
-            "- Structure as 'If A then B because C'\n"
-            "- Maximum 10 words per step\n"
-            "- Use symbols (→, =, ≠, etc.) instead of words if appropriate\n"
-            "- Abbreviate common terms (prob/probability, calc/calculate)\n"
-            "Your response should be clear but minimal. Show key logical steps only.\n"
-        )
-    with assistant():
-        llm += f"The section heading {target} implies " + gen(max_tokens=512) + " therefore the most likely section heading is: "
-        llm += select(
-            possibles, name="target_section_name"
-        )
-    target_section_name = llm["target_section_name"]
-    curation_tracer.log_event(
-                "flowchart_section_choice",
-                step="choose_section",
-                evidence="",
-                result=target_section_name,
-                reasoning=llm['reasoning'],
-                loaded_sections=[],
-                timestamp=time(),
+    try:
+        augmentations = {
+            "methods": ("Bear in mind this section is likely to contain details on the experimental "
+                        "techniques used."
+            ),
+            "results": ("Bear in mind this section is likely to contain the results of the experiments, "
+                        "but may also contain the discussion of those results."
+            ),
+        }
+        with user():
+            llm += (
+                f"We are looking for the closest section heading to '{target}' from "
+                f"the following possbilities: {','.join(possibles)}. "
+                "Which of the available headings most likely to contain the information "
+                f"we would expect from a section titled '{target}'? "
+                f"{augmentations.get(target, '')}"
             )
+            llm += "\n think about it briefly, then make a selection.\n"
+            llm += ("In your reasoning:\n"
+                "- Skip obvious steps\n"
+                "- Structure as 'If A then B because C'\n"
+                "- Maximum 10 words per step\n"
+                "- Use symbols (→, =, ≠, etc.) instead of words if appropriate\n"
+                "- Abbreviate common terms (prob/probability, calc/calculate)\n"
+                "Your response should be clear but minimal. Show key logical steps only.\n"
+            )
+        with assistant():
+            llm += f"The section heading {target} implies " + gen(max_tokens=512) + " therefore the most likely section heading is: "
+            llm += select(
+                possibles, name="target_section_name"
+            )
+        target_section_name = llm["target_section_name"]
+        curation_tracer.log_event(
+                    "flowchart_section_choice",
+                    step="choose_section",
+                    evidence="",
+                    result=target_section_name,
+                    reasoning=llm['reasoning'],
+                    loaded_sections=[],
+                    timestamp=time(),
+                )
+    except:
+        print(llm)
+        exit()
     return target_section_name
 
 @dataclass
