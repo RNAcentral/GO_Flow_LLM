@@ -51,8 +51,8 @@
           "condition": "diseaseModel"
         },
         "transitions": {
-          "true" : "validated_binding_only",
-          "false": "validated_binding_mrna"
+          "false" : "validated_binding_only",
+          "true": "validated_binding_mrna"
         }
       },
       "disease_model_2": {
@@ -62,8 +62,8 @@
           "condition": "diseaseModel"
         },
         "transitions": {
-          "true" : "validated_binding_only",
-          "false": "validated_binding_translation"
+          "false" : "validated_binding_only",
+          "true": "validated_binding_translation"
         }
       },
       "effect_endogenous_2": {
