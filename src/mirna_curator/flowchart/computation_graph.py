@@ -181,7 +181,8 @@ class ComputationGraph:
                         article.sections[target_section_name], True, prompt.prompt, rna_id
                     )
                     self.loaded_sections.append(target_section_name)
-            except:
+            except Exception as e:
+                print(e)
                 print(llm)
                 exit()
 

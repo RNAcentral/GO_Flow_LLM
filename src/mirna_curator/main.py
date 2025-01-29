@@ -170,7 +170,8 @@ def main(config: Optional[str] = None,
         article = fetch.article(row["PMCID"])
         try:
             llm_trace, curation_result = graph.execute_graph(row["PMCID"], llm, article, row["rna_id"], prompt_data)
-        except:
+        except Exception as e:
+            print(e)
             logger.error("Paper %s has exceeded context limit, skipping", row['PMCID'])
             print(llm)
             continue
