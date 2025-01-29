@@ -165,17 +165,20 @@ class ComputationGraph:
                         ]
                 else:
                     target_section_name = prompt.target_section
-
-            ## Now we load a section to the context only once, we have to get the node result here.
-            if target_section_name in self.loaded_sections:
-                llm += graph_node.function(
-                    article.sections[target_section_name], False, prompt.prompt, rna_id
-                )    
-            else:
-                llm += graph_node.function(
-                    article.sections[target_section_name], True, prompt.prompt, rna_id
-                )
-                self.loaded_sections.append(target_section_name)
+            try:
+                ## Now we load a section to the context only once, we have to get the node result here.
+                if target_section_name in self.loaded_sections:
+                    llm += graph_node.function(
+                        article.sections[target_section_name], False, prompt.prompt, rna_id
+                    )    
+                else:
+                    llm += graph_node.function(
+                        article.sections[target_section_name], True, prompt.prompt, rna_id
+                    )
+                    self.loaded_sections.append(target_section_name)
+            except:
+                print(llm)
+                exit()
 
             node_result = llm['answer'].lower().replace("*", "") == "yes"
             node_evidence = llm['evidence']
