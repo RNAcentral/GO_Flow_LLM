@@ -2,10 +2,10 @@
     "model_path":  "bartowski/QwQ-32B-Preview-GGUF",
     "flowchart": "mirna_curation_flowchart_author_intent.json",
     "prompts": "mirna_curation_prompts.json",
-    "context_length": 32768,
+    "context_length": 65536,
     "quantization": "q6_k_l",
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_QwQ.parquet",
-    "max_papers": 500
+    "max_papers": 5
 }
