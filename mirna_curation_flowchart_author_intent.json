@@ -106,8 +106,8 @@
           "condition": "hasMiRNAEffect"
         },
         "transitions": {
-          "true": "disease_model_1",
-          "false": "disease_model_2"
+          "true": "disease_model_2",
+          "false": "disease_model_1"
         }
       },
 
