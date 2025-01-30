@@ -59,7 +59,7 @@
     {
       "name": "hasMiRNAEffect",
       "type": "condition_prompt_boolean",
-      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors measure mRNA levels of the miRNA target gene and did they find them decreased?",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene?",
       "target_section": "results",
       "detector": null,
       "annotation": null
