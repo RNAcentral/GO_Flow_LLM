@@ -38,8 +38,8 @@ def prompted_flowchart_step_bool(
             "Use brief variable names\n"
             "Structure as 'If A then B because C'\n"
             "Maximum 10 words per step\n"
-            "Use symbols (→, =, ≠, etc.) instead of words\n"
-            "Abbreviate common terms (prob/probability, calc/calculate)\n"
+            # "Use symbols (→, =, ≠, etc.) instead of words\n"
+            # "Abbreviate common terms (prob/probability, calc/calculate)\n"
             "Your response should be clear but minimal. Show key logical steps only.\n"
         )
 
