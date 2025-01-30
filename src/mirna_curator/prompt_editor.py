@@ -82,6 +82,10 @@ def save():
 
     with open(prompt_filename, 'w') as out:
         out.write(prompt_data.model_dump_json(indent=2))
+    
+    with open(prompt_filename, 'r') as reread:
+        prompt_string = reread.read()
+        prompt_data = flow_prompts.CurationPrompts.model_validate_json(prompt_string)
     return jsonify({"status": "success"})
 
 def set_content_dict(new_dict):
