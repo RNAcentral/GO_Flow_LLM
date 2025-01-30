@@ -55,7 +55,7 @@ def prompted_flowchart_step_bool(
         )
     
     with user():
-        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant piece of evidence.\n"
+        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant sentence or two.\n"
 
     with assistant():
         llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
