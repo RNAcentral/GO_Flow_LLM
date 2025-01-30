@@ -83,7 +83,7 @@
     {
       "name": "hasmRNALevelDecrease",
       "type": "condition_prompt_boolean",
-      "prompt": "Does the paper report a decrease in the endogenous levels of the target gene mRNA following the inhibition or addition of the miRNA?",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors measure mRNA levels and find them significantly decreased?",
       "target_section": "results",
       "detector": null,
       "annotation": null
@@ -132,7 +132,7 @@
       "name": "diseaseModel",
       "type": "condition_prompt_boolean",
       "prompt": "Did the researchers validate the core molecular interaction in normal cells/contexts? Answer yes even if that was just one component of a larger disease-focused study? To help you answer this question, identify the cell lines where experiments were carried out and determine whether they are used as normal cell models or not.",
-      "target_section": "methods",
+      "target_section": "introduction",
       "detector": null,
       "annotation": null
     }
