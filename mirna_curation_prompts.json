@@ -59,7 +59,7 @@
     {
       "name": "hasMiRNAEffect",
       "type": "condition_prompt_boolean",
-      "prompt": "Does the paper show that the inhibition or addition of the miRNA affects the endogenous level of the target mRNA level? ",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors measure mRNA levels and find them significantly decreased?",
       "target_section": "results",
       "detector": null,
       "annotation": null
