@@ -43,7 +43,7 @@ def prompted_flowchart_step_bool(
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=1024, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
+            with_temperature(gen("reasoning", max_tokens=1024, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>"]), temperature_reasoning)
             + "\n"
         )
 
