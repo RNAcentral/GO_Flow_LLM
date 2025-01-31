@@ -22,7 +22,7 @@ TEMPLATE_LOOKUP = {
 
 from huggingface_hub import HfFileSystem, hf_hub_download
 from pathlib import Path
-
+import re
 import logging
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
                 )
             # Find the right quantization file types
             matching_ggufs = list(
-                filter(lambda x: quantization.lower() in x.lower(), gguf_files)
+                filter(lambda x: re.match(f'quantization.lower()\.', x.lower()), gguf_files)
             )
             if len(matching_ggufs) == 0:
                 logging.error(
