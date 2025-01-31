@@ -33,7 +33,7 @@ def prompted_flowchart_step_bool(
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += ("Explain your reasoning step-by-step, using these guidelines:\n"
-            "\tUse only if/then statements with format\n:"
+            "\tUse only if/then statements with format:\n"
             "\t\tStep n: If [A] then [B] because [C]\n"
             "\tMaximum 5 steps, single line each\n"
             "\tNO introductions or summaries\n"
@@ -43,7 +43,7 @@ def prompted_flowchart_step_bool(
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
+            with_temperature(gen("reasoning", max_tokens=1024, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
             + "\n"
         )
 
