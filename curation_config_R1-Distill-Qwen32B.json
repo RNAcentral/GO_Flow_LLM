@@ -1,5 +1,5 @@
 {
-    "model_path":  "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+    "model_path":  "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
     "flowchart": "mirna_curation_flowchart_author_intent.json",
     "prompts": "mirna_curation_prompts.json",
     "context_length": 65536,
