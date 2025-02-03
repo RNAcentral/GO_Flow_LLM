@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 import signal
 import traceback
 import sys
+import time
 
 curation_output = []
 
@@ -127,14 +128,18 @@ def main(
     annot_class: Optional[int] = None,
 ):
     curation_tracer.set_model_name(model_path)
+    _model_load_start = time.time()
     llm = get_model(
         model_path,
         chat_template=chat_template,
         quantization=quantization,
         context_length=context_length,
     )
+    _model_load_end = time.time()
     logger.info(f"Loaded model from {model_path}")
+    logger.info(f"Model loaded in {_model_load_end - _model_load_start:.2f} seconds")
 
+    _flowchart_load_start = time.time()
     try:
         cur_flowchart_string = open(flowchart, "r").read()
         cf = curation.CurationFlowchart.model_validate_json(cur_flowchart_string)
@@ -142,7 +147,11 @@ def main(
         logger.fatal(e)
         logger.fatal("Error loading flowchart, aborting")
         exit()
+    _flowchart_load_end = time.time()
     logger.info(f"Loaded flowchart from {flowchart}")
+    logger.info(f"Flowchart loaded in {_flowchart_load_end - _flowchart_load_start:.2f} seconds")
+
+    _prompt_load_start = time.time()
     try:
         prompt_string = open(prompts, "r").read()
         prompt_data = flow_prompts.CurationPrompts.model_validate_json(prompt_string)
@@ -150,12 +159,15 @@ def main(
         logger.fatal(e)
         logger.fatal("Error loading prompts, aborting")
         exit()
+    _prompt_load_end = time.time()
     logger.info(f"Loaded prompts from {prompts}")
+    logger.info(f"Prompts loaded in {_prompt_load_end - _prompt_load_start:.2f}")
 
+    _system_prompt_start = time.time()
     ## Look for a system prompt in the prompts, and apply it if found
     for prompt in prompt_data.prompts:
         if prompt.type == "system":
-            print(prompt.prompt)
+            logger.info("Found system prompt, applying...")
             try:
                 with system():
                     llm += prompt.prompt
@@ -167,9 +179,15 @@ def main(
                     llm += prompt.prompt
 
             break
+    _system_prompt_end = time.time()
+    logger.info(f"System prompt (if present) applied in {_system_prompt_end - _system_prompt_start:.2f} seconds")
 
+    _graph_construction_start = time.time()
     graph = ComputationGraph(cf)
+    _graph_construction_end = time.time()
     logger.info("Constructed computation graph")
+    logger.info(f"Graph constructed in {_graph_construction_end - _graph_construction_start:.2f} seconds")
+
 
     curation_input = pl.read_parquet(input_data)
     if annot_class is not None:
@@ -178,11 +196,16 @@ def main(
 
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
+    _bulk_processing_start = time.time()
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
         logger.info("Starting curation for paper %s", row["PMCID"])
+        _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
+        _paper_fetch_end = time.time()
+        logger.info(f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds")
+        _curation_start = time.time()
         try:
             llm_trace, curation_result = graph.execute_graph(
                 row["PMCID"], llm, article, row["rna_id"], prompt_data
@@ -190,7 +213,6 @@ def main(
         except Exception as e:
             print(e)
             logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
-            print(llm)
             continue
         logger.info(
             f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
@@ -198,6 +220,8 @@ def main(
         logger.info(
             f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
         )
+        _curation_end = time.time()
+        logger.info(f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds")
         curation_output.append(
             {
                 "PMCID": row["PMCID"],
@@ -207,7 +231,11 @@ def main(
         )
         with open(f"{row['PMCID']}_{row['rna_id']}_llm_trace.txt", "w") as f:
             f.write(llm_trace)
-
+    _bulk_processing_end = time.time()
+    _bulk_processing_total = _bulk_processing_end - _bulk_processing_start
+    _bulk_processing_average = _bulk_processing_total / len(curation_output)
+    logger.info(f"Curation of {len(curation_output)} articles completed in {_bulk_processing_total:.2f} seconds")
+    logger.info(f"Average time to curate one paper: {_bulk_processing_average:.2f} seconds")
     curation_output_df = pl.DataFrame(curation_output)
     curation_output_df.write_parquet(output_data)
 
