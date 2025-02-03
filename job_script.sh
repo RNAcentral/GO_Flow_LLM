@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=24   # number of CPUs Per Task i.e if your code is multi-threaded
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --gres=gpu:a100:1
-#SBATCH --mem=32G   # memory per node
+#SBATCH --mem=48G   # memory per node
 #SBATCH -J "go_flow_llm"   # job name
 #SBATCH -o "out_gfllm_disease"   # job output file
 #SBATCH -e "err_gfllm_disease"   # job error file
