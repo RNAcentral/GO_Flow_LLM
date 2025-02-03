@@ -11,7 +11,7 @@ from functools import wraps
 from typing import Optional, Callable
 import json
 import polars as pl
-from mirna_curator.utils.tracing import EventLogger
+from mirna_curator.utils.tracing import curation_tracer
 from guidance import system, user
 
 logging.basicConfig(level=logging.INFO)
@@ -126,7 +126,7 @@ def main(
     max_papers: Optional[int] = None,
     annot_class: Optional[int] = None,
 ):
-
+    curation_tracer.set_model_name(model_path)
     llm = get_model(
         model_path,
         chat_template=chat_template,

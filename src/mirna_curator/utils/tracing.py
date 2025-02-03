@@ -37,6 +37,12 @@ class EventLogger:
         """
         self.paper_id = paper_id
 
+    def set_model_name(self, model_name: str) -> None:
+        """
+        Set the model name used in this run
+        """
+        self.model_id = model_name
+
     def log_event(self, event_type: str, **event_data: Any) -> bool:
         """
         Log an event with the given type and data.
@@ -53,8 +59,13 @@ class EventLogger:
             "type": event_type,
             "run_id": self.run_id,
             "paper_id": self.paper_id,
+            "model_id": self.model_id,
+            "date" : datetime.datetime.now().strftime("%Y-%m-%d"),
             **event_data,
         }
         with open(self._get_current_filename(), "a", encoding="utf-8") as f:
             json.dump(event_dict, f)
             f.write("\n")
+
+# Create singleton object when this module is imported
+curation_tracer = EventLogger()

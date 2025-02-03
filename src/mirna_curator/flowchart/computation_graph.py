@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from guidance.models._model import Model
 from guidance import user, assistant, select, gen
 from epmc_xml.article import Article
-from mirna_curator.utils.tracing import EventLogger
+from mirna_curator.utils.tracing import curation_tracer
 
 from mirna_curator.flowchart.curation import NodeType, CurationFlowchart
 from mirna_curator.flowchart.flow_prompts import CurationPrompts
@@ -14,7 +14,7 @@ from mirna_curator.llm_functions.conditions import (
 )
 from time import time
 
-curation_tracer = EventLogger()
+
 
 
 def find_section_heading(llm, target, possibles):
