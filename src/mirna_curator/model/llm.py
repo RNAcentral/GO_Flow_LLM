@@ -75,7 +75,12 @@ def download_split_file(repo_id, filenames):
     return local_filenames
 
 
-def get_model(model_name: str, chat_template: str = None, quantization: str = None, context_length: int = 16384):
+def get_model(
+    model_name: str,
+    chat_template: str = None,
+    quantization: str = None,
+    context_length: int = 16384,
+):
     """
     Load a llama.cpp model, either locally or by downloading from huggingface
 
@@ -93,7 +98,7 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
         quantization (optional): str
             What quantization type/level to use. This is required when loading from
             a hf hub repo that contains multiple models.
-        
+
         context_length (optional): int
             The context length to use when interacting with the model. Defaults to 16384
 
@@ -145,7 +150,10 @@ def get_model(model_name: str, chat_template: str = None, quantization: str = No
                 )
             # Find the right quantization file types
             matching_ggufs = list(
-                filter(lambda x: re.search(f'.*{quantization.lower()}\\.', x.lower()), gguf_files)
+                filter(
+                    lambda x: re.search(f".*{quantization.lower()}\\.", x.lower()),
+                    gguf_files,
+                )
             )
             if len(matching_ggufs) == 0:
                 logging.error(

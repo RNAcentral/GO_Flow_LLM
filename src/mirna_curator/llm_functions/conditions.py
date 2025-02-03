@@ -10,6 +10,7 @@ import sqlite3
 
 import typing as ty
 
+
 @guidance
 def prompted_flowchart_step_bool(
     llm: guidance.models.Model,
@@ -32,7 +33,8 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += ("Explain your reasoning step-by-step, using these guidelines:\n"
+        llm += (
+            "Explain your reasoning step-by-step, using these guidelines:\n"
             "\tUse only if/then statements with format:\n"
             "\t\tStep n: If [A] then [B] because [C]\n"
             "\tMaximum 5 steps, single line each\n"
@@ -43,7 +45,14 @@ def prompted_flowchart_step_bool(
 
     with assistant():
         llm += (
-            with_temperature(gen("reasoning", max_tokens=1024, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>"]), temperature_reasoning)
+            with_temperature(
+                gen(
+                    "reasoning",
+                    max_tokens=1024,
+                    stop=["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>"],
+                ),
+                temperature_reasoning,
+            )
             + "\n"
         )
 
@@ -51,24 +60,26 @@ def prompted_flowchart_step_bool(
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
-    
+
     with user():
         llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant sentence or two.\n"
 
     with assistant():
         llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
-    
 
     return llm
 
+
 @guidance
-def prompted_flowchart_terminal(llm: guidance.models.Model,
-                                article_text: str,
-                                load_article_text: bool,
-                                detector_prompt: str,
-                                rna_id: str,
-                                temperature_reasoning: ty.Optional[float] = 0.4,
-                                temperature_selection: ty.Optional[float] = 0.1,):
+def prompted_flowchart_terminal(
+    llm: guidance.models.Model,
+    article_text: str,
+    load_article_text: bool,
+    detector_prompt: str,
+    rna_id: str,
+    temperature_reasoning: ty.Optional[float] = 0.4,
+    temperature_selection: ty.Optional[float] = 0.1,
+):
     """
     Use the LLM to find the targets and AEs for the GO annotation
 
@@ -78,14 +89,23 @@ def prompted_flowchart_terminal(llm: guidance.models.Model,
             llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         else:
             llm += "\n\n"
-        
-        llm += (f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
-                "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
-                "When stating the protein name, do not add additional formatting or an explanation of the name.\n"
+
+        llm += (
+            f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
+            "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
+            "When stating the protein name, do not add additional formatting or an explanation of the name.\n"
         )
     with assistant():
-        llm += ( "Reasoning: " 
-            + with_temperature(gen("detector_reasoning", max_tokens=512, stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"]), temperature_reasoning)
+        llm += (
+            "Reasoning: "
+            + with_temperature(
+                gen(
+                    "detector_reasoning",
+                    max_tokens=512,
+                    stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"],
+                ),
+                temperature_reasoning,
+            )
             + "\n"
         )
     with assistant():

@@ -16,24 +16,27 @@ from time import time
 
 curation_tracer = EventLogger()
 
+
 def find_section_heading(llm, target, possibles):
     """
     Finds the most likely section heading given the ones found in the paper.
 
-    This is not a guidance function, so the state of the LLM is not modified. 
+    This is not a guidance function, so the state of the LLM is not modified.
     I think that means we can clear/reset the LLM with no ill effects outside this function
 
-    
+
 
     """
     llm.reset()
     try:
         augmentations = {
-            "methods": ("Bear in mind this section is likely to contain details on the experimental "
-                        "techniques used."
+            "methods": (
+                "Bear in mind this section is likely to contain details on the experimental "
+                "techniques used."
             ),
-            "results": ("Bear in mind this section is likely to contain the results of the experiments, "
-                        "but may also contain the discussion of those results."
+            "results": (
+                "Bear in mind this section is likely to contain the results of the experiments, "
+                "but may also contain the discussion of those results."
             ),
         }
         with user():
@@ -45,7 +48,8 @@ def find_section_heading(llm, target, possibles):
                 f"{augmentations.get(target, '')}"
             )
             llm += "\n think about it briefly, then make a selection.\n"
-            llm += ("In your reasoning:\n"
+            llm += (
+                "In your reasoning:\n"
                 "- Skip obvious steps\n"
                 "- Structure as 'If A then B because C'\n"
                 "- Maximum 10 words per step\n"
@@ -54,25 +58,28 @@ def find_section_heading(llm, target, possibles):
                 "Your response should be clear but minimal. Show key logical steps only.\n"
             )
         with assistant():
-            llm += f"The section heading {target} implies " + gen('reasoning', max_tokens=512) + " therefore the most likely section heading is: "
-            llm += select(
-                possibles, name="target_section_name"
+            llm += (
+                f"The section heading {target} implies "
+                + gen("reasoning", max_tokens=512)
+                + " therefore the most likely section heading is: "
             )
+            llm += select(possibles, name="target_section_name")
         target_section_name = llm["target_section_name"]
         curation_tracer.log_event(
-                    "flowchart_section_choice",
-                    step="choose_section",
-                    evidence="",
-                    result=target_section_name,
-                    reasoning=llm['reasoning'],
-                    loaded_sections=[],
-                    timestamp=time(),
-                )
+            "flowchart_section_choice",
+            step="choose_section",
+            evidence="",
+            result=target_section_name,
+            reasoning=llm["reasoning"],
+            loaded_sections=[],
+            timestamp=time(),
+        )
     except Exception as e:
         print(e)
         print(llm)
         exit()
     return target_section_name
+
 
 @dataclass
 class ComputationNode:
@@ -132,18 +139,25 @@ class ComputationGraph:
 
         self.start_node = self._nodes[flowchart.startNode]
 
-    def execute_graph(self, paper_id: str, llm: Model, article: Article, rna_id: str, prompts: CurationPrompts):
+    def execute_graph(
+        self,
+        paper_id: str,
+        llm: Model,
+        article: Article,
+        rna_id: str,
+        prompts: CurationPrompts,
+    ):
         curation_tracer.set_paper_id(paper_id)
         graph_node = self._nodes[self.start_node.name]
 
         curation_tracer.log_event(
-                "flowchart_init",
-                step="starup_timestamp",
-                evidence="",
-                result="",
-                reasoning="",
-                loaded_sections=[],
-                timestamp=time(),
+            "flowchart_init",
+            step="starup_timestamp",
+            evidence="",
+            result="",
+            reasoning="",
+            loaded_sections=[],
+            timestamp=time(),
         )
         node_idx = 0
         visited_nodes = []
@@ -163,7 +177,9 @@ class ComputationGraph:
                         for section_name in article.sections.keys()
                     ]
                     if not any(check_subtitles):
-                        target_section_name = find_section_heading(llm, prompt.target_section, list(article.sections.keys()))
+                        target_section_name = find_section_heading(
+                            llm, prompt.target_section, list(article.sections.keys())
+                        )
                     else:
                         target_section_name = list(article.sections.keys())[
                             check_subtitles.index(True)
@@ -174,11 +190,17 @@ class ComputationGraph:
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += graph_node.function(
-                        article.sections[target_section_name], False, prompt.prompt, rna_id
-                    )    
+                        article.sections[target_section_name],
+                        False,
+                        prompt.prompt,
+                        rna_id,
+                    )
                 else:
                     llm += graph_node.function(
-                        article.sections[target_section_name], True, prompt.prompt, rna_id
+                        article.sections[target_section_name],
+                        True,
+                        prompt.prompt,
+                        rna_id,
                     )
                     self.loaded_sections.append(target_section_name)
             except Exception as e:
@@ -186,53 +208,59 @@ class ComputationGraph:
                 print(llm)
                 exit()
 
-            node_result = llm['answer'].lower().replace("*", "") == "yes"
-            node_evidence = llm['evidence']
-            node_reasoning = llm['reasoning']
+            node_result = llm["answer"].lower().replace("*", "") == "yes"
+            node_evidence = llm["evidence"]
+            node_reasoning = llm["reasoning"]
 
             curation_tracer.log_event(
                 "flowchart_internal",
                 step=graph_node.name,
                 evidence=node_evidence,
-                result=llm['answer'].lower().replace("*", ""),
+                result=llm["answer"].lower().replace("*", ""),
                 reasoning=node_reasoning,
                 loaded_sections=self.loaded_sections,
                 timestamp=time(),
             )
 
-
             visit_results.append(node_result)
 
-            
             ## Move to the next node...
             graph_node = graph_node.transitions[node_result]
             if graph_node.node_type == "terminal":
                 aes = {}
                 visited_nodes.append(graph_node.name)
                 prompt = list(
-                filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts))[0]
+                    filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
+                )[0]
                 if prompt.name == "no_annotation":
                     annotation = None
                     break
                 else:
                     annotation = prompt.annotation
-                
 
-                detector = list(filter(lambda d: d.name == prompt.detector, prompts.detectors))[0]
+                detector = list(
+                    filter(lambda d: d.name == prompt.detector, prompts.detectors)
+                )[0]
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += graph_node.function(
-                        article.sections[target_section_name], False , detector.prompt, rna_id
-                    )    
+                        article.sections[target_section_name],
+                        False,
+                        detector.prompt,
+                        rna_id,
+                    )
                 else:
                     llm += graph_node.function(
-                        article.sections[target_section_name], True, detector.prompt, rna_id
+                        article.sections[target_section_name],
+                        True,
+                        detector.prompt,
+                        rna_id,
                     )
                     self.loaded_sections.append(target_section_name)
                 aes[detector.name] = llm["protein_name"].strip()
                 target_name = llm["protein_name"].strip()
-                node_reasoning = llm['detector_reasoning']
-                node_evidence = llm['detector_evidence']
+                node_reasoning = llm["detector_reasoning"]
+                node_evidence = llm["detector_evidence"]
                 curation_tracer.log_event(
                     "flowchart_terminal",
                     step=graph_node.name,
@@ -242,21 +270,15 @@ class ComputationGraph:
                     loaded_sections=self.loaded_sections,
                     timestamp=time(),
                 )
-                
-
 
             node_idx += 1
         all_nodes = list(self._nodes.keys())
-        result = {n : None for n in all_nodes}
-        result.update({f"{n}_result" : None for n in all_nodes})
+        result = {n: None for n in all_nodes}
+        result.update({f"{n}_result": None for n in all_nodes})
         for visited, visit_result in zip(visited_nodes, visit_results):
             result[visited] = True
             result[f"{visited}_result"] = visit_result
-        result.update({
-            "annotation" : annotation,
-            "aes": aes
-
-        })
+        result.update({"annotation": annotation, "aes": aes})
         trace = str(llm)
         self.loaded_sections = []
         return trace, result
