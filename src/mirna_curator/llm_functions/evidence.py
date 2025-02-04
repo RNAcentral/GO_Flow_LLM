@@ -1,6 +1,8 @@
 import guidance
 from guidance import user, assistant, select, substring
 
+import logging
+logger = logging.getLogger(__name__)
 
 @guidance
 def extract_evidence(llm, article_text, mode="recursive-paragraph"):
@@ -56,6 +58,8 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
             llm += "Choose the most relevant paragraph from the article\n"
         with assistant():
             llm += f"The most relevant paragraph is: {select(article_paragraphs, name='relevant_para')}\n"
+        paragraph = llm['relevant_para']
+        logging.info(f"chose this paragraph:\n{paragraph}\n")
         with user():
             llm += "Now choose the most relevant piece of evidence within that paragraph.\n"
         with assistant():
