@@ -10,7 +10,7 @@ class Prompt(BaseModel):
         "terminal_full",
         "terminal_bp_only",
         "terminal_conditional",
-        "system"
+        "system",
     ]
     prompt: str = ""
     target_section: Optional[str] = None
