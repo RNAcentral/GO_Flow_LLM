@@ -218,7 +218,7 @@ def main(
                 row["PMCID"], llm, article, row["rna_id"], prompt_data
             )
         except Exception as e:
-            print(e)
+            logger.error(e)
             logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
             continue
         logger.info(
