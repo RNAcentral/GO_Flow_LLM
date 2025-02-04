@@ -8,7 +8,7 @@ import guidance
 from guidance import gen, select, system, user, assistant, with_temperature, substring
 
 from mirna_curator.llm_functions.evidence import extract_evidence
-
+from mirna_curator.apis import epmc
 import typing as ty
 
 import logging
@@ -86,6 +86,7 @@ def prompted_flowchart_terminal(
     load_article_text: bool,
     detector_prompt: str,
     rna_id: str,
+    paper_id: str,
     temperature_reasoning: ty.Optional[float] = 0.4,
     temperature_selection: ty.Optional[float] = 0.1,
 ):
@@ -93,6 +94,7 @@ def prompted_flowchart_terminal(
     Use the LLM to find the targets and AEs for the GO annotation
 
     """
+    epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
     with user():
         if load_article_text:
             logger.info(
@@ -103,8 +105,7 @@ def prompted_flowchart_terminal(
             llm += "\n\n"
         llm += (
             f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
-            "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
-            "When stating the protein name, do not add additional formatting or an explanation of the name.\n"
+            "Give some reasoning for your answer, then state the miRNA's target protein name as it appears in the paper.\n"
         )
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
@@ -125,7 +126,7 @@ def prompted_flowchart_terminal(
             + "\n"
         )
     with assistant():
-        llm += f"Protein name: {substring(article_text, name='protein_name')}"
+        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name')}"
         # with_temperature(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )

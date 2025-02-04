@@ -246,6 +246,7 @@ class ComputationGraph:
                         False,
                         detector.prompt,
                         rna_id,
+                        paper_id,
                     )
                 else:
                     llm += graph_node.function(
@@ -253,6 +254,7 @@ class ComputationGraph:
                         True,
                         detector.prompt,
                         rna_id,
+                        paper_id,
                     )
                     self.loaded_sections.append(target_section_name)
                 aes[detector.name] = llm["protein_name"].strip()
