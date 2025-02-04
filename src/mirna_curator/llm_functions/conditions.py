@@ -10,6 +10,11 @@ import sqlite3
 
 import typing as ty
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @guidance
 def prompted_flowchart_step_bool(
@@ -28,6 +33,9 @@ def prompted_flowchart_step_bool(
 
     with user():
         if load_article_text:
+            logger.info(
+                f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (internal node)"
+            )
             llm += f"You will be asked a yes/no question. The answer could be in following text, or it could be in some text you have already seen: \n{article_text}\n\n"
         else:
             llm += "\n\n"
@@ -42,7 +50,11 @@ def prompted_flowchart_step_bool(
             "\tSkip obvious steps\n"
             "Your response should be clear but minimal. Show key logical steps only.\n"
         )
-
+    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
+    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(
+        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+    )
     with assistant():
         llm += (
             with_temperature(
@@ -86,15 +98,22 @@ def prompted_flowchart_terminal(
     """
     with user():
         if load_article_text:
+            logger.info(
+                f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal node)"
+            )
             llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         else:
             llm += "\n\n"
-
         llm += (
             f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
             "Give some reasoning for your answer, then state the protein name as it appears in the paper.\n"
             "When stating the protein name, do not add additional formatting or an explanation of the name.\n"
         )
+    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
+    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(
+        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+    )
     with assistant():
         llm += (
             "Reasoning: "
