@@ -149,7 +149,9 @@ def main(
         exit()
     _flowchart_load_end = time.time()
     logger.info(f"Loaded flowchart from {flowchart}")
-    logger.info(f"Flowchart loaded in {_flowchart_load_end - _flowchart_load_start:.2f} seconds")
+    logger.info(
+        f"Flowchart loaded in {_flowchart_load_end - _flowchart_load_start:.2f} seconds"
+    )
 
     _prompt_load_start = time.time()
     try:
@@ -180,14 +182,17 @@ def main(
 
             break
     _system_prompt_end = time.time()
-    logger.info(f"System prompt (if present) applied in {_system_prompt_end - _system_prompt_start:.2f} seconds")
+    logger.info(
+        f"System prompt (if present) applied in {_system_prompt_end - _system_prompt_start:.2f} seconds"
+    )
 
     _graph_construction_start = time.time()
     graph = ComputationGraph(cf)
     _graph_construction_end = time.time()
     logger.info("Constructed computation graph")
-    logger.info(f"Graph constructed in {_graph_construction_end - _graph_construction_start:.2f} seconds")
-
+    logger.info(
+        f"Graph constructed in {_graph_construction_end - _graph_construction_start:.2f} seconds"
+    )
 
     curation_input = pl.read_parquet(input_data)
     if annot_class is not None:
@@ -204,7 +209,9 @@ def main(
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
         _paper_fetch_end = time.time()
-        logger.info(f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds")
+        logger.info(
+            f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds"
+        )
         _curation_start = time.time()
         try:
             llm_trace, curation_result = graph.execute_graph(
@@ -221,7 +228,9 @@ def main(
             f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
         )
         _curation_end = time.time()
-        logger.info(f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds")
+        logger.info(
+            f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
+        )
         curation_output.append(
             {
                 "PMCID": row["PMCID"],
@@ -234,8 +243,12 @@ def main(
     _bulk_processing_end = time.time()
     _bulk_processing_total = _bulk_processing_end - _bulk_processing_start
     _bulk_processing_average = _bulk_processing_total / len(curation_output)
-    logger.info(f"Curation of {len(curation_output)} articles completed in {_bulk_processing_total:.2f} seconds")
-    logger.info(f"Average time to curate one paper: {_bulk_processing_average:.2f} seconds")
+    logger.info(
+        f"Curation of {len(curation_output)} articles completed in {_bulk_processing_total:.2f} seconds"
+    )
+    logger.info(
+        f"Average time to curate one paper: {_bulk_processing_average:.2f} seconds"
+    )
     curation_output_df = pl.DataFrame(curation_output)
     curation_output_df.write_parquet(output_data)
 
