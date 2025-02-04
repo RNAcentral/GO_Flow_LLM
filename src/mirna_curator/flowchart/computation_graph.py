@@ -12,6 +12,7 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_step_bool,
     prompted_flowchart_terminal,
 )
+from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 
 
@@ -58,7 +59,7 @@ def find_section_heading(llm, target, possibles):
         with assistant():
             llm += (
                 f"The section heading {target} implies "
-                + gen("reasoning", max_tokens=512)
+                + gen("reasoning", max_tokens=512, stop=STOP_TOKENS)
                 + " therefore the most likely section heading is: "
             )
             llm += select(possibles, name="target_section_name")
