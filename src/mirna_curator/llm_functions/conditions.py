@@ -9,6 +9,7 @@ from guidance import gen, select, system, user, assistant, with_temperature, sub
 
 from mirna_curator.llm_functions.evidence import extract_evidence
 from mirna_curator.apis import epmc
+from mirna_curator.model.llm import STOP_TOKENS
 import typing as ty
 
 import logging
@@ -62,7 +63,7 @@ def prompted_flowchart_step_bool(
                 gen(
                     "reasoning",
                     max_tokens=1024,
-                    stop=["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>"],
+                    stop=STOP_TOKENS,
                 ),
                 temperature_reasoning,
             )
@@ -118,8 +119,8 @@ def prompted_flowchart_terminal(
             + with_temperature(
                 gen(
                     "detector_reasoning",
-                    max_tokens=512,
-                    stop=["<|end|>", "<|eot_id|>", "<|eom_id|>"],
+                    max_tokens=128,
+                    stop=STOP_TOKENS,
                 ),
                 temperature_reasoning,
             )
@@ -134,5 +135,3 @@ def prompted_flowchart_terminal(
     llm += extract_evidence(article_text, mode="recursive-paragraph")
 
     return llm
-
-    pass
