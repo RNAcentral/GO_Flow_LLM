@@ -6,7 +6,8 @@ condition in the flowchart
 
 import guidance
 from guidance import gen, select, system, user, assistant, with_temperature, substring
-import sqlite3
+
+from mirna_curator.llm_functions.evidence import extract_evidence
 
 import typing as ty
 
@@ -73,11 +74,7 @@ def prompted_flowchart_step_bool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    with user():
-        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant sentence or two.\n"
-
-    with assistant():
-        llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
+    llm += extract_evidence(article_text, mode='recursive-paragraph')
 
     return llm
 
@@ -132,10 +129,8 @@ def prompted_flowchart_terminal(
         # with_temperature(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
-    with user():
-        llm += "Give a piece of evidence from the text that supports your answer. Choose the most relevant piece of evidence.\n"
-    with assistant():
-        llm += f"The most relevant piece of evidence is: '{substring(article_text, name='detector_evidence')}'"
+
+    llm += extract_evidence(article_text, mode='recursive-paragraph')
 
     return llm
 
