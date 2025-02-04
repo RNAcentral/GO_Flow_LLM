@@ -235,10 +235,22 @@ raw = pl.read_csv(
     has_header=False,
     columns=[1, 2, 3, 4, 10],
     new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"],
+    infer_schema_length=None,
+    dtypes={
+        "rna_id": pl.Utf8,
+        "qualifier": pl.Utf8, 
+        "go_term": pl.Utf8,
+        "pmid": pl.Utf8,
+        "extension": pl.Utf8
+    }
 )
 raw = raw.with_columns(pl.col("pmid").str.split(":").list.last())
 raw = raw.with_columns(
-    res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct)
+    res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct([
+            pl.Field("targets", pl.List(pl.Utf8)),
+            pl.Field("anatomical_locations", pl.List(pl.Utf8)),
+            pl.Field("cell_lines", pl.List(pl.Utf8))
+        ]))
 ).unnest("res")
 
 pmid_pmcid_mapping = pl.scan_csv(
