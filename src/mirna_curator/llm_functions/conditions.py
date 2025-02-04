@@ -74,7 +74,7 @@ def prompted_flowchart_step_bool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    llm += extract_evidence(article_text, mode='recursive-paragraph')
+    llm += extract_evidence(article_text, mode="recursive-paragraph")
 
     return llm
 
@@ -130,7 +130,7 @@ def prompted_flowchart_terminal(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
 
-    llm += extract_evidence(article_text, mode='recursive-paragraph')
+    llm += extract_evidence(article_text, mode="recursive-paragraph")
 
     return llm
 

@@ -15,8 +15,6 @@ from mirna_curator.llm_functions.conditions import (
 from time import time
 
 
-
-
 def find_section_heading(llm, target, possibles):
     """
     Finds the most likely section heading given the ones found in the paper.
@@ -272,6 +270,7 @@ class ComputationGraph:
                 )
 
             node_idx += 1
+
         all_nodes = list(self._nodes.keys())
         result = {n: None for n in all_nodes}
         result.update({f"{n}_result": None for n in all_nodes})

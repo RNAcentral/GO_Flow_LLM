@@ -60,12 +60,13 @@ class EventLogger:
             "run_id": self.run_id,
             "paper_id": self.paper_id,
             "model_id": self.model_id,
-            "date" : datetime.datetime.now().strftime("%Y-%m-%d"),
+            "date": datetime.datetime.now().strftime("%Y-%m-%d"),
             **event_data,
         }
         with open(self._get_current_filename(), "a", encoding="utf-8") as f:
             json.dump(event_dict, f)
             f.write("\n")
+
 
 # Create singleton object when this module is imported
 curation_tracer = EventLogger()
