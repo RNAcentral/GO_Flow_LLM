@@ -59,7 +59,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
         with user():
             llm += "Now choose the most relevant piece of evidence within that paragraph.\n"
         with assistant():
-            llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
+            llm += f"The most relevant piece of evidence is: '{substring(llm['relevant_para'], name='evidence')}'"
     elif mode == "recursive-sentence":
         # first split the text into sentences by splitting on '. '
         article_sentences = article_text.split(". ")
