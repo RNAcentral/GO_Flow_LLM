@@ -7,12 +7,15 @@ from pathlib import Path
 from epmc_xml import fetch
 from ratelimit.exception import RateLimitException
 import time
+
+
 def is_open_access(pmcid):
     url = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextXML"
 
     paper_url = url.format(pmcid=pmcid)
     r = requests.get(paper_url)
     return r.status_code == 200
+
 
 @lru_cache
 def _get_article(pmcid):
@@ -25,6 +28,7 @@ def _get_article(pmcid):
         art = fetch.article(pmcid)
 
     return art
+
 
 def search_protein_id(args):
     pmcid, gene_id = args
@@ -39,12 +43,20 @@ def search_protein_id(args):
             mentioning_sentences.append(para)
     return mentioning_sentences
 
+
 @lru_cache
 def lookup_rnac_names(rna_id):
-    rnacentral_ids = pl.scan_csv("data/id_mapping.tsv", separator='\t', has_header=False, new_columns=["urs", "source", "external_id", "taxid", "type", "synonym"])
+    rnacentral_ids = pl.scan_csv(
+        "data/id_mapping.tsv",
+        separator="\t",
+        has_header=False,
+        new_columns=["urs", "source", "external_id", "taxid", "type", "synonym"],
+    )
     rnacentral_ids = rnacentral_ids.filter(pl.col("source").is_in(["MIRBASE"]))
-    urs, taxid = rna_id.split('_')
-    rnc_data = rnacentral_ids.filter((pl.col("urs") == urs) & (pl.col("taxid") == int(taxid))).collect()
+    urs, taxid = rna_id.split("_")
+    rnc_data = rnacentral_ids.filter(
+        (pl.col("urs") == urs) & (pl.col("taxid") == int(taxid))
+    ).collect()
     if len(rnc_data) == 0:
         id_string = rna_id
     else:
@@ -52,24 +64,24 @@ def lookup_rnac_names(rna_id):
         alt_id = rnc_data.get_column("synonym").to_list()[0]
         short_alt = "-".join(alt_id.split("-")[1:3])
         id_string = f"{mirbase_id}|{alt_id}|{short_alt}"
-    
+
     return id_string
 
 
 def identify_used_ids(args):
     print(args)
-    pmcid = args['PMCID']
-    genes = args['Gene Names']
+    pmcid = args["PMCID"]
+    genes = args["Gene Names"]
     rnas = args["rna_id"]
-    
+
     article = _get_article(pmcid)
     full_text = "\n\n".join(list(article.get_sections().values()))
-    sentences = full_text.split('.')
+    sentences = full_text.split(".")
 
     used_rna_id = None
     used_prot_id = None
     if len(rnas) == 1:
-        ## Then the URS was unresolved, we should pass 
+        ## Then the URS was unresolved, we should pass
         ## it back as-is for later manual fixing
         used_rna_id = rnas[0]
     else:
@@ -84,7 +96,7 @@ def identify_used_ids(args):
     if genes[0] is None:
         used_prot_id = "N/A"
     else:
-    # Find the most mentioned protein:
+        # Find the most mentioned protein:
         prot_mentions = {prot: 0 for prot in genes}
         for sentence in sentences:
             for prot in genes:
@@ -112,22 +124,20 @@ def identify_used_ids(args):
 
     return {"used_protein_id": used_prot_id, "used_rna_id": used_rna_id}
 
+
 def expand_extension(ext):
     if ext is None:
-        return {
-        "targets" : list(),
-        "anatomical_locations" : list(),
-        "cell_lines" : list()
-        }
+        return {"targets": list(), "anatomical_locations": list(), "cell_lines": list()}
+
     def get_input(ext_text):
-        protein = re.match(r'.*has_input\(UniProtKB:([A-Za-z0-9]+)\)', ext_text)
+        protein = re.match(r".*has_input\(UniProtKB:([A-Za-z0-9]+)\)", ext_text)
         if protein:
             protein = protein.group(1)
             return protein
         return None
-    
+
     def get_anatomy(ext_text):
-        location = re.match(r'.*occurs_in\(UBERON:([0-9]+)\)', ext_text)
+        location = re.match(r".*occurs_in\(UBERON:([0-9]+)\)", ext_text)
         if location:
             location = location.group(1)
             return f"UBERON:{location}"
@@ -135,17 +145,17 @@ def expand_extension(ext):
         return None
 
     def get_cell_line(ext_text):
-        location = re.match(r'.*occurs_in\(CL:([0-9]+)\)', ext_text)
+        location = re.match(r".*occurs_in\(CL:([0-9]+)\)", ext_text)
         if location:
             location = location.group(1)
             return f"CL:{location}"
 
         return None
-    
+
     proteins = []
     anatomies = []
     cell_lines = []
-    for sub_ext in ext.split('|'):
+    for sub_ext in ext.split("|"):
         protein = get_input(sub_ext)
         anatomy = get_anatomy(sub_ext)
         cell_line = get_cell_line(sub_ext)
@@ -154,10 +164,11 @@ def expand_extension(ext):
         cell_lines.append(cell_line)
 
     return {
-        "targets" : list(set(proteins)),
-        "anatomical_locations" : list(set(anatomies)),
-        "cell_lines" : list(set(cell_lines))
+        "targets": list(set(proteins)),
+        "anatomical_locations": list(set(anatomies)),
+        "cell_lines": list(set(cell_lines)),
     }
+
 
 def assign_classes(df):
     """
@@ -167,67 +178,79 @@ def assign_classes(df):
     r_cols = []
 
     for row in df.iter_rows(named=True):
-        if row['PMCID'] in pmcids_done:
+        if row["PMCID"] in pmcids_done:
             continue
         rdata = {}
         rdata["protein_id"] = row["used_protein_id"]
         rdata["rna_id"] = row["used_rna_id"]
-        if row['go_term'] == "GO:0035195":
+        if row["go_term"] == "GO:0035195":
             # rdata = expand_extension(row["extension"])
-            paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
+            paper_annotations = df.filter(pl.col("pmid") == row["pmid"])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
-            if 'enables' in qualifiers and 'GO:1903231' in go_terms:
+            if "enables" in qualifiers and "GO:1903231" in go_terms:
                 annotation_class = 1
             else:
                 annotation_class = 4
             rdata["class"] = annotation_class
-            rdata['go_term'] = row['go_term']
-            pmcids_done.append(row['PMCID'])
-            rdata["PMCID"] = row['PMCID']
+            rdata["go_term"] = row["go_term"]
+            pmcids_done.append(row["PMCID"])
+            rdata["PMCID"] = row["PMCID"]
             r_cols.append(rdata)
-        elif row['go_term'] == "GO:0035278":
+        elif row["go_term"] == "GO:0035278":
             # rdata = expand_extension(row["extension"])
-            paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
+            paper_annotations = df.filter(pl.col("pmid") == row["pmid"])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
-            if 'enables' in qualifiers and 'GO:1903231' in go_terms:
+            if "enables" in qualifiers and "GO:1903231" in go_terms:
                 annotation_class = 3
             else:
                 annotation_class = 4
             rdata["class"] = annotation_class
-            rdata['go_term'] = row['go_term']
-            pmcids_done.append(row['PMCID'])
-            rdata["PMCID"] = row['PMCID']
+            rdata["go_term"] = row["go_term"]
+            pmcids_done.append(row["PMCID"])
+            rdata["PMCID"] = row["PMCID"]
             r_cols.append(rdata)
-        elif row['go_term'] == "GO:0035279":
+        elif row["go_term"] == "GO:0035279":
             # rdata = expand_extension(row["extension"])
-            paper_annotations = df.filter(pl.col("pmid") == row['pmid'])
+            paper_annotations = df.filter(pl.col("pmid") == row["pmid"])
             qualifiers = paper_annotations.get_column("qualifier").to_list()
             go_terms = paper_annotations.get_column("go_term").to_list()
-            if 'enables' in qualifiers and 'GO:1903231' in go_terms:
+            if "enables" in qualifiers and "GO:1903231" in go_terms:
                 annotation_class = 2
             else:
-                annotation_class = 4 
+                annotation_class = 4
             rdata["class"] = annotation_class
-            rdata['go_term'] = row['go_term']
-            pmcids_done.append(row['pmid'])
-            rdata["PMCID"] = row['PMCID']
-        
+            rdata["go_term"] = row["go_term"]
+            pmcids_done.append(row["pmid"])
+            rdata["PMCID"] = row["PMCID"]
+
             r_cols.append(rdata)
     return r_cols
 
-    
 
-raw = pl.read_csv("data/bhf_ucl_annotations.tsv", separator='\t', has_header=False, columns=[1,2,3,4,10], new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"])
-raw = raw.with_columns(pl.col("pmid").str.split(':').list.last())
-raw = raw.with_columns(res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct)).unnest("res")
+raw = pl.read_csv(
+    "data/bhf_ucl_annotations.tsv",
+    separator="\t",
+    has_header=False,
+    columns=[1, 2, 3, 4, 10],
+    new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"],
+)
+raw = raw.with_columns(pl.col("pmid").str.split(":").list.last())
+raw = raw.with_columns(
+    res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct)
+).unnest("res")
 
 pmid_pmcid_mapping = pl.scan_csv(
-        "data/PMID_PMCID_DOI.csv",
-    )
+    "data/PMID_PMCID_DOI.csv",
+)
 
-raw = raw.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
+raw = (
+    raw.lazy()
+    .join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID")
+    .filter(pl.col("PMCID").is_not_null())
+    .collect()
+)
 
 targets = raw.unique("pmid").explode("targets").filter(pl.col("targets").is_not_null())
 
@@ -235,30 +258,55 @@ cached_targets = True
 if cached_targets and Path("cached_target_data.parquet").exists():
     targets = pl.read_parquet("data/cached_target_data.parquet")
 else:
-    uniprot_ids = pl.read_csv("data/idmapping_uniprot.tsv", separator='\t')
+    uniprot_ids = pl.read_csv("data/idmapping_uniprot.tsv", separator="\t")
     targets = targets.join(uniprot_ids, left_on="targets", right_on="Entry")
-    targets = targets.with_columns(pl.col("Gene Names").str.split(' ')).explode("Gene Names")
-    targets = targets.lazy().join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID").filter(pl.col("PMCID").is_not_null()).collect()
+    targets = targets.with_columns(pl.col("Gene Names").str.split(" ")).explode(
+        "Gene Names"
+    )
+    targets = (
+        targets.lazy()
+        .join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID")
+        .filter(pl.col("PMCID").is_not_null())
+        .collect()
+    )
     targets = targets.with_columns(
-        open_access=pl.col("PMCID").map_elements(is_open_access, return_dtype=pl.Boolean)
+        open_access=pl.col("PMCID").map_elements(
+            is_open_access, return_dtype=pl.Boolean
+        )
     ).filter(pl.col("open_access"))
-    targets = targets.with_columns(pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String))
+    targets = targets.with_columns(
+        pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String)
+    )
     targets.write_parquet("data/cached_target_data.parquet")
 
 targets = targets.with_columns(pl.col("rna_id").str.split("|")).explode("rna_id")
 
 if not Path("data/paper_and_targets.csv").exists():
-    paper_searching = targets.group_by("PMCID").agg(pl.col("Gene Names").unique(), pl.col("rna_id").unique()).sort(by="PMCID")
-    paper_searching = paper_searching.with_columns(res = pl.struct("PMCID", "Gene Names", "rna_id").map_elements(identify_used_ids, return_dtype=pl.Struct))
+    paper_searching = (
+        targets.group_by("PMCID")
+        .agg(pl.col("Gene Names").unique(), pl.col("rna_id").unique())
+        .sort(by="PMCID")
+    )
+    paper_searching = paper_searching.with_columns(
+        res=pl.struct("PMCID", "Gene Names", "rna_id").map_elements(
+            identify_used_ids, return_dtype=pl.Struct
+        )
+    )
     paper_searching = paper_searching.unnest("res")
-    paper_searching.select(["PMCID", "used_protein_id", "used_rna_id"]).write_csv("data/paper_and_targets.csv")
+    paper_searching.select(["PMCID", "used_protein_id", "used_rna_id"]).write_csv(
+        "data/paper_and_targets.csv"
+    )
     # After writing, manually check and fix anything missing
 else:
     paper_searching = pl.read_csv("data/paper_and_targets.csv")
 
 
-enriched_target_data = raw.select(["pmid","PMCID", "go_term", "extension", "qualifier"]).join(paper_searching, on="PMCID", how="inner")
+enriched_target_data = raw.select(
+    ["pmid", "PMCID", "go_term", "extension", "qualifier"]
+).join(paper_searching, on="PMCID", how="inner")
 
-classification_data = pl.DataFrame(assign_classes(enriched_target_data))#.filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
+classification_data = pl.DataFrame(
+    assign_classes(enriched_target_data)
+)  # .filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
 classification_data.write_parquet("data/paper_classification_data.parquet")
 print(classification_data)
