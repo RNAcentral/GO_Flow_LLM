@@ -27,7 +27,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
         with user():
             llm += "Choose the most relevant sentence or two.\n"
         with assistant():
-            llm += f"The most relevant piece of evidence is: '{substring(article_text, name='detector_evidence')}'"
+            llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
     elif mode == "single-sentence":
         # first split the text into sentences by splitting on '. '
         # NB, may not be 100% accurate, but will probably do
@@ -36,7 +36,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
             llm += "Choose the most relevant sentence from the article\n"
         with assistant():
             llm += "The most relevant sentence is: " + select(
-                article_sentences, name="detector_evidence"
+                article_sentences, name="evidence"
             )
     elif mode == "single-paragraph":
         # first split the text into paragraphs by splitting on '\n'
@@ -46,7 +46,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
             llm += "Choose the most relevant paragraph from the article\n"
         with assistant():
             llm += "The most relevant paragraph is: " + select(
-                article_paragraphs, name="detector_evidence"
+                article_paragraphs, name="evidence"
             )
     elif mode == "recursive-paragraph":
         # first split the text into paragraphs by splitting on '\n'
@@ -59,12 +59,12 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
         with user():
             llm += "Now choose the most relevant piece of evidence within that paragraph.\n"
         with assistant():
-            llm += f"The most relevant piece of evidence is: '{substring(article_text, name='detector_evidence')}'"
+            llm += f"The most relevant piece of evidence is: '{substring(article_text, name='evidence')}'"
     elif mode == "recursive-sentence":
         # first split the text into sentences by splitting on '. '
         article_sentences = article_text.split(". ")
         with user():
             llm += "Choose the most relevant sentences from the article\n"
         with assistant():
-            llm += f"The most relevant sentences are: {select(article_sentences, name='detector_evidence', recurse=True, list_append=True)}\n"
+            llm += f"The most relevant sentences are: {select(article_sentences, name='evidence', recurse=True, list_append=True)}\n"
     return llm

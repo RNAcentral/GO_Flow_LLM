@@ -260,7 +260,7 @@ class ComputationGraph:
                 aes[detector.name] = llm["protein_name"].strip()
                 target_name = llm["protein_name"].strip()
                 node_reasoning = llm["detector_reasoning"]
-                node_evidence = llm["detector_evidence"]
+                node_evidence = llm["evidence"]
                 curation_tracer.log_event(
                     "flowchart_terminal",
                     step=graph_node.name,
