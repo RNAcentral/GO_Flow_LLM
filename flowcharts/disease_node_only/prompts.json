@@ -6,5 +6,9 @@
       "prompt": "Did the researchers validate the core molecular interaction in normal cells/contexts? Answer yes even if that was just one component of a larger disease-focused study? To help you answer this question, identify the cell lines where experiments were carried out and determine whether they are used as normal cell models or not.",
       "target_section": "methods"
     }
+  ],
+  "detectors" :
+  [
+    
   ]
 }
