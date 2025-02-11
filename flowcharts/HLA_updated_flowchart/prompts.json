@@ -1,0 +1,114 @@
+{
+  "prompts": [
+    {
+      "name": "experimental_evidence",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper have experimental evidence? This must be from reporter assays, in-vivo protein level measurements, qRT-PCR, Western Blot or similar techniques.",
+      "target_section": "methods"
+    },
+    {
+      "name": "functional_interaction",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper present evidence of a functional interatction between miRNA and mRNA? This must be in the form of a reporter assay",
+      "target_section": "methods"
+    },
+    {
+      "name": "mirna_mrna_binding",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper have a functional interaction determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
+      "target_section": "results"
+    },
+    {
+      "name": "effect_endogenous_1",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results"
+    },
+    {
+      "name": "effect_endogenous_2",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results"
+    },
+    {
+      "name": "computational_prediction",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper make a computational target prediction in addition to the binding assays?",
+      "target_section": "results"
+    },
+    {
+      "name": "effect_endogenous_3",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results"
+    },
+    {
+      "name": "mirna_changes",
+      "type": "condition_prompt_boolean",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene?",
+      "target_section": "results"
+    },
+    {
+      "name": "no_annotation",
+      "type": "terminal_full"
+    },
+    {
+      "name": "validated_binding_only",
+      "type": "terminal_full",
+      "annotation": "GO:0035195",
+      "detector": "target"
+    },
+    {
+      "name": "validated_binding_mrna",
+      "type": "terminal_full",
+      "annotation": "GO:0035279",
+      "detector": "target"
+    },
+    {
+      "name": "validated_binding_translation",
+      "type": "terminal_full",
+      "annotation": "GO:0035278",
+      "detector": "target"
+    },
+    {
+      "name": "no_validated_binding",
+      "type": "terminal_conditional",
+      "additionalNodes": [
+        "effect_endogenous_1",
+        "mirna_changes"
+      ],
+      "annotation_map": {
+        "GO:0035195": [
+          true,
+          false
+        ],
+        "GO:0035279": [
+          false,
+          true
+        ],
+        "GO:0035278": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "name": "mrna_expression_assay",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper include an assay for the miRNA effect on the target gene mRNA expression?",
+      "target_section": "methods"
+    }
+  ],
+  "detectors": [
+    {
+      "name": "target",
+      "type": "AE",
+      "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
+    },
+    {
+      "name": "mRNAlevelDectrase",
+      "type": "decision",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors measure mRNA levels and find them significantly decreased?"
+    }
+  ]
+}
