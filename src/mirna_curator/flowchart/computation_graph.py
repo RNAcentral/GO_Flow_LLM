@@ -228,6 +228,7 @@ class ComputationGraph:
                 graph_node = graph_node.transitions[node_result]
             else:
                 annotation = None
+                aes = None
                 break
             if graph_node.node_type == "terminal":
                 aes = {}
