@@ -21,5 +21,7 @@ source ~/.pyenv_setup
 
 pyenv activate mirna-curator
 
-python src/mirna_curator/main.py --config curation_config_QwQ.json
+#python src/mirna_curator/main.py --config configs/curation_config_QwQ.json
+
+python src/mirna_curator/main.py --config configs/one_node_QwQ.json
 
