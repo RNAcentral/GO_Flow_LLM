@@ -104,11 +104,6 @@
       "name": "target",
       "type": "AE",
       "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
-    },
-    {
-      "name": "mRNAlevelDectrase",
-      "type": "decision",
-      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors measure mRNA levels and find them significantly decreased?"
     }
   ]
 }
