@@ -64,6 +64,7 @@ from pydantic import BaseModel, Field, constr
 class NodeType(str, Enum):
     decision = "decision"  ## These are where we make decision
     terminal = "terminal"  ## These are where we make classifications
+    terminal_conditional = "terminal_conditional" ## These make classifications, but with some extra conditions
 
 
 class NodeData(BaseModel):
