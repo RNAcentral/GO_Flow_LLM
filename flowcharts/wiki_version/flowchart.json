@@ -1,0 +1,182 @@
+{
+  "nodes": {
+    "experimental_evidence": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Experimental Evidence?",
+        "condition": "experimental_evidence"
+      },
+      "transitions": {
+        "true": "functional_interaction",
+        "false": "no_annotation"
+      }
+    },
+    "functional_interaction": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Functional interaction by reporter assay?",
+        "condition": "functional_interaction"
+      },
+      "transitions": {
+        "true": "effect_endogenous_1",
+        "false": "mirna_mrna_binding"
+      }
+    },
+    "mirna_mrna_binding": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "miRNA-mRNA binding assay?",
+        "condition": "mirna_mrna_binding"
+      },
+      "transitions": {
+        "true": "effect_endogenous_2",
+        "false": "computational_prediction"
+      }
+    },
+    "effect_endogenous_1": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Effect on endogenous target gene expression?",
+        "condition": "effect_endogenous_1"
+      },
+      "transitions": {
+        "true": "mirna_changes",
+        "false": "validated_binding_only"
+      }
+    },
+    "effect_endogenous_2": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Effect on endogenous target gene expression?",
+        "condition": "effect_endogenous_2"
+      },
+      "transitions": {
+        "true": "mirna_changes",
+        "false": "no_annotation"
+      }
+    },
+    "computational_prediction": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Computational target prediction?",
+        "condition": "computational_prediction"
+      },
+      "transitions": {
+        "true": "effect_endogenous_3",
+        "false": "no_annotation"
+      }
+    },
+    "effect_endogenous_3": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "Effect on endogenous target gene expression?",
+        "condition": "effect_endogenous_3"
+      },
+      "transitions": {
+        "true": "no_validated_binding",
+        "false": "no_annotation"
+      }
+    },
+    "mirna_changes": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "miRNA inhibition or addition changes endogenous target mRNA level?",
+        "condition": "mirna_changes"
+      },
+      "transitions": {
+        "true": "validated_binding_mrna",
+        "false": "validated_binding_translation"
+      }
+    },
+    "no_annotation": {
+      "type": "terminal",
+      "data": {
+        "desc": "No annotation",
+        "terminal": "no_annotation"
+      }
+    },
+    "validated_binding_only": {
+      "type": "terminal",
+      "data": {
+        "desc": "Validated binding only",
+        "terminal": "validated_binding_only"
+      }
+    },
+    "validated_binding_mrna": {
+      "type": "terminal",
+      "data": {
+        "desc": "Validated binding + evidence of mRNA destabilization",
+        "terminal": "validated_binding_mrna"
+      }
+    },
+    "validated_binding_translation": {
+      "type": "terminal",
+      "data": {
+        "desc": "Validated binding + evidence of inhibition of translation",
+        "terminal": "validated_binding_translation"
+      }
+    },
+    "no_validated_binding": {
+      "type": "terminal_conditional",
+      "data": {
+        "desc": "No validated binding. Decreased expression of target",
+        "terminal": "no_validated_binding"
+      }
+    }
+  },
+  "displayMetadata": {
+    "experimental_evidence": {
+      "x": 195,
+      "y": 20
+    },
+    "functional_interaction": {
+      "x": 157,
+      "y": 210
+    },
+    "mirna_mrna_binding": {
+      "x": 468,
+      "y": 137
+    },
+    "effect_endogenous_1": {
+      "x": 146,
+      "y": 367
+    },
+    "effect_endogenous_2": {
+      "x": 719,
+      "y": 247
+    },
+    "computational_prediction": {
+      "x": 762,
+      "y": 74
+    },
+    "effect_endogenous_3": {
+      "x": 1067,
+      "y": 32
+    },
+    "mirna_changes": {
+      "x": 718,
+      "y": 421
+    },
+    "no_annotation": {
+      "x": 511,
+      "y": -15
+    },
+    "validated_binding_only": {
+      "x": 105,
+      "y": 636
+    },
+    "validated_binding_mrna": {
+      "x": 580,
+      "y": 612
+    },
+    "validated_binding_translation": {
+      "x": 968,
+      "y": 615
+    },
+    "no_validated_binding": {
+      "x": 1064,
+      "y": 203
+    }
+  },
+  "startNode": "experimental_evidence"
+}
