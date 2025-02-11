@@ -131,7 +131,7 @@
     {
       "name": "diseaseModel",
       "type": "condition_prompt_boolean",
-      "prompt": "Did the researchers validate the core molecular interaction in normal cells/contexts? Answer yes even if that was just one component of a larger disease-focused study? To help you answer this question, identify the cell lines where experiments were carried out and determine whether they are used as normal cell models or not.",
+      "prompt": "Did the researchers validate the core molecular interaction in normal cells/contexts? To answer:\n1. For ALL validation-relevant cell lines in Methods:\n   a) PRIMARY? (directly isolated from tissue)\n   b) HEALTHY ORIGIN? (from non-diseased donor/tissue)\n   c) UNMODIFIED? (no genetic alterations/disease modeling)\n   - Only 'yes' if all 3 criteria met\n2. Examples:\n   - Primary hepatocytes from healthy donor + no modifications: Normal\n   - HUVECs (primary umbilical vein cells) from normal birth: Normal\n   - Primary keratinocytes transfected with oncogene: Not normal\n   - Immortalized lymphocyte cell line: Not normal\n3. Answer 'yes' only if \u22651 cell model meets all criteria\nFormat: 'Answer: [yes/no]. Reasoning: Cells:[list]. Evaluation: [criterion checks]. Conclusion: [if any met all 3 criteria].' Think sequentially, check rigorously.",
       "target_section": "methods",
       "detector": null,
       "annotation": null
