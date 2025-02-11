@@ -9,9 +9,9 @@
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --gres=gpu:a100:1
 #SBATCH --mem=48G   # memory per node
-#SBATCH -J "go_flow_llm"   # job name
-#SBATCH -o "out_gfllm"   # job output file
-#SBATCH -e "err_gfllm"   # job error file
+#SBATCH -J "go_flow_llm_one_node"   # job name
+#SBATCH -o "out_gfllm_one_node"   # job output file
+#SBATCH -e "err_gfllm_one_node"   # job error file
 #SBATCH --mail-user=agreen@ebi.ac.uk   # email address
 #SBATCH --mail-type=END
 
