@@ -59,7 +59,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
         with assistant():
             llm += f"The most relevant paragraph is: {select(article_paragraphs, name='relevant_para')}\n"
         paragraph = llm['relevant_para']
-        logging.info(f"chose this paragraph:\n{paragraph}\n")
+        logging.debug(f"chose this paragraph:\n{paragraph}\n")
         with user():
             llm += "Now choose the most relevant piece of evidence within that paragraph.\n"
         with assistant():
