@@ -64,15 +64,15 @@ def find_section_heading(llm, target, possibles):
             )
             llm += select(possibles, name="target_section_name")
         target_section_name = llm["target_section_name"]
-        curation_tracer.log_event(
-            "flowchart_section_choice",
-            step="choose_section",
-            evidence="",
-            result=target_section_name,
-            reasoning=llm["reasoning"],
-            loaded_sections=[],
-            timestamp=time(),
-        )
+        # curation_tracer.log_event(
+        #     "flowchart_section_choice",
+        #     step="choose_section",
+        #     evidence="",
+        #     result=target_section_name,
+        #     reasoning=llm["reasoning"],
+        #     loaded_sections=[],
+        #     timestamp=time(),
+        # )
     except Exception as e:
         print(e)
         print(llm)
@@ -224,7 +224,10 @@ class ComputationGraph:
             visit_results.append(node_result)
 
             ## Move to the next node...
-            graph_node = graph_node.transitions[node_result]
+            if graph_node.transitions[node_result] is not None:
+                graph_node = graph_node.transitions[node_result]
+            else:
+                break
             if graph_node.node_type == "terminal":
                 aes = {}
                 visited_nodes.append(graph_node.name)
@@ -283,4 +286,5 @@ class ComputationGraph:
         result.update({"annotation": annotation, "aes": aes})
         trace = str(llm)
         self.loaded_sections = []
+        print(trace, result)
         return trace, result
