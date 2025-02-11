@@ -224,9 +224,10 @@ class ComputationGraph:
             visit_results.append(node_result)
 
             ## Move to the next node...
-            if graph_node.transitions[node_result] is not None:
+            if graph_node.transitions.get(node_result, None) is not None:
                 graph_node = graph_node.transitions[node_result]
             else:
+                annotation = None
                 break
             if graph_node.node_type == "terminal":
                 aes = {}
@@ -286,5 +287,4 @@ class ComputationGraph:
         result.update({"annotation": annotation, "aes": aes})
         trace = str(llm)
         self.loaded_sections = []
-        print(trace, result)
         return trace, result
