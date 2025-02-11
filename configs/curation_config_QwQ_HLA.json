@@ -6,6 +6,6 @@
     "quantization": "q6_k_l",
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
-    "output_data": "development_results_all_class_QwQ.parquet",
+    "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
     "max_papers": 500
 }
