@@ -1,7 +1,7 @@
 {
   "nodes": {
     "experimental_evidence": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "Experimental Evidence?",
         "condition": "experimental_evidence"
@@ -12,7 +12,7 @@
       }
     },
     "functional_interaction": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "Functional interaction by reporter assay?",
         "condition": "functional_interaction"
@@ -23,7 +23,7 @@
       }
     },
     "mirna_mrna_binding": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "miRNA-mRNA binding assay?",
         "condition": "mirna_mrna_binding"
@@ -34,7 +34,7 @@
       }
     },
     "effect_endogenous_2": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "Effect on endogenous target gene expression?",
         "condition": "effect_endogenous_2"
@@ -45,7 +45,7 @@
       }
     },
     "computational_prediction": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "Computational target prediction?",
         "condition": "computational_prediction"
@@ -56,7 +56,7 @@
       }
     },
     "effect_endogenous_3": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "Effect on endogenous target gene expression?",
         "condition": "effect_endogenous_3"
@@ -67,7 +67,7 @@
       }
     },
     "mirna_changes": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "miRNA inhibition or addition changes endogenous target mRNA level?",
         "condition": "mirna_changes"
@@ -113,7 +113,7 @@
       }
     },
     "mrna_expression_assay": {
-      "type": "conditional_boolean",
+      "type": "decision",
       "data": {
         "desc": "mrna_expression_assay",
         "condition": "mrna_expression_assay"
