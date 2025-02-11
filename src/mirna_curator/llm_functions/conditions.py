@@ -43,15 +43,8 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += (
-            "Explain your reasoning step-by-step, using these guidelines:\n"
-            "\tUse only if/then statements with format:\n"
-            "\t\tStep n: If [A] then [B] because [C]\n"
-            "\tMaximum 5 steps, single line each\n"
-            "\tNO introductions or summaries\n"
-            "\tSkip obvious steps\n"
-            "Your response should be clear but minimal. Show key logical steps only.\n"
-        )
+        llm += "Explain your reasoning step-by-step. Try to be concise\n"
+            
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
     logger.info(
