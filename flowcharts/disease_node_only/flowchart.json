@@ -1,0 +1,22 @@
+{
+  "nodes": {
+    "disease_model": {
+      "type": "conditional_boolean",
+      "data": {
+        "desc": "disease_model",
+        "condition": "disease_model"
+      },
+      "transitions": {
+        "true": null,
+        "false": null
+      }
+    }
+  },
+  "displayMetadata": {
+    "disease_model": {
+      "x": 533,
+      "y": 225
+    }
+  },
+  "startNode": "disease_model"
+}
