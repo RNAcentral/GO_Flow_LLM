@@ -25,7 +25,7 @@ def prompted_flowchart_step_bool(
     load_article_text: bool,
     step_prompt: str,
     rna_id: str,
-    temperature_reasoning: ty.Optional[float] = 0.4,
+    temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.4,
 ) -> guidance.models.Model:
     """
@@ -43,7 +43,7 @@ def prompted_flowchart_step_bool(
             llm += "\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
-        llm += "Explain your reasoning step-by-step. Try to be concise\n"
+        llm += "Explain your reasoning step-by-step. Be concise\n"
             
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
@@ -55,7 +55,7 @@ def prompted_flowchart_step_bool(
             with_temperature(
                 gen(
                     "reasoning",
-                    max_tokens=1024,
+                    max_tokens=512,
                     stop=STOP_TOKENS,
                 ),
                 temperature_reasoning,
@@ -81,7 +81,7 @@ def prompted_flowchart_terminal(
     detector_prompt: str,
     rna_id: str,
     paper_id: str,
-    temperature_reasoning: ty.Optional[float] = 0.4,
+    temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.1,
 ):
     """
