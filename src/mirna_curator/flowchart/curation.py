@@ -62,8 +62,10 @@ from pydantic import BaseModel, Field, constr
 
 
 class NodeType(str, Enum):
-    decision = "decision"  ## These are where we make decision
-    terminal = "terminal"  ## These are where we make classifications
+    decision = "conditional_prompt_boolean"  ## These are where we make decision
+    decision_tool = "conditional_tool_use" ## Nodes that use a tool
+    terminal = "terminal_full"  ## These are where we make classifications
+    terminal_short_circuit = "terminal_short_circuit" ## No annotation basically
     terminal_conditional = "terminal_conditional" ## These make classifications, but with some extra conditions
 
 

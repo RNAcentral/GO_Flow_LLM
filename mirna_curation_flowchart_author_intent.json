@@ -1,7 +1,7 @@
 {
     "nodes": {
       "experimental_evidence": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Experimental Evidence?",
           "condition": "hasExperimentalEvidence"
@@ -12,7 +12,7 @@
         }
       },
       "functional_interaction": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Functional interaction by reporter assay?",
           "condition": "hasFunctionalInteraction"
@@ -23,7 +23,7 @@
         }
       },
       "mirna_mrna_binding": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "miRNA-mRNA binding assay?",
           "condition": "hasBindingAssay"
@@ -34,7 +34,7 @@
         }
       },
       "effect_endogenous_1": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Effect on endogenous target gene expression?",
           "condition": "hasEndogenousEffect"
@@ -45,7 +45,7 @@
         }
       },
       "disease_model_1": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Are the experiments being done in a disease context?",
           "condition": "diseaseModel"
@@ -56,7 +56,7 @@
         }
       },
       "disease_model_2": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Are the experiments being done in a disease context?",
           "condition": "diseaseModel"
@@ -67,7 +67,7 @@
         }
       },
       "effect_endogenous_2": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Effect on endogenous target gene expression?",
           "condition": "hasEndogenousEffect"
@@ -78,7 +78,7 @@
         }
       },
       "computational_prediction": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Computational target prediction?",
           "condition": "hasComputationalPrediction"
@@ -89,7 +89,7 @@
         }
       },
       "effect_endogenous_3": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "Effect on endogenous target gene expression?",
           "condition": "hasEndogenousEffect"
@@ -100,7 +100,7 @@
         }
       },
       "mirna_changes": {
-        "type": "decision",
+        "type": "conditional_prompt_boolean",
         "data": {
           "desc": "miRNA inhibition or addition changes endogenous target mRNA level?",
           "condition": "hasMiRNAEffect"
@@ -113,7 +113,7 @@
 
 
       "no_annotation": {
-        "type": "terminal",
+        "type": "terminal_short_circuit",
         "data": {
           "desc": "No annotation",
           "terminal": "no_annotation"
@@ -121,7 +121,7 @@
       },
 
       "validated_binding_only": {
-        "type": "terminal",
+        "type": "terminal_full",
         "data": {
           "desc": "Validated binding only",
           "terminal" : "validated_binding_only"
@@ -129,21 +129,21 @@
         }
       },
       "validated_binding_mrna": {
-        "type": "terminal",
+        "type": "terminal_full",
         "data": {
           "desc": "Validated binding + evidence of mRNA destabilization",
           "terminal" : "validated_binding_plus_destabilisation"
         }
       },
       "validated_binding_translation": {
-        "type": "terminal",
+        "type": "terminal_full",
         "data": {
           "desc": "Validated binding + evidence of inhibition of translation",
           "terminal" : "validated_binding_plus_trans_inhibition"
         }
       },
       "no_validated_binding": {
-        "type": "terminal",
+        "type": "terminal_conditional",
         "data": {
           "desc": "No validated binding. Decreased expression of target",
           "terminal" : "validated_binding_plus_decreased_expression"

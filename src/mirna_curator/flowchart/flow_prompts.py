@@ -6,6 +6,7 @@ class Prompt(BaseModel):
     name: str
     type: Literal[
         "condition_prompt_boolean",
+        "conditional_tool_use",
         "terminal_short_circuit",
         "terminal_full",
         "terminal_bp_only",
