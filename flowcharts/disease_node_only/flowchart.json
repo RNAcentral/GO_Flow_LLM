@@ -1,7 +1,7 @@
 {
   "nodes": {
     "disease_model": {
-      "type": "decision",
+      "type": "condition_prompt_boolean",
       "data": {
         "desc": "disease_model",
         "condition": "disease_model"
