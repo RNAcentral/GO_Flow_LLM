@@ -11,10 +11,11 @@ from mirna_curator.flowchart.flow_prompts import CurationPrompts
 from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_step_bool,
     prompted_flowchart_terminal,
+    prompted_flowchart_step_tool,
 )
 from mirna_curator.model.llm import STOP_TOKENS
 from time import time
-
+from functools import partial
 
 def find_section_heading(llm, target, possibles):
     """
@@ -86,6 +87,7 @@ class ComputationNode:
     transitions: ty.Dict[ty.Any, "ComputationNode"]
     prompt_name: ty.Optional[str]
     node_type: ty.Literal["internal", "terminal"]
+    tools: ty.Optional[ty.List[str]]
     name: str
 
 
@@ -101,8 +103,12 @@ class ComputationGraph:
         self._nodes = {}
         # first pass, construct the nodes without transitions
         for flow_node_name, flow_node_props in flowchart.nodes.items():
-            if flow_node_props.type == NodeType("decision"):
+            if flow_node_props.type == NodeType("conditional_prompt_boolean"):
                 function = prompted_flowchart_step_bool
+                prompt = flow_node_props.data.condition
+                node_type = "internal"
+            elif flow_node_props.type == NodeType("conditional_tool_use"):
+                function = partial(prompted_flowchart_step_tool, tools=flow_node_props.data.tools)
                 prompt = flow_node_props.data.condition
                 node_type = "internal"
             elif flow_node_props.type == NodeType("terminal"):
