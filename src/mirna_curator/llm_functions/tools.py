@@ -2,6 +2,7 @@ import wikipedia
 import logging
 import requests
 import sys
+import re
 from typing import List, Dict, Any, Optional, Set
 
 logging.basicConfig(level=logging.INFO)
@@ -266,7 +267,7 @@ class CellosaurusAPI:
     
 def search_cellosaurus(cell_line_query:str) -> str:
     """
-    A tool that searchers the cellosauris API to get disease model and usage information for a given cell line ID
+    A tool that searchers the cellosaurus API to get disease model and usage information for a given cell line
 
     Args:
         cell_line_query: A string representing the cell lines ID
@@ -274,7 +275,10 @@ def search_cellosaurus(cell_line_query:str) -> str:
     api = CellosaurusAPI()
     
     # Get information about HeLa cell line
-    cell_info = api.get_cell_line(cell_line_query)
+    search_results = api.search_cell_lines(cell_line_query)
+    print(search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value'])
+    accession = search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value']
+    cell_info = api.get_cell_line(accession)
     
     # Get usage information
     usage = api.get_cell_line_usage(cell_info)
