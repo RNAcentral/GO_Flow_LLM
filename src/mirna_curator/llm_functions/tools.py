@@ -267,17 +267,19 @@ class CellosaurusAPI:
     
 def search_cellosaurus(cell_line_query:str) -> str:
     """
-    A tool that searchers the cellosaurus API to get disease model and usage information for a given cell line
+    A tool that searches the cellosaurus API to get disease model and usage information for a given cell line
 
     Args:
-        cell_line_query: A string representing the cell lines ID
+        cell_line_query: A string representing the cell lines ID. Only the ID should be given, e.g. HeLa
     """
     api = CellosaurusAPI()
     
     # Get information about HeLa cell line
     search_results = api.search_cell_lines(cell_line_query)
     if len(search_results['Cellosaurus']['cell-line-list']) == 0:
-        return f"Cellosaurus does not have any information about {cell_line_query}"
+        return (f"Cellosaurus does not have any information about {cell_line_query}."
+                "Make sure you only give the cell line id, e.g. HeLa for the search."
+        )
     print(search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value'])
     accession = search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value']
     cell_info = api.get_cell_line(accession)
