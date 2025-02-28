@@ -111,7 +111,15 @@ class ComputationGraph:
                 function = partial(prompted_flowchart_step_tool, tools=flow_node_props.data.tools)
                 prompt = flow_node_props.data.condition
                 node_type = "internal"
-            elif flow_node_props.type == NodeType("terminal"):
+            elif flow_node_props.type == NodeType("terminal_full"):
+                function = prompted_flowchart_terminal
+                prompt = flow_node_props.data.terminal
+                node_type = "terminal"
+            elif flow_node_props.type == NodeType("terminal_short_circuit"):
+                function = prompted_flowchart_terminal
+                prompt = flow_node_props.data.terminal
+                node_type = "terminal"
+            elif flow_node_props.type == NodeType("terminal_conditional"):
                 function = prompted_flowchart_terminal
                 prompt = flow_node_props.data.terminal
                 node_type = "terminal"
