@@ -122,6 +122,7 @@ class ComputationGraph:
                 node_type=node_type,
                 transitions={},
                 prompt_name=prompt,
+                tools=flow_node_props.data.tools
             )
             self._nodes[flow_node_name] = this_node
 
