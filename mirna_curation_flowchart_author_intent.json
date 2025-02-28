@@ -45,10 +45,11 @@
         }
       },
       "disease_model_1": {
-        "type": "conditional_prompt_boolean",
+        "type": "conditional_tool_use",
         "data": {
           "desc": "Are the experiments being done in a disease context?",
-          "condition": "diseaseModel"
+          "condition": "diseaseModel",
+          "tools": ["search_cellosaurus", "search_wikipedia"]
         },
         "transitions": {
           "false" : "validated_binding_only",
@@ -56,10 +57,11 @@
         }
       },
       "disease_model_2": {
-        "type": "conditional_prompt_boolean",
+        "type": "conditional_tool_use",
         "data": {
           "desc": "Are the experiments being done in a disease context?",
-          "condition": "diseaseModel"
+          "condition": "diseaseModel",
+          "tools": ["search_cellosaurus", "search_wikipedia"]
         },
         "transitions": {
           "false" : "validated_binding_only",
