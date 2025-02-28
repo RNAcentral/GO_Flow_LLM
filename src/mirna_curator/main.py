@@ -113,6 +113,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--annot_class", help="Restrict processing to one class of annotation", type=int
 )
+@click.option("--validate_only", help="only load and validate flowcharts", is_flag=True, default=False)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -126,18 +127,10 @@ def main(
     output_data: Optional[str] = None,
     max_papers: Optional[int] = None,
     annot_class: Optional[int] = None,
+    validate_only: Optional[bool] = None
 ):
     curation_tracer.set_model_name(model_path)
-    _model_load_start = time.time()
-    llm = get_model(
-        model_path,
-        chat_template=chat_template,
-        quantization=quantization,
-        context_length=context_length,
-    )
-    _model_load_end = time.time()
-    logger.info(f"Loaded model from {model_path}")
-    logger.info(f"Model loaded in {_model_load_end - _model_load_start:.2f} seconds")
+    
 
     _flowchart_load_start = time.time()
     try:
@@ -164,6 +157,21 @@ def main(
     _prompt_load_end = time.time()
     logger.info(f"Loaded prompts from {prompts}")
     logger.info(f"Prompts loaded in {_prompt_load_end - _prompt_load_start:.2f}")
+
+    if validate_only:
+        logger.info("Validation only, exiting now")
+        return 0
+
+    _model_load_start = time.time()
+    llm = get_model(
+        model_path,
+        chat_template=chat_template,
+        quantization=quantization,
+        context_length=context_length,
+    )
+    _model_load_end = time.time()
+    logger.info(f"Loaded model from {model_path}")
+    logger.info(f"Model loaded in {_model_load_end - _model_load_start:.2f} seconds")
 
     _system_prompt_start = time.time()
     ## Look for a system prompt in the prompts, and apply it if found
