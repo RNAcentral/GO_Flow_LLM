@@ -57,7 +57,7 @@ schema = """
 }
 """
 from enum import Enum
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from pydantic import BaseModel, Field, constr
 
 
@@ -73,6 +73,7 @@ class NodeData(BaseModel):
     desc: Optional[str] = None  ## Text description of the node
     condition: Optional[str] = None  ## Prompt to lookup for conditions
     terminal: Optional[str] = None  ## Terminal to look up for final classification
+    tools: Optional[List[str]] = None ## List of tool names to be available in the node
 
 
 class NodeTransitions(BaseModel):
