@@ -276,6 +276,8 @@ def search_cellosaurus(cell_line_query:str) -> str:
     
     # Get information about HeLa cell line
     search_results = api.search_cell_lines(cell_line_query)
+    if len(search_results['Cellosaurus']['cell-line-list']) == 0:
+        return f"Cellosaurus does not have any information about {cell_line_query}"
     print(search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value'])
     accession = search_results['Cellosaurus']['cell-line-list'][0]['accession-list'][0]['value']
     cell_info = api.get_cell_line(accession)
