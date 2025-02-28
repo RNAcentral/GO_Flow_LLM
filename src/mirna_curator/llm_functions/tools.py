@@ -290,6 +290,8 @@ def search_cellosaurus(cell_line_query:str) -> str:
         summary = f"{cell_line_query} cell line is a disease model\n"
     else:
         summary = f"{cell_line_query} cell line is a normal process model\n"
+    
+    summary += f"{usage}"
 
     summary += "Applications:\n"
     for app in usage["applications"]:
