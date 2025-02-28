@@ -111,9 +111,15 @@ def prompted_flowchart_step_tool(
         tools_string += f"Name: {tool_name}\n+++++++++++\n"
         tools_string += f"Description:\n{tool.__doc__}"
         tools_string += "\n+++++++++++\n"
+
+    tools_string += f"Name: finish\n+++++++++++\n"
+    tools_string += f"Description:\nEnd the searching process and move on to answering the question"
+    tools_string += "\n+++++++++++\n"
+
     tools_string += "===========================\n"
-    print(tools_string)
-    tools.append("finish")
+    
+    _tools = tools
+    _tools.append("finish")
     with user():
         if load_article_text:
             logger.info(
@@ -132,11 +138,12 @@ def prompted_flowchart_step_tool(
         llm += tools_string
         while True:
             llm += f"Thought {i}: " + gen(suffix='\n')
-            llm += f"Act {i}: " + select(tools, name='act')
-            llm += "[" + gen(name="arg", stop=']') + "]\n" 
-            if llm['act'] == 'finish' or i > max_steps:
+            llm += f"Act {i}: " + select(_tools, name='act')
+            llm += "[" + gen(name="arg", suffix=']') + "\n" 
+            if llm['act'].lower() == 'finish' or i > max_steps:
                 break
             else:
+                logger.info(f"calling {llm['act']} with argument {llm['arg']}")
                 tool_output = tool_dict[llm['act']](llm['arg'])
                 llm += f"Observation {i}: {tool_output}\n"
             i += 1
