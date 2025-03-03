@@ -101,7 +101,11 @@ def set_content_dict(new_dict):
 @click.option(
     "--prompts", type=click.Path(exists=True), help="JSON file with content dictionary"
 )
-def run(prompts):
+@click.option("--port", "-p", default=5000, help="Port to run the Flask server on")
+@click.option(
+    "--host", "-h", default="127.0.0.1", help="Host to run the Flask server on"
+)
+def run(prompts, port, host):
     global content_dict
     global prompt_dict
     global prompt_lookup
@@ -122,7 +126,7 @@ def run(prompts):
     prompt_lookup = {p.name: p for p in prompt_data.prompts}
     prompt_lookup.update({d.name: d for d in prompt_data.detectors})
 
-    app.run(debug=True)
+    app.run(debug=True, host=host, port=port)
 
 
 if __name__ == "__main__":
