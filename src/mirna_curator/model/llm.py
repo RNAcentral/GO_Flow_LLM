@@ -154,7 +154,7 @@ def get_model(
             # Find the right quantization file types
             matching_ggufs = list(
                 filter(
-                    lambda x: re.search(f".*{quantization.lower()}\\.", x.lower()),
+                    lambda x: re.search(f".*{quantization.lower()}.*", x.lower()),
                     gguf_files,
                 )
             )
