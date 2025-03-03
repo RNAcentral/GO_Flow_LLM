@@ -113,7 +113,12 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--annot_class", help="Restrict processing to one class of annotation", type=int
 )
-@click.option("--validate_only", help="only load and validate flowcharts", is_flag=True, default=False)
+@click.option(
+    "--validate_only",
+    help="only load and validate flowcharts",
+    is_flag=True,
+    default=False,
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -127,10 +132,9 @@ def main(
     output_data: Optional[str] = None,
     max_papers: Optional[int] = None,
     annot_class: Optional[int] = None,
-    validate_only: Optional[bool] = None
+    validate_only: Optional[bool] = None,
 ):
     curation_tracer.set_model_name(model_path)
-    
 
     _flowchart_load_start = time.time()
     try:
