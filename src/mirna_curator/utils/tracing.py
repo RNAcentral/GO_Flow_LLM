@@ -6,6 +6,9 @@ from typing import Any, Dict, Optional
 import uuid
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class EventLogger:
     """Logger for event sourcing pattern that writes to NDJSON files"""
 
@@ -25,6 +28,7 @@ class EventLogger:
         ## Use a run instance uid
         self.run_id = str(uuid.uuid4())
         self.paper_id = None
+        logger.info(f"Starting trace for run id {self.run_id}")
 
     def _get_current_filename(self) -> str:
         """Generate filename for current day's events"""
