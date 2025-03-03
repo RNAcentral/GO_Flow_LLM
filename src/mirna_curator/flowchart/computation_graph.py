@@ -209,14 +209,14 @@ class ComputationGraph:
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += graph_node.function(
-                        article.get_section(target_section_name, include_figures=True, figure_placement='end'),
+                        article.get_section(target_section_name, include_figures=True, figures_placement='end'),
                         False,
                         prompt.prompt,
                         rna_id,
                     )
                 else:
                     llm += graph_node.function(
-                        article.get_section(target_section_name, include_figures=True, figure_placement='end'),
+                        article.get_section(target_section_name, include_figures=True, figures_placement='end'),
                         True,
                         prompt.prompt,
                         rna_id,
