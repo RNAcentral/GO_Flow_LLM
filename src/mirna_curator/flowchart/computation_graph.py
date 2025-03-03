@@ -179,6 +179,8 @@ class ComputationGraph:
         node_idx = 0
         visited_nodes = []
         visit_results = []
+        visit_evidences = []
+        visit_reasonings = []
         while graph_node.node_type == "internal":
             prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
@@ -240,6 +242,8 @@ class ComputationGraph:
             )
 
             visit_results.append(node_result)
+            visit_evidences.append(node_evidence)
+            visit_reasonings.append(node_reasoning)
 
             ## Move to the next node...
             if graph_node.transitions.get(node_result, None) is not None:
@@ -300,9 +304,13 @@ class ComputationGraph:
         all_nodes = list(self._nodes.keys())
         result = {n: None for n in all_nodes}
         result.update({f"{n}_result": None for n in all_nodes})
-        for visited, visit_result in zip(visited_nodes, visit_results):
+        for visited, visit_result, visit_evidence, visit_reasoning in zip(
+            visited_nodes, visit_results, visit_evidences, visit_reasonings
+        ):
             result[visited] = True
             result[f"{visited}_result"] = visit_result
+            result[f"{visited}_evidence"] = visit_evidence
+            result[f"{visited}_reasoning"] = visit_reasoning
         result.update({"annotation": annotation, "aes": aes})
         trace = str(llm)
         self.loaded_sections = []
