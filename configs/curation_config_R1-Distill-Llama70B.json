@@ -1,0 +1,11 @@
+{
+    "model_path":  "unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF",
+    "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
+    "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
+    "context_length": 65536,
+    "quantization": "q6_k",
+    "chat_template": "chatml",
+    "input_data": "development_set.parquet",
+    "output_data": "development_results_hla_deepseekr1_llama70B.parquet",
+    "max_papers": 500
+}
