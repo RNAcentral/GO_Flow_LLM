@@ -59,7 +59,7 @@
     {
       "name": "mirna_changes",
       "type": "condition_prompt_boolean",
-      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene? This must be an observed change in the mRNA levels using a technique such as qRT-PCR, not an inference from other measurements.",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene? This must be an observed change in the mRNA levels of the target gene using a technique such as qRT-PCR, not an inference from other measurements. Make sure the qRT-PCR is used to measure the target gene mRNA level, not just the miRNA level.",
       "target_section": "results",
       "detector": null,
       "annotation": null
