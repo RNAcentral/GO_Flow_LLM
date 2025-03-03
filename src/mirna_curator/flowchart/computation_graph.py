@@ -17,6 +17,7 @@ from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 from functools import partial
 
+
 def find_section_heading(llm, target, possibles):
     """
     Finds the most likely section heading given the ones found in the paper.
@@ -108,7 +109,9 @@ class ComputationGraph:
                 prompt = flow_node_props.data.condition
                 node_type = "internal"
             elif flow_node_props.type == NodeType("conditional_tool_use"):
-                function = partial(prompted_flowchart_step_tool, tools=flow_node_props.data.tools)
+                function = partial(
+                    prompted_flowchart_step_tool, tools=flow_node_props.data.tools
+                )
                 prompt = flow_node_props.data.condition
                 node_type = "internal"
             elif flow_node_props.type == NodeType("terminal_full"):
@@ -130,7 +133,7 @@ class ComputationGraph:
                 node_type=node_type,
                 transitions={},
                 prompt_name=prompt,
-                tools=flow_node_props.data.tools
+                tools=flow_node_props.data.tools,
             )
             self._nodes[flow_node_name] = this_node
 

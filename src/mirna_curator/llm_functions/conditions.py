@@ -45,7 +45,7 @@ def prompted_flowchart_step_bool(
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
-            
+
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
     logger.info(
@@ -102,9 +102,10 @@ def prompted_flowchart_step_tool(
 
     ## build the tool description string.
     tool_dict = safe_import(tools)
-    tools_string = ("To help me answer this question, I have access to some tools to look"
-                    " up some information. The tools are described here:\n"
-                    "===========================\n"
+    tools_string = (
+        "To help me answer this question, I have access to some tools to look"
+        " up some information. The tools are described here:\n"
+        "===========================\n"
     )
 
     for tool_name, tool in tool_dict.items():
@@ -113,11 +114,13 @@ def prompted_flowchart_step_tool(
         tools_string += "\n+++++++++++\n"
 
     tools_string += f"Name: finish\n+++++++++++\n"
-    tools_string += f"Description:\nEnd the searching process and move on to answering the question"
+    tools_string += (
+        f"Description:\nEnd the searching process and move on to answering the question"
+    )
     tools_string += "\n+++++++++++\n"
 
     tools_string += "===========================\n"
-    
+
     _tools = tools
     _tools.append("finish")
     with user():
@@ -130,27 +133,27 @@ def prompted_flowchart_step_tool(
             llm += "\n\n"
 
         llm += f"Question: {step_prompt}\n"
-    
+
     ## Make a tiny little ReAct agent loop
     i = 0
     max_steps = 5
     with assistant():
         llm += tools_string
         while True:
-            llm += f"Thought {i}: " + gen(suffix='\n')
-            llm += f"Act {i}: " + select(_tools, name='act')
-            llm += "[" + gen(name="arg", suffix=']') + "\n" 
-            if llm['act'].lower() == 'finish' or i > max_steps:
+            llm += f"Thought {i}: " + gen(suffix="\n")
+            llm += f"Act {i}: " + select(_tools, name="act")
+            llm += "[" + gen(name="arg", suffix="]") + "\n"
+            if llm["act"].lower() == "finish" or i > max_steps:
                 break
             else:
                 logger.info(f"calling {llm['act']} with argument {llm['arg']}")
-                tool_output = tool_dict[llm['act']](llm['arg'])
+                tool_output = tool_dict[llm["act"]](llm["arg"])
                 llm += f"Observation {i}: {tool_output}\n"
             i += 1
         # Restrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
-            
+
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
     logger.info(
