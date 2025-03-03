@@ -164,7 +164,7 @@ def prompted_flowchart_step_tool(
             with_temperature(
                 gen(
                     "reasoning",
-                    max_tokens=512,
+                    max_tokens=1024,
                     stop=STOP_TOKENS,
                 ),
                 temperature_reasoning,
