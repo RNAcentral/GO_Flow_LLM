@@ -11,7 +11,7 @@
     {
       "name": "functional_interaction",
       "type": "condition_prompt_boolean",
-      "prompt": "Does the paper present evidence of a functional interatction between miRNA and mRNA? This must be in the form of a reporter assay",
+      "prompt": "Does the paper have a functional interaction determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
       "target_section": "methods",
       "detector": null,
       "annotation": null
@@ -19,7 +19,7 @@
     {
       "name": "mirna_mrna_binding",
       "type": "condition_prompt_boolean",
-      "prompt": "Does the paper have a functional interaction determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
+      "prompt": "Does the paper have a miRNA-mRNA binding assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
       "target_section": "results",
       "detector": null,
       "annotation": null
