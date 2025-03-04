@@ -220,6 +220,7 @@ def main(
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
+        article.add_figures_section()
         _paper_fetch_end = time.time()
         logger.info(
             f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds"
