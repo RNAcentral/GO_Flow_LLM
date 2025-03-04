@@ -21,7 +21,7 @@ source ~/.pyenv_setup
 
 pyenv activate mirna-curator
 
-python src/mirna_curator/main.py --config configs/curation_config_QwQ.json
+python src/mirna_curator/main.py --config configs/curation_config_QwQ_HLA.json
 
 # python src/mirna_curator/main.py --config configs/curation_config_R1-Distill-Llama70B.json
 
