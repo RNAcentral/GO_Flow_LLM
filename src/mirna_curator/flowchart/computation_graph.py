@@ -1,6 +1,6 @@
 import typing as ty
 from dataclasses import dataclass
-from guidance.models._model import Model
+from guidance.models._base._model import Model
 from guidance import user, assistant, select, gen
 from epmc_xml.article import Article
 from mirna_curator.utils.tracing import curation_tracer
