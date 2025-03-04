@@ -18,7 +18,7 @@
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
 source ~/.pyenv_setup
-
+export HF_HUB_ENABLE_HF_TRANSFER=1
 pyenv activate mirna-curator
 
 python src/mirna_curator/main.py --config configs/curation_config_QwQ_HLA.json
