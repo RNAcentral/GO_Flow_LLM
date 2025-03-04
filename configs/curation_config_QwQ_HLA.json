@@ -2,7 +2,7 @@
     "model_path":  "bartowski/QwQ-32B-Preview-GGUF",
     "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
-    "context_length": 32768,
+    "context_length": 65536,
     "quantization": "q6_k_l",
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
