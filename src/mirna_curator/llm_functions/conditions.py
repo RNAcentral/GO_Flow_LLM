@@ -192,7 +192,7 @@ def prompted_flowchart_terminal(
     detector_prompt: str,
     rna_id: str,
     paper_id: str,
-    config: ty.Optional[ty.Dict[str, ty.Any]] = None,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.1,
 ):
