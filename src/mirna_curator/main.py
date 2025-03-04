@@ -119,6 +119,8 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     is_flag=True,
     default=False,
 )
+@click.option("--evidence_type", help="How to do the evidence extraction", type=click.Choice(["recursive-paragraph", "recursive-sentence", "single-sentence", "single-paragraph", "full-substring"]), default="single-sentence")
+@click.option("--deepseek_mode", help="Tweak the reasoning generation for deepseek models", is_flag=True, default=False)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -133,9 +135,16 @@ def main(
     max_papers: Optional[int] = None,
     annot_class: Optional[int] = None,
     validate_only: Optional[bool] = None,
+    evidence_type: Optional[str] = "single-sentence",
+    deepseek_mode: Optional[bool] = False,
 ):
     curation_tracer.set_model_name(model_path)
 
+    ## Build the run config options dict from things in the config
+    run_config_options = {
+        "evidence_type": evidence_type,
+        "deepseek_mode": deepseek_mode,
+    }
     _flowchart_load_start = time.time()
     try:
         cur_flowchart_string = open(flowchart, "r").read()
@@ -199,7 +208,7 @@ def main(
     )
 
     _graph_construction_start = time.time()
-    graph = ComputationGraph(cf)
+    graph = ComputationGraph(cf, run_config=run_config_options)
     _graph_construction_end = time.time()
     logger.info("Constructed computation graph")
     logger.info(

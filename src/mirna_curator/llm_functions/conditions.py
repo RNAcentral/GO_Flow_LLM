@@ -26,6 +26,7 @@ def prompted_flowchart_step_bool(
     load_article_text: bool,
     step_prompt: str,
     rna_id: str,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.4,
 ) -> guidance.models.Model:
@@ -69,7 +70,7 @@ def prompted_flowchart_step_bool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    llm += extract_evidence(article_text, mode="recursive-paragraph")
+    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
 
     return llm
 
@@ -81,6 +82,7 @@ def prompted_flowchart_step_tool(
     load_article_text: bool,
     step_prompt: str,
     rna_id: str,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     tools: ty.Optional[ty.List[str]] = [],
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.4,
@@ -177,7 +179,7 @@ def prompted_flowchart_step_tool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    llm += extract_evidence(article_text, mode="recursive-paragraph")
+    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
 
     return llm
 
@@ -190,6 +192,7 @@ def prompted_flowchart_terminal(
     detector_prompt: str,
     rna_id: str,
     paper_id: str,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = None,
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.1,
 ):
@@ -234,6 +237,6 @@ def prompted_flowchart_terminal(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
 
-    llm += extract_evidence(article_text, mode="recursive-paragraph")
+    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
 
     return llm

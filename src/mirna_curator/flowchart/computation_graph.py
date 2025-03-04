@@ -93,9 +93,10 @@ class ComputationNode:
 
 
 class ComputationGraph:
-    def __init__(self, flowchart: CurationFlowchart):
+    def __init__(self, flowchart: CurationFlowchart, run_config: ty.Dict = None):
         self.construct_nodes(flowchart)
         self.loaded_sections = []
+        self.run_config = run_config
 
     def construct_nodes(self, flowchart: CurationFlowchart) -> None:
         """
