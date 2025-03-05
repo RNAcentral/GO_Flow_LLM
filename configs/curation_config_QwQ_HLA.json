@@ -1,5 +1,5 @@
 {
-    "model_path":  "bartowski/Llama-3.3-70B-Instruct-GGUF",
+    "model_path":  "bartowski/QwQ-32B-Preview-GGUF",
     "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
