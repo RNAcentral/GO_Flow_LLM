@@ -3,7 +3,7 @@
     "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
-    "quantization": "q6_k",
+    "quantization": "q8_0",
     "chat_template": "qwen",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
