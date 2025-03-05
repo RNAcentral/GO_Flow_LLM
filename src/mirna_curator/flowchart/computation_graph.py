@@ -183,6 +183,7 @@ class ComputationGraph:
         visit_results = []
         visit_evidences = []
         visit_reasonings = []
+        error_count = 0
         while graph_node.node_type == "internal":
             prompt = list(
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
@@ -235,7 +236,11 @@ class ComputationGraph:
                 print(llm)
                 print("---ARICLE SECTION CONSIDERED---")
                 print(article.get_section(target_section_name, include_figures=True, figures_placement='end'))
-                exit()
+                error_count += 1
+                if error_count > 3:
+                    print("Too many errors, exiting")
+                    exit()
+                continue
 
             node_result = llm["answer"].lower().replace("*", "") == "yes"
             node_evidence = llm["evidence"]
