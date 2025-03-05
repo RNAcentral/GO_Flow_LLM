@@ -64,13 +64,16 @@ def prompted_flowchart_step_bool(
             )
             + "\n"
         )
+        logger.info("Generated reasoning ok")
 
     with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
+        logger.info("Selected answer ok")
 
     llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
+    logger.info("Evidence extracted, ready to return")
 
     return llm
 
