@@ -16,7 +16,8 @@ from mirna_curator.llm_functions.conditions import (
 from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 from functools import partial
-
+import logging
+logger = logging.getLogger(__name__)
 
 def find_section_heading(llm, target, possibles):
     """
@@ -187,9 +188,10 @@ class ComputationGraph:
                 filter(lambda p: p.name == graph_node.prompt_name, prompts.prompts)
             )[0]
             visited_nodes.append(graph_node.name)
-
+            logger.info(f"Processing node {graph_node.name}")
             ## see if we already have the target section loaded - this should speed things up provided we can reuse the context
             if not prompt.target_section in self.loaded_sections:
+                logger.info(f"Loading section {prompt.target_section} into context")
                 ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
                 if not prompt.target_section in article.sections.keys():
                     check_subtitles = [
@@ -209,6 +211,7 @@ class ComputationGraph:
             try:
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
+                    logger.info("Running condition function, not loading context")
                     llm += graph_node.function(
                         article.get_section(target_section_name, include_figures=True, figures_placement='end'),
                         False,
@@ -216,6 +219,7 @@ class ComputationGraph:
                         rna_id,
                     )
                 else:
+                    logger.info("Running condition function, loading context")
                     llm += graph_node.function(
                         article.get_section(target_section_name, include_figures=True, figures_placement='end'),
                         True,
@@ -224,8 +228,13 @@ class ComputationGraph:
                     )
                     self.loaded_sections.append(target_section_name)
             except Exception as e:
+                logger.error("Hit an exception when trying to run conditions")
+                logger.error(f"Exception: {e}")
                 print(e)
+                print("---LLM STATE---")
                 print(llm)
+                print("---ARICLE SECTION CONSIDERED---")
+                print(article.get_section(target_section_name, include_figures=True, figures_placement='end'))
                 exit()
 
             node_result = llm["answer"].lower().replace("*", "") == "yes"

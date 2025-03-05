@@ -25,6 +25,7 @@ def extract_evidence(llm, article_text, mode="recursive-paragraph"):
     - full-substring: Run substring selection on the whole
         article text
     """
+    logger.info(f"Extracting evidence from article text")
     with user():
         llm += "Give a piece of evidence from the text that supports your answer. "
     if mode == "full-substring":
