@@ -1,5 +1,5 @@
 {
-    "model_path":  "Qwen/QwQ-32B",
+    "model_path":  "Qwen/QwQ-32B-GGUF",
     "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
