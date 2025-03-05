@@ -239,6 +239,7 @@ class ComputationGraph:
                 error_count += 1
                 if error_count > 3:
                     print("Too many errors, exiting")
+                    logger.fatal("Too many errors, exiting")
                     exit()
                 continue
 
