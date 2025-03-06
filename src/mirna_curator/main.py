@@ -142,7 +142,7 @@ def main(
 
     ## Build the run config options dict from things in the config
     run_config_options = {
-        "evidence_type": evidence_type,
+        "evidence_mode": evidence_type,
         "deepseek_mode": deepseek_mode,
     }
     _flowchart_load_start = time.time()
@@ -226,6 +226,8 @@ def main(
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
+        if i < 3:
+            continue
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
@@ -237,7 +239,7 @@ def main(
         _curation_start = time.time()
         try:
             llm_trace, curation_result = graph.execute_graph(
-                row["PMCID"], llm, article, row["rna_id"], prompt_data
+                row["PMCID"], llm, article, row["rna_id"], prompt_data, 
             )
         except Exception as e:
             logger.error(e)

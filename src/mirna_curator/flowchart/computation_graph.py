@@ -218,6 +218,7 @@ class ComputationGraph:
                         False,
                         prompt.prompt,
                         rna_id,
+                        config=self.run_config,
                     )
                 else:
                     logger.info("Running condition function, loading context")
@@ -226,16 +227,17 @@ class ComputationGraph:
                         True,
                         prompt.prompt,
                         rna_id,
+                        config=self.run_config,
                     )
                     self.loaded_sections.append(target_section_name)
             except Exception as e:
                 logger.error("Hit an exception when trying to run conditions")
                 logger.error(f"Exception: {e}")
-                print(e)
-                print("---LLM STATE---")
-                print(llm)
-                print("---ARICLE SECTION CONSIDERED---")
-                print(article.get_section(target_section_name, include_figures=True, figures_placement='end'))
+                # print(e)
+                # print("---LLM STATE---")
+                # print(llm)
+                # print("---ARICLE SECTION CONSIDERED---")
+                # print(article.get_section(target_section_name, include_figures=True, figures_placement='end'))
                 error_count += 1
                 if error_count > 3:
                     print("Too many errors, exiting")
@@ -291,6 +293,7 @@ class ComputationGraph:
                         detector.prompt,
                         rna_id,
                         paper_id,
+                        config=self.run_config,
                     )
                 else:
                     llm += graph_node.function(
@@ -299,6 +302,7 @@ class ComputationGraph:
                         detector.prompt,
                         rna_id,
                         paper_id,
+                        config=self.run_config,
                     )
                     self.loaded_sections.append(target_section_name)
                 aes[detector.name] = llm["protein_name"].strip()

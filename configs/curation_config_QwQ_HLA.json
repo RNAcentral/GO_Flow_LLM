@@ -7,5 +7,6 @@
     "chat_template": "qwen",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
-    "max_papers": 5
+    "max_papers": 5,
+    "evidence_type": "recursive-paragraph"
 }

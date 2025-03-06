@@ -1,11 +1,12 @@
 {
     "model_path":  "/Users/agreen/tmp/Qwen2.5-0.5B-Instruct.Q4_K_M.gguf",
-    "flowchart": "mirna_curation_flowchart_author_intent.json",
-    "prompts": "mirna_curation_prompts.json",
+    "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
+    "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
     "quantization": "q4_k_M",
-    "chat_template": "chatml",
+    "chat_template": "qwen",
     "input_data": "data/development_set.parquet",
     "output_data": "outputs/development_results_all_class_qwen0_5B.parquet",
-    "max_papers": 500
+    "max_papers": 5,
+    "evidence_type": "single-paragraph"
 }
