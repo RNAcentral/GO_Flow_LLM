@@ -1,0 +1,12 @@
+{
+    "model_path":  "bartowski/Mistral-Large-Instruct-2407-GGUF",
+    "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
+    "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
+    "context_length": 65536,
+    "quantization": "q4_k_m",
+    "chat_template": "mistral",
+    "input_data": "development_set.parquet",
+    "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
+    "max_papers": 500,
+    "evidence_type": "single-paragraph"
+}
