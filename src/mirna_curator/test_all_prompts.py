@@ -15,6 +15,7 @@ from tqdm import tqdm
 from epmc_xml import fetch
 import sqlite3
 
+
 def w_pbar(pbar, func):
     def foo(*args, **kwargs):
         pbar.update(1)
@@ -22,11 +23,12 @@ def w_pbar(pbar, func):
 
     return foo
 
+
 def run_one_paper(pmcid, prompts, llm, trace_connection):
     article = fetch.article(pmcid)
     result_dict = {}
     for prompt in prompts:
-        if prompt.type.startswith("terminal"): ## for now
+        if prompt.type.startswith("terminal"):  ## for now
             continue
 
         if not prompt.target_section in article.sections.keys():
@@ -41,9 +43,7 @@ def run_one_paper(pmcid, prompts, llm, trace_connection):
                         f"the following possbilities: {article.sections.keys()}. Which one is closest?"
                     )
                 with assistant():
-                    llm += select(
-                        article.sections.keys(), name="target_section_name"
-                    )
+                    llm += select(article.sections.keys(), name="target_section_name")
                 target_section_name = llm["target_section_name"]
             else:
                 target_section_name = list(article.sections.keys())[
@@ -52,11 +52,12 @@ def run_one_paper(pmcid, prompts, llm, trace_connection):
         else:
             target_section_name = prompt.target_section
 
-        llm = prompted_flowchart_step_bool(llm, article.sections[target_section_name], prompt.prompt)
+        llm = prompted_flowchart_step_bool(
+            llm, article.sections[target_section_name], prompt.prompt
+        )
 
-        result_dict[prompt.name] = llm['answer'] == "yes"
+        result_dict[prompt.name] = llm["answer"] == "yes"
     return result_dict
-
 
 
 @click.command()
@@ -67,7 +68,15 @@ def run_one_paper(pmcid, prompts, llm, trace_connection):
 @click.option("--quant", default="q4_k_m")
 @click.option("--template", default="chatml")
 @click.option("--trace_storage", default=None)
-def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, template, trace_storage):
+def main(
+    curation_prompts_path,
+    paper_set_path,
+    model_name,
+    output_path,
+    quant,
+    template,
+    trace_storage,
+):
     curation_prompts_json = open(curation_prompts_path, "r").read()
     prompt_object = CurationPrompts.model_validate_json(curation_prompts_json)
 
@@ -83,14 +92,19 @@ def main(curation_prompts_path, paper_set_path, model_name, output_path, quant, 
 
     papers = pl.read_parquet(paper_set_path)
 
-    pbar = tqdm(total=len(papers), desc='Running all decisions', colour='green')
-    process_one = w_pbar(pbar, partial(run_one_paper, prompts=prompt_object.prompts, llm=llm))
+    pbar = tqdm(total=len(papers), desc="Running all decisions", colour="green")
+    process_one = w_pbar(
+        pbar, partial(run_one_paper, prompts=prompt_object.prompts, llm=llm)
+    )
 
-    papers = papers.with_columns(res=pl.col("PMCID").map_elements(process_one, return_dtype=pl.Struct)).unnest("res")
+    papers = papers.with_columns(
+        res=pl.col("PMCID").map_elements(process_one, return_dtype=pl.Struct)
+    ).unnest("res")
 
     print(papers)
 
     papers.write_parquet(output_path)
+
 
 if __name__ == "__main__":
     main()
