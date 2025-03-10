@@ -7,7 +7,7 @@
         "condition": "mirna_binding"
       },
       "transitions": {
-        "true": "multiple_targets",
+        "true": "mirna_cluster",
         "false": "no_annotation"
       }
     },

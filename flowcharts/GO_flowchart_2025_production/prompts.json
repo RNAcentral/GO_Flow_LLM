@@ -20,7 +20,7 @@
       "name": "multiple_targets",
       "type": "condition_prompt_boolean",
       "prompt": "Does this paper present evidence for multiple targets of the miRNA?",
-      "target_section": "methods",
+      "target_section": "results",
       "detector": null,
       "annotation": "miRNA_multiple_targets"
     },
