@@ -1,0 +1,12 @@
+{
+    "model_path":  "Qwen/QwQ-32B-GGUF",
+    "flowchart": "flowcharts/GO_flowchart_2025_production/flowchart.json",
+    "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
+    "context_length": 65536,
+    "quantization": "q8_0",
+    "chat_template": "chatml",
+    "input_data": "development_set.parquet",
+    "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
+    "max_papers": 500,
+    "evidence_type": "single-paragraph"
+}
