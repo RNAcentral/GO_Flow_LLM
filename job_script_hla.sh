@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1   # number of tasks
 #SBATCH --cpus-per-task=24   # number of CPUs Per Task i.e if your code is multi-threaded
 #SBATCH --nodes=1   # number of nodes
-#SBATCH --gres=gpu:a100:2
+#SBATCH --gres=gpu:a100:1
 #SBATCH --mem=48G   # memory per node
 #SBATCH -J "go_flow_llm_updated_fc"   # job name
 #SBATCH -o "out_gfllm_updated_fc"   # job output file
