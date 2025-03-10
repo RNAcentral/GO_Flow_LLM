@@ -226,8 +226,6 @@ def main(
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
-        if i < 3:
-            continue
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
