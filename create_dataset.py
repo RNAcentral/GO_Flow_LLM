@@ -69,7 +69,6 @@ def lookup_rnac_names(rna_id):
 
 
 def identify_used_ids(args):
-    print(args)
     pmcid = args["PMCID"]
     genes = args["Gene Names"]
     rnas = args["rna_id"]
@@ -126,7 +125,7 @@ def identify_used_ids(args):
 
 
 def expand_extension(ext):
-    if ext is None:
+    if ext is None or ext == "":
         return {"targets": list(), "anatomical_locations": list(), "cell_lines": list()}
 
     def get_input(ext_text):
@@ -183,6 +182,7 @@ def assign_classes(df):
         rdata = {}
         rdata["protein_id"] = row["used_protein_id"]
         rdata["rna_id"] = row["used_rna_id"]
+        rdata["date"] = row["date"]
         if row["go_term"] == "GO:0035195":
             # rdata = expand_extension(row["extension"])
             paper_annotations = df.filter(pl.col("pmid") == row["pmid"])
@@ -231,26 +231,33 @@ def assign_classes(df):
 
 raw = pl.read_csv(
     "data/bhf_ucl_annotations.tsv",
+    # "data/aruk_ucl_annotations.tsv",
     separator="\t",
     has_header=False,
-    columns=[1, 2, 3, 4, 10],
-    new_columns=["rna_id", "qualifier", "go_term", "pmid", "extension"],
+    columns=[1, 2, 3, 4, 8, 10],
+    new_columns=["rna_id", "qualifier", "go_term", "pmid", "date", "extension"],
     infer_schema_length=None,
     dtypes={
         "rna_id": pl.Utf8,
-        "qualifier": pl.Utf8, 
+        "qualifier": pl.Utf8,
         "go_term": pl.Utf8,
         "pmid": pl.Utf8,
-        "extension": pl.Utf8
-    }
+        "extension": pl.Utf8,
+    },
 )
+print(raw)
 raw = raw.with_columns(pl.col("pmid").str.split(":").list.last())
 raw = raw.with_columns(
-    res=pl.col("extension").map_elements(expand_extension, return_dtype=pl.Struct([
-            pl.Field("targets", pl.List(pl.Utf8)),
-            pl.Field("anatomical_locations", pl.List(pl.Utf8)),
-            pl.Field("cell_lines", pl.List(pl.Utf8))
-        ]))
+    res=pl.col("extension").map_elements(
+        expand_extension,
+        return_dtype=pl.Struct(
+            [
+                pl.Field("targets", pl.List(pl.Utf8)),
+                pl.Field("anatomical_locations", pl.List(pl.Utf8)),
+                pl.Field("cell_lines", pl.List(pl.Utf8)),
+            ]
+        ),
+    )
 ).unnest("res")
 
 pmid_pmcid_mapping = pl.scan_csv(
@@ -264,32 +271,38 @@ raw = (
     .collect()
 )
 
+## Select unique papers
+## Explode list of targets
+## Filter for only entries with a target (should be our terms)
 targets = raw.unique("pmid").explode("targets").filter(pl.col("targets").is_not_null())
-
-cached_targets = True
-if cached_targets and Path("cached_target_data.parquet").exists():
-    targets = pl.read_parquet("data/cached_target_data.parquet")
+print(f"Total unique papers: {targets.height}")
+cached_targets = False  # True
+if cached_targets and Path("data/bhf_cached_target_data.parquet").exists():
+    targets = pl.read_parquet("data/bhf_cached_target_data.parquet")
 else:
     uniprot_ids = pl.read_csv("data/idmapping_uniprot.tsv", separator="\t")
     targets = targets.join(uniprot_ids, left_on="targets", right_on="Entry")
     targets = targets.with_columns(pl.col("Gene Names").str.split(" ")).explode(
         "Gene Names"
     )
+    ## Expand gpa data to get PMCIDs - so we can check OA status
     targets = (
         targets.lazy()
         .join(pmid_pmcid_mapping, left_on="pmid", right_on="PMID")
         .filter(pl.col("PMCID").is_not_null())
         .collect()
     )
+    ## Use ePMC API to check if we can pull the xml
     targets = targets.with_columns(
         open_access=pl.col("PMCID").map_elements(
             is_open_access, return_dtype=pl.Boolean
         )
     ).filter(pl.col("open_access"))
+    print(f"Number of open acces pblicatins available: {targets.height}")
     targets = targets.with_columns(
         pl.col("rna_id").map_elements(lookup_rnac_names, return_dtype=pl.String)
     )
-    targets.write_parquet("data/cached_target_data.parquet")
+    targets.write_parquet("data/bhf_cached_target_data.parquet")
 
 targets = targets.with_columns(pl.col("rna_id").str.split("|")).explode("rna_id")
 
@@ -314,11 +327,11 @@ else:
 
 
 enriched_target_data = raw.select(
-    ["pmid", "PMCID", "go_term", "extension", "qualifier"]
+    ["pmid", "PMCID", "go_term", "date", "extension", "qualifier"]
 ).join(paper_searching, on="PMCID", how="inner")
 
 classification_data = pl.DataFrame(
     assign_classes(enriched_target_data)
 )  # .filter(pl.col("rna_id") == "URS0000D55DFB_9606"))
-classification_data.write_parquet("data/paper_classification_data.parquet")
+classification_data.write_parquet("data/bhf_paper_classification_data.parquet")
 print(classification_data)
