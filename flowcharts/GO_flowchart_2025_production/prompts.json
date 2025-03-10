@@ -1,0 +1,147 @@
+{
+  "prompts": [
+    {
+      "name": "mirna_binding",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does this paper present an experiment on miRNA binding?",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": "miRNA_cluster"
+    },
+    {
+      "name": "mirna_cluster",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does this paper present an experiment on a miRNA cluster? miRNA clusters are defined as miRNA genes, which are located on a chromosome at the maximum inter-miRNA distance (MID) of 10 kb.",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": "miRNA_cluster"
+    },
+    {
+      "name": "multiple_targets",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does this paper present evidence for multiple targets of the miRNA?",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": "miRNA_multiple_targets"
+    },
+    {
+      "name": "experimental_evidence",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper have experimental evidence? This must be from reporter assays, in-vivo protein level measurements, qRT-PCR, Western Blot or similar techniques.",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "functional_interaction",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper have a functional interaction between the miRNA and an mRNA, determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "mirna_mrna_binding",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper have a miRNA-mRNA binding assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "effect_endogenous_1",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "effect_endogenous_2",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "computational_prediction",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper make a computational target prediction in addition to the binding assays?",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "effect_endogenous_3",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "mirna_changes",
+      "type": "condition_prompt_boolean",
+      "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene? This must be an observed change in the mRNA levels of the target gene using a technique such as qRT-PCR, not an inference from other measurements. Make sure the qRT-PCR is used to measure the target gene mRNA level, not just the miRNA level.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "no_annotation",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "validated_binding_only",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": "target",
+      "annotation": "GO:0035195"
+    },
+    {
+      "name": "validated_binding_mrna",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": "target",
+      "annotation": "GO:0035279"
+    },
+    {
+      "name": "validated_binding_translation",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": "target",
+      "annotation": "GO:0035278"
+    },
+    {
+      "name": "no_validated_binding",
+      "type": "terminal_conditional",
+      "prompt": "",
+      "target_section": null,
+      "detector": null,
+      "annotation": null
+    },
+    {
+      "name": "mrna_expression_assay",
+      "type": "condition_prompt_boolean",
+      "prompt": "Does the paper include an assay for the miRNA effect on the target gene mRNA expression? This must be a direct assay of the levels of mRNA for the gene identified as a target of the miRNA, not inferred from a binding assay or other measurement. If other things are measured with qRT-PCR, such as to confirm the expression of the miRNA, you should ignore them.",
+      "target_section": "results",
+      "detector": null,
+      "annotation": null
+    }
+  ],
+  "detectors": [
+    {
+      "name": "target",
+      "type": "AE",
+      "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
+    }
+  ]
+}
