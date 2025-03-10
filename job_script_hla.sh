@@ -23,5 +23,5 @@ pyenv activate mirna-curator
 
 # python src/mirna_curator/main.py --config configs/curation_config_QwQ_HLA.json
 
-python src/mirna_curator/main.py --config configs/curation_config_mistral_large.json
+python src/mirna_curator/main.py --config configs/curation_config_QwQ_prod.json
 
