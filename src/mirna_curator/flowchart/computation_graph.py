@@ -108,25 +108,25 @@ class ComputationGraph:
         for flow_node_name, flow_node_props in flowchart.nodes.items():
             if flow_node_props.type == NodeType("conditional_prompt_boolean"):
                 function = prompted_flowchart_step_bool
-                prompt = flow_node_props.data.condition
+                prompt = flow_node_props.data.prompt_name
                 node_type = "internal"
             elif flow_node_props.type == NodeType("conditional_tool_use"):
                 function = partial(
                     prompted_flowchart_step_tool, tools=flow_node_props.data.tools
                 )
-                prompt = flow_node_props.data.condition
+                prompt = flow_node_props.data.prompt_name
                 node_type = "internal"
             elif flow_node_props.type == NodeType("terminal_full"):
                 function = prompted_flowchart_terminal
-                prompt = flow_node_props.data.terminal
+                prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
             elif flow_node_props.type == NodeType("terminal_short_circuit"):
                 function = prompted_flowchart_terminal
-                prompt = flow_node_props.data.terminal
+                prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
             elif flow_node_props.type == NodeType("terminal_conditional"):
                 function = prompted_flowchart_terminal
-                prompt = flow_node_props.data.terminal
+                prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
             ## Initialise node with empty transitions dict
             this_node = ComputationNode(
