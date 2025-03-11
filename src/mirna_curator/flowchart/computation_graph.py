@@ -1,7 +1,7 @@
 import typing as ty
 from dataclasses import dataclass
-from guidance.models._model import Model
-from guidance import user, assistant, select, gen
+from guidance.models._base._model import Model
+from guidance import user, assistant, select, gen, with_temperature
 from epmc_xml.article import Article
 from mirna_curator.utils.tracing import curation_tracer
 
@@ -29,7 +29,8 @@ def find_section_heading(llm, target, possibles):
 
 
     """
-    llm.reset()
+    # print(dir(llm))
+    # llm.reset()
     try:
         augmentations = {
             "methods": (
@@ -49,20 +50,11 @@ def find_section_heading(llm, target, possibles):
                 f"we would expect from a section titled '{target}'? "
                 f"{augmentations.get(target, '')}"
             )
-            llm += "\n think about it briefly, then make a selection.\n"
-            llm += (
-                "In your reasoning:\n"
-                "- Skip obvious steps\n"
-                "- Structure as 'If A then B because C'\n"
-                "- Maximum 10 words per step\n"
-                "- Use symbols (→, =, ≠, etc.) instead of words if appropriate\n"
-                "- Abbreviate common terms (prob/probability, calc/calculate)\n"
-                "Your response should be clear but minimal. Show key logical steps only.\n"
-            )
+            llm += "\nThink about it briefly, then make a selection.\n"
         with assistant():
             llm += (
                 f"The section heading {target} implies "
-                + gen("reasoning", max_tokens=512, stop=STOP_TOKENS)
+                + with_temperature(gen("reasoning", max_tokens=512, stop=STOP_TOKENS), 0.6)
                 + " therefore the most likely section heading is: "
             )
             llm += select(possibles, name="target_section_name")
