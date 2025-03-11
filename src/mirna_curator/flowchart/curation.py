@@ -62,6 +62,7 @@ from pydantic import BaseModel, Field, constr
 
 
 class NodeType(str, Enum):
+    filter = "filter" ## Use these to zero shot classify things for filtering
     decision = "conditional_prompt_boolean"  ## These are where we make decision
     decision_tool = "conditional_tool_use"  ## Nodes that use a tool
     terminal = "terminal_full"  ## These are where we make classifications

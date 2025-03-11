@@ -13,6 +13,7 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_terminal,
     prompted_flowchart_step_tool,
 )
+from mirna_curator.llm_functions.filtering import prompted_filter
 from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 from functools import partial
@@ -80,7 +81,7 @@ class ComputationNode:
     function: ty.Callable
     transitions: ty.Dict[ty.Any, "ComputationNode"]
     prompt_name: ty.Optional[str]
-    node_type: ty.Literal["internal", "terminal"]
+    node_type: ty.Literal["filter", "internal", "terminal"]
     tools: ty.Optional[ty.List[str]]
     name: str
 
@@ -120,6 +121,11 @@ class ComputationGraph:
                 function = prompted_flowchart_terminal
                 prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
+            elif flow_node_props.type == NodeType("filter"):
+                function = prompted_filter
+                node_type = "filter"
+                prompt = flow_node_props.data.prompt_name
+
             ## Initialise node with empty transitions dict
             this_node = ComputationNode(
                 function=function,
