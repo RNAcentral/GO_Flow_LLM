@@ -10,7 +10,7 @@ dependencies = [
   "polars>=1.12.0",
   "requests>=2.32.3",
   "pyjats>=0.0.2",
-  "epmc-xml>=0.1.8",
+  "epmc-xml>=0.1.12",
   "guidance>=0.1.16",
   "llama-cpp-python>=0.3.2",
   "huggingface_hub>=0.26.2",
@@ -22,3 +22,4 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["coverage", "pytest", "requests-mock"]
+evaluation = ["flask"]
