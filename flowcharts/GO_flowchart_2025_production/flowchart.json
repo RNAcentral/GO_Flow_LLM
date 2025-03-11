@@ -4,7 +4,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Does the paper look at miRNA binding at all?",
-        "condition": "mirna_binding"
+        "prompt_name": "mirna_binding"
       },
       "transitions": {
         "true": "mirna_cluster",
@@ -15,7 +15,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Does the paper look at a miRNA cluster?",
-        "condition": "mirna_cluster"
+        "prompt_name": "mirna_cluster"
       },
       "transitions": {
         "true": "no_annotation",
@@ -26,7 +26,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Does the paper define multiple targets?",
-        "condition": "multiple_targets"
+        "prompt_name": "multiple_targets"
       },
       "transitions": {
         "true": "no_annotation",
@@ -37,7 +37,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Experimental Evidence?",
-        "condition": "experimental_evidence"
+        "prompt_name": "experimental_evidence"
       },
       "transitions": {
         "true": "functional_interaction",
@@ -48,7 +48,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Functional interaction by reporter assay?",
-        "condition": "functional_interaction"
+        "prompt_name": "functional_interaction"
       },
       "transitions": {
         "true": "mrna_expression_assay",
@@ -59,7 +59,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "miRNA-mRNA binding assay?",
-        "condition": "mirna_mrna_binding"
+        "prompt_name": "mirna_mrna_binding"
       },
       "transitions": {
         "true": "effect_endogenous_2",
@@ -70,7 +70,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Effect on endogenous target gene expression?",
-        "condition": "effect_endogenous_2"
+        "prompt_name": "effect_endogenous_2"
       },
       "transitions": {
         "true": "mrna_expression_assay",
@@ -81,7 +81,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Computational target prediction?",
-        "condition": "computational_prediction"
+        "prompt_name": "computational_prediction"
       },
       "transitions": {
         "true": "effect_endogenous_3",
@@ -92,7 +92,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "Effect on endogenous target gene expression?",
-        "condition": "effect_endogenous_3"
+        "prompt_name": "effect_endogenous_3"
       },
       "transitions": {
         "true": "no_validated_binding",
@@ -103,7 +103,7 @@
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "miRNA inhibition or addition changes endogenous target mRNA level?",
-        "condition": "mirna_changes"
+        "prompt_name": "mirna_changes"
       },
       "transitions": {
         "true": "validated_binding_mrna",
@@ -114,42 +114,42 @@
       "type": "terminal_short_circuit",
       "data": {
         "desc": "No annotation",
-        "terminal": "no_annotation"
+        "terminal_name": "no_annotation"
       }
     },
     "validated_binding_only": {
       "type": "terminal_full",
       "data": {
         "desc": "Validated binding only",
-        "terminal": "validated_binding_only"
+        "terminal_name": "validated_binding_only"
       }
     },
     "validated_binding_mrna": {
       "type": "terminal_full",
       "data": {
         "desc": "Validated binding + evidence of mRNA destabilization",
-        "terminal": "validated_binding_mrna"
+        "terminal_name": "validated_binding_mrna"
       }
     },
     "validated_binding_translation": {
       "type": "terminal_full",
       "data": {
         "desc": "Validated binding + evidence of inhibition of translation",
-        "terminal": "validated_binding_translation"
+        "terminal_name": "validated_binding_translation"
       }
     },
     "no_validated_binding": {
       "type": "terminal_conditional",
       "data": {
         "desc": "No validated binding. Decreased expression of target",
-        "terminal": "no_validated_binding"
+        "terminal_name": "no_validated_binding"
       }
     },
     "mrna_expression_assay": {
       "type": "conditional_prompt_boolean",
       "data": {
         "desc": "mrna_expression_assay",
-        "condition": "mrna_expression_assay"
+        "prompt_name": "mrna_expression_assay"
       },
       "transitions": {
         "true": "mirna_changes",
