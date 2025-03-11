@@ -11,13 +11,27 @@ logger = logging.getLogger(__name__)
 
 class EventLogger:
     """Logger for event sourcing pattern that writes to NDJSON files"""
-
+    
+    # Class variable to hold the single instance
+    _instance = None
+    
+    # Using __new__ to implement the singleton pattern
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(EventLogger, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
     def __init__(
         self,
         output_dir: str = "curation_traces",
         filename_prefix: str = "flowchart_events",
         encoding: str = "utf-8",
     ):
+        # Only initialize once
+        if getattr(self, "_initialized", False):
+            return
+            
         self.output_dir = Path(output_dir)
         self.filename_prefix = filename_prefix
         self.encoding = encoding
@@ -26,14 +40,20 @@ class EventLogger:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         ## Use a run instance uid
-        self.run_id = str(uuid.uuid4())
+        self.run_id = None
         self.paper_id = None
+        self.model_id = None
         logger.info(f"Starting trace for run id {self.run_id}")
+        self._initialized = True
 
+    # Rest of your methods remain the same
     def _get_current_filename(self) -> str:
         """Generate filename for current day's events"""
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         return str(self.output_dir / f"{self.filename_prefix}_{date_str}.ndjson")
+    
+    def initialize_run(self) -> None:
+        self.run_id = str(uuid.uuid4())
 
     def set_paper_id(self, paper_id: str) -> None:
         """
@@ -52,13 +72,6 @@ class EventLogger:
         Log an event with the given type and data.
         Returns True if logging was successful, False otherwise.
         """
-        """
-        Log an event with the given type and data.
-        
-        Args:
-            event_type: Type of the event (e.g., "curation_started")
-            **event_data: Additional event data as keyword arguments
-        """
         event_dict = {
             "type": event_type,
             "run_id": self.run_id,
@@ -74,3 +87,4 @@ class EventLogger:
 
 # Create singleton object when this module is imported
 curation_tracer = EventLogger()
+
