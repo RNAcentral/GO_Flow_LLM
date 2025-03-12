@@ -46,10 +46,9 @@ def prompted_filter(
             )
             + "\n"
         )
-    with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
         logger.debug("Selected answer ok")
-
+    
     return llm['answer'], llm['reasoning']
