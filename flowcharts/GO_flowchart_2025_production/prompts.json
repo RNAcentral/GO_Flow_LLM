@@ -3,7 +3,7 @@
     {
       "name": "mirna_binding",
       "type": "condition_prompt_boolean",
-      "prompt": "Does this paper present an experiment on miRNA binding?",
+      "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
       "target_section": "methods",
       "detector": null,
       "annotation": "miRNA_cluster"

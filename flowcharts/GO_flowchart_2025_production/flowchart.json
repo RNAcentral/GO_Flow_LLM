@@ -1,7 +1,7 @@
 {
   "nodes": {
-    "mirna_binding": {
-      "type": "conditional_prompt_boolean",
+    "mirna_binding_filter": {
+      "type": "filter",
       "data": {
         "desc": "Does the paper look at miRNA binding at all?",
         "prompt_name": "mirna_binding"
@@ -12,7 +12,7 @@
       }
     },
     "mirna_cluster": {
-      "type": "conditional_prompt_boolean",
+      "type": "filter",
       "data": {
         "desc": "Does the paper look at a miRNA cluster?",
         "prompt_name": "mirna_cluster"
@@ -23,7 +23,7 @@
       }
     },
     "multiple_targets": {
-      "type": "conditional_prompt_boolean",
+      "type": "filter",
       "data": {
         "desc": "Does the paper define multiple targets?",
         "prompt_name": "multiple_targets"
@@ -215,5 +215,5 @@
       "y": 307
     }
   },
-  "startNode": "mirna_binding"
+  "startNode": "mirna_binding_filter"
 }
