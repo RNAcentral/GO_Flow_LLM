@@ -246,7 +246,9 @@ class ComputationGraph:
             ## TODO: this can be improved with some more specific exception handling
             except Exception as e:
                 logger.error(f"Hit error: {e} while filtering, aborting")
-                logger.error(f"LLM state: {llm}")
+                logger.error(f"LLM state: {str(llm)}")
+                logger.error(filter_decision)
+                logger.error(filter_reasoning)
                 exit(1)
 
     def run_nodes(self, llm, article, prompts, rna_id):
