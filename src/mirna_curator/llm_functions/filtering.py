@@ -14,7 +14,6 @@ def prompted_filter(
     _load_article_text: bool, ## Always load it, but keep this argument for signature compatibility
     filter_prompt: str,
     rna_id: str,
-    _paper_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.1,
@@ -25,7 +24,7 @@ def prompted_filter(
     """
     with user():
         logger.info(
-            f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal node)"
+            f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (filter node)"
         )
         llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         llm += f"Question: {filter_prompt}. Restrict your answer to the target of {rna_id}. "
@@ -39,7 +38,7 @@ def prompted_filter(
             "Reasoning: "
             + with_temperature(
                 gen(
-                    "detector_reasoning",
+                    "reasoning",
                     max_tokens=1024,
                     stop=STOP_TOKENS,
                 ),
@@ -53,4 +52,4 @@ def prompted_filter(
         )
         logger.debug("Selected answer ok")
 
-    return llm
+    return llm['answer'], llm['reasoning']
