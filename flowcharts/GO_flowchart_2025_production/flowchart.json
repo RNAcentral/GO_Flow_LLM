@@ -19,20 +19,20 @@
       },
       "transitions": {
         "true": "no_annotation",
-        "false": "multiple_targets"
+        "false": "functional_interaction"
       }
     },
-    "multiple_targets": {
-      "type": "filter",
-      "data": {
-        "desc": "Does the paper define multiple targets?",
-        "prompt_name": "multiple_targets"
-      },
-      "transitions": {
-        "true": "no_annotation",
-        "false": "experimental_evidence"
-      }
-    },
+    // "multiple_targets": {
+    //   "type": "filter",
+    //   "data": {
+    //     "desc": "Does the paper define multiple targets?",
+    //     "prompt_name": "multiple_targets"
+    //   },
+    //   "transitions": {
+    //     "true": "no_annotation",
+    //     "false": "experimental_evidence"
+    //   }
+    // },
     "experimental_evidence": {
       "type": "conditional_prompt_boolean",
       "data": {
