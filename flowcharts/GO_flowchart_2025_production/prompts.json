@@ -16,14 +16,6 @@
       "detector": null,
       "annotation": "miRNA_cluster"
     },
-    // {
-    //   "name": "multiple_targets",
-    //   "type": "condition_prompt_boolean",
-    //   "prompt": "Does this paper present evidence for multiple targets of the miRNA? Answer 'no' if the paper only presents evidence for a single target.",
-    //   "target_section": "results",
-    //   "detector": null,
-    //   "annotation": "miRNA_multiple_targets"
-    // },
     {
       "name": "experimental_evidence",
       "type": "condition_prompt_boolean",
