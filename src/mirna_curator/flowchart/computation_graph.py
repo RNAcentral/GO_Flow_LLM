@@ -234,7 +234,7 @@ class ComputationGraph:
                 self.visit_reasonings.append(node_reasoning)
 
                 ## Only move to next node after updating everything else
-                self.current_node = self.current_node.transitions[node_result]
+                self.current_node = self.current_node.transitions[node_result == "yes"]
                 ## It should pretty much always be the case that if we go to a terminal
                 ## node from a filter, there will be no annotation. This just allows us to
                 ## record the reason as an annotation and skip to the next paper.
