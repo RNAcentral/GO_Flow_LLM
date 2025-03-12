@@ -335,6 +335,8 @@ class ComputationGraph:
             self.node_idx += 1
             ## Terminal node handling - 
             if self.current_node.node_type == "terminal":
+                logger.info(f"Hit terminal node {self.current_node.name}")
+                logger.info("Breaking from node running")
                 break
 
 
@@ -352,6 +354,7 @@ class ComputationGraph:
         """
         aes = {} ## Default is no extensions
         annotation = None
+        logging.info(self.current_node)
         if self.current_node.node_type == "terminal":
             self.visited_nodes.append(self.current_node.name)
             if self.current_node.prompt_name is None:
