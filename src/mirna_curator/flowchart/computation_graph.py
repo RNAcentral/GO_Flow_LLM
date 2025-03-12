@@ -223,7 +223,7 @@ class ComputationGraph:
                     "flowchart_filter",
                     step=self.current_node.name,
                     evidence=node_evidence,
-                    result=llm["answer"].lower().replace("*", ""),
+                    result=filter_decision,
                     reasoning=node_reasoning,
                     loaded_sections=self.loaded_sections,
                     timestamp=time(),
