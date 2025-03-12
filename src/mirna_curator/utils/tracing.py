@@ -43,6 +43,7 @@ class EventLogger:
         self.run_id = None
         self.paper_id = None
         self.model_id = None
+        self.initialize_run()
         logger.info(f"Starting trace for run id {self.run_id}")
         self._initialized = True
 
