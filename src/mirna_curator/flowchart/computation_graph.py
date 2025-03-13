@@ -374,7 +374,7 @@ class ComputationGraph:
         as a result of sucessful curation. If we're short circuiting after filtering, then it doesn't
         matter.
         """
-        aes = {}  ## Default is no extensions
+        aes = None  ## Default is no extensions
         annotation = None
         logging.info(self.current_node)
         if self.current_node.node_type == "terminal":
@@ -434,7 +434,7 @@ class ComputationGraph:
                     self.loaded_sections.append(target_section_name)
 
                 ## extract results from the LLM
-                aes[detector.name] = llm["protein_name"].strip()
+                aes = {detector.name : llm["protein_name"].strip()}
                 target_name = llm["protein_name"].strip()
                 node_reasoning = llm["detector_reasoning"]
                 node_evidence = llm["evidence"]
