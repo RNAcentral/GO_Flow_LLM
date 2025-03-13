@@ -2,6 +2,7 @@ import typing as ty
 from dataclasses import dataclass
 from guidance.models._base._model import Model
 from guidance import user, assistant, select, gen, with_temperature
+import guidance
 from epmc_xml.article import Article
 from mirna_curator.utils.tracing import curation_tracer
 
@@ -250,7 +251,7 @@ class ComputationGraph:
                 logger.error(filter_decision)
                 logger.error(filter_reasoning)
                 exit(1)
-
+    @guidance
     def run_nodes(self, llm, article, prompts, rna_id):
         """
         Runs the core logic of the flowchart
@@ -338,7 +339,7 @@ class ComputationGraph:
                 logger.info(f"Hit terminal node {self.current_node.name}")
                 logger.info("Breaking from node running")
                 break
-
+        return llm
 
 
     def terminal_node_check(self, llm, article, prompts, rna_id, paper_id):
@@ -463,7 +464,7 @@ class ComputationGraph:
         annotation, aes = self.terminal_node_check(llm, article, prompts, rna_id, paper_id)
         if annotation is None:
             ## means the filtering steps did not end on a terminal node, so continue curation  
-            self.run_nodes(llm, article, prompts, rna_id)
+            llm += self.run_nodes(article, prompts, rna_id)
             ## Once this is done, we should have hit a terminal node, so we can update the annotation and aes
             annotation, aes = self.terminal_node_check(llm, article, prompts, rna_id, paper_id)
 
