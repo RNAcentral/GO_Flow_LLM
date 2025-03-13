@@ -380,7 +380,7 @@ class ComputationGraph:
                 target_section_name = self.infer_target_section_name(llm, prompt, article)
                 
                 annotation = prompt.annotation
-
+                logging.info(prompts.detectors)
                 detector = list(
                     filter(lambda d: d.name == prompt.detector, prompts.detectors)
                 )[0]
@@ -467,6 +467,16 @@ class ComputationGraph:
             ## Once this is done, we should have hit a terminal node, so we can update the annotation and aes
             annotation, aes = self.terminal_node_check(llm, article, prompts, rna_id, paper_id)
 
+
+        curation_tracer.log_event(
+            "flowchart_end",
+            setp="finish_timestamp",
+            evidence="",
+            result="",
+            reasoning="",
+            loaded_sections=[],
+            timestamp=time(),
+        )
         all_nodes = list(self._nodes.keys())
         result = {n: None for n in all_nodes}
         result.update({f"{n}_result": None for n in all_nodes})
