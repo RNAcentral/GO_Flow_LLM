@@ -258,8 +258,9 @@ def main(
             logger.info(
                 f"Curation of {len(curation_output)} articles completed in {time.time()-_bulk_processing_start:.2f} seconds"
             )
-            curation_output_df = pl.DataFrame(curation_output)
-            curation_output_df.write_parquet(f"curation_results_checkpoint_{i}.parquet")
+            if len(curation_output) > 0:
+                curation_output_df = pl.DataFrame(curation_output)
+                curation_output_df.write_parquet(f"curation_results_checkpoint_{i}.parquet")
 
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
