@@ -122,6 +122,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 )
 @click.option("--evidence_type", help="How to do the evidence extraction", type=click.Choice(["recursive-paragraph", "recursive-sentence", "single-sentence", "single-paragraph", "full-substring"]), default="single-sentence")
 @click.option("--deepseek_mode", help="Tweak the reasoning generation for deepseek models", is_flag=True, default=False)
+@click.option("--checkpoint_frequency", help="How often to write a results checkpoint", default=-1)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -138,6 +139,7 @@ def main(
     validate_only: Optional[bool] = None,
     evidence_type: Optional[str] = "single-sentence",
     deepseek_mode: Optional[bool] = False,
+    checkpoint_frequency: Optional[int] = -1,
 ):
     curation_tracer.set_model_name(model_path)
 
@@ -223,18 +225,33 @@ def main(
 
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
+
+    ## This is where we start riunning the curation graph for all the papers, one by one.
     _bulk_processing_start = time.time()
     for i, row in enumerate(curation_input.iter_rows(named=True)):
         if max_papers is not None and i >= max_papers:
             break
+
+        ## See if we need to checkpoint, then write output
+        if checkpoint_frequency > 0 and i % checkpoint_frequency == 0:
+            logger.info("Checkpointing results")
+            logger.info(
+                f"Curation of {len(curation_output)} articles completed in {time.time()-_bulk_processing_start:.2f} seconds"
+            )
+            curation_output_df = pl.DataFrame(curation_output)
+            curation_output_df.write_parquet(f"curation_results_checkpoint_{i}.parquet")
+
+
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
         article.add_figures_section()
         _paper_fetch_end = time.time()
+        
         logger.info(
             f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds"
         )
+
         _curation_start = time.time()
         try:
             llm_trace, curation_result = graph.execute_graph(
