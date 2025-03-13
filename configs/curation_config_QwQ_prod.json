@@ -7,9 +7,9 @@
     "chat_template": "qwen",
     "input_data": "production_test_data_2025-03-13.parquet",
     "output_data": "production_data_output_2025-03-13.parquet",
-    "max_papers": 10,
+    "max_papers": 4500,
     "evidence_type": "full-substring",
     "deepseek_mode": true, 
-    "checkpoint_frequency": 1,
+    "checkpoint_frequency": 100,
     "checkpoint_file_path": "gfllm_qwq_checkpoint.parquet"
 }
