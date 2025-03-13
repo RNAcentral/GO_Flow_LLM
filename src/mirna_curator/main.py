@@ -302,8 +302,8 @@ def main(
                 "curation_result": curation_result,
             }
         )
-        with open(f"{row['PMCID']}_{row['rna_id']}_llm_trace.txt", "w") as f:
-            f.write(llm_trace)
+        # with open(f"{row['PMCID']}_{row['rna_id']}_llm_trace.txt", "w") as f:
+        #     f.write(llm_trace)
     _bulk_processing_end = time.time()
     _bulk_processing_total = _bulk_processing_end - _bulk_processing_start
     _bulk_processing_average = _bulk_processing_total / len(curation_output)
