@@ -8,7 +8,7 @@ from guidance.chat import (
     Phi3SmallMediumChatTemplate,
     Mistral7BInstructChatTemplate,
     Gemma29BInstructChatTemplate,
-    # Qwen2dot5ChatTemplate,
+    Qwen2dot5ChatTemplate,
 )
 
 TEMPLATE_LOOKUP = {
@@ -19,7 +19,7 @@ TEMPLATE_LOOKUP = {
     "phi3-med": Phi3SmallMediumChatTemplate,
     "mistral": Mistral7BInstructChatTemplate,
     "gemma": Gemma29BInstructChatTemplate,
-    # "qwen": Qwen2dot5ChatTemplate,
+    "qwen": Qwen2dot5ChatTemplate,
 }
 
 from huggingface_hub import HfFileSystem, hf_hub_download
