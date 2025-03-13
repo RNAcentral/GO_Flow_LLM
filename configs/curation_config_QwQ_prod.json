@@ -9,5 +9,6 @@
     "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
     "max_papers": 10,
     "evidence_type": "full-substring",
-    "deepseek_mode": true
+    "deepseek_mode": true, 
+    "checkpoint_frequency": 1
 }
