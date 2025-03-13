@@ -489,7 +489,7 @@ class ComputationGraph:
         annotation, aes = self.terminal_node_check(
             llm, article, prompts, rna_id, paper_id
         )
-        if annotation is None:
+        if annotation is None and self.current_node.node_type != "terminal":
             ## means the filtering steps did not end on a terminal node, so continue curation
             llm += self.run_nodes(article, prompts, rna_id)
             ## Once this is done, we should have hit a terminal node, so we can update the annotation and aes
