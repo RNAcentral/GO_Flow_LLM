@@ -120,9 +120,29 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     is_flag=True,
     default=False,
 )
-@click.option("--evidence_type", help="How to do the evidence extraction", type=click.Choice(["recursive-paragraph", "recursive-sentence", "single-sentence", "single-paragraph", "full-substring"]), default="single-sentence")
-@click.option("--deepseek_mode", help="Tweak the reasoning generation for deepseek models", is_flag=True, default=False)
-@click.option("--checkpoint_frequency", help="How often to write a results checkpoint", default=-1)
+@click.option(
+    "--evidence_type",
+    help="How to do the evidence extraction",
+    type=click.Choice(
+        [
+            "recursive-paragraph",
+            "recursive-sentence",
+            "single-sentence",
+            "single-paragraph",
+            "full-substring",
+        ]
+    ),
+    default="single-sentence",
+)
+@click.option(
+    "--deepseek_mode",
+    help="Tweak the reasoning generation for deepseek models",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--checkpoint_frequency", help="How often to write a results checkpoint", default=-1
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -241,13 +261,12 @@ def main(
             curation_output_df = pl.DataFrame(curation_output)
             curation_output_df.write_parquet(f"curation_results_checkpoint_{i}.parquet")
 
-
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
         article = fetch.article(row["PMCID"])
         article.add_figures_section()
         _paper_fetch_end = time.time()
-        
+
         logger.info(
             f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds"
         )
@@ -255,7 +274,11 @@ def main(
         _curation_start = time.time()
         try:
             llm_trace, curation_result = graph.execute_graph(
-                row["PMCID"], llm, article, row["rna_id"], prompt_data, 
+                row["PMCID"],
+                llm,
+                article,
+                row["rna_id"],
+                prompt_data,
             )
         except Exception as e:
             logger.error(e)

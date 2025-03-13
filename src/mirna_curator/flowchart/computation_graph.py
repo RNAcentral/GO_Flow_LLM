@@ -19,7 +19,9 @@ from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 from functools import partial
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def find_section_heading(llm, target, possibles):
     """
@@ -56,7 +58,9 @@ def find_section_heading(llm, target, possibles):
         with assistant():
             llm += (
                 f"The section heading {target} implies "
-                + with_temperature(gen("reasoning", max_tokens=512, stop=STOP_TOKENS), 0.6)
+                + with_temperature(
+                    gen("reasoning", max_tokens=512, stop=STOP_TOKENS), 0.6
+                )
                 + " therefore the most likely section heading is: "
             )
             llm += select(possibles, name="target_section_name")
@@ -165,7 +169,7 @@ class ComputationGraph:
 
         This is used in a few places, so makes sense to factor out
         """
-         ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
+        ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
         if not prompt.target_section in article.sections.keys():
             check_subtitles = [
                 prompt.target_section in section_name
@@ -188,8 +192,8 @@ class ComputationGraph:
         """
         Run filters in the flowchart
 
-        This will update the current node, and other node recording things, but does not 
-        update the LLM state. That's what we want for the filtering step, but we do have to 
+        This will update the current node, and other node recording things, but does not
+        update the LLM state. That's what we want for the filtering step, but we do have to
         handle the terminal node correctly so it doesn't lose the annotation from filtering
         """
         while self.current_node.node_type == "filter":
@@ -198,24 +202,30 @@ class ComputationGraph:
 
             ## Have to filter to get the prompt named by the flowchart node
             prompt = list(
-                filter(lambda p: p.name == self.current_node.prompt_name, prompts.prompts)
+                filter(
+                    lambda p: p.name == self.current_node.prompt_name, prompts.prompts
+                )
             )[0]
 
             try:
                 ## Find and load the relevant article section
-                target_section_name = self.infer_target_section_name(llm, prompt, article)
-
+                target_section_name = self.infer_target_section_name(
+                    llm, prompt, article
+                )
 
                 filter_decision, filter_reasoning = self.current_node.function(
-                        llm,
-                        article.get_section(target_section_name, include_figures=True, figures_placement='end'),
-                        True,
-                        prompt.prompt,
-                        rna_id,
-                        config=self.run_config,
-                    )
-                
-                
+                    llm,
+                    article.get_section(
+                        target_section_name,
+                        include_figures=True,
+                        figures_placement="end",
+                    ),
+                    True,
+                    prompt.prompt,
+                    rna_id,
+                    config=self.run_config,
+                )
+
                 node_result = filter_decision
                 node_evidence = ""
                 node_reasoning = filter_reasoning
@@ -251,36 +261,44 @@ class ComputationGraph:
                 logger.error(filter_decision)
                 logger.error(filter_reasoning)
                 exit(1)
+
     @guidance
     def run_nodes(self, llm, article, prompts, rna_id):
         """
         Runs the core logic of the flowchart
         This will just keep advancing the state until it hits a terminal node
-        Therefore, it doesn't return anything 
+        Therefore, it doesn't return anything
         """
         while self.current_node.node_type == "internal":
             print(self.current_node.name)
             ## Have to filter to get the prompt named by the flowchart node
             prompt = list(
-                filter(lambda p: p.name == self.current_node.prompt_name, prompts.prompts)
+                filter(
+                    lambda p: p.name == self.current_node.prompt_name, prompts.prompts
+                )
             )[0]
-
 
             self.visited_nodes.append(self.current_node.name)
             logger.info(f"Processing node {self.current_node.name}")
-            
+
             ## see if we already have the target section loaded - this should speed things up provided we can reuse the context
             if not prompt.target_section in self.loaded_sections:
                 logger.info(f"Loading section {prompt.target_section} into context")
                 ## sometimes, the section we want is named differently, so need to use the LLM to figure it out
-                target_section_name = self.infer_target_section_name(llm, prompt, article)
+                target_section_name = self.infer_target_section_name(
+                    llm, prompt, article
+                )
 
             try:
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     logger.info("Running condition function, not loading context")
                     llm += self.current_node.function(
-                        article.get_section(target_section_name, include_figures=True, figures_placement='end'),
+                        article.get_section(
+                            target_section_name,
+                            include_figures=True,
+                            figures_placement="end",
+                        ),
                         False,
                         prompt.prompt,
                         rna_id,
@@ -289,7 +307,11 @@ class ComputationGraph:
                 else:
                     logger.info("Running condition function, loading context")
                     llm += self.current_node.function(
-                        article.get_section(target_section_name, include_figures=True, figures_placement='end'),
+                        article.get_section(
+                            target_section_name,
+                            include_figures=True,
+                            figures_placement="end",
+                        ),
                         True,
                         prompt.prompt,
                         rna_id,
@@ -334,13 +356,12 @@ class ComputationGraph:
                 aes = None
                 break
             self.node_idx += 1
-            ## Terminal node handling - 
+            ## Terminal node handling -
             if self.current_node.node_type == "terminal":
                 logger.info(f"Hit terminal node {self.current_node.name}")
                 logger.info("Breaking from node running")
                 break
         return llm
-
 
     def terminal_node_check(self, llm, article, prompts, rna_id, paper_id):
         """
@@ -349,11 +370,11 @@ class ComputationGraph:
             - Short circuit for no annotation by recording the annotation note and moving on, or
             - Running the detector prompt to get the aes for the annotation, and recording the result
 
-        The LLM will have the needed sections in context (probably) if we have got to a terminal node 
-        as a result of sucessful curation. If we're short circuiting after filtering, then it doesn't 
+        The LLM will have the needed sections in context (probably) if we have got to a terminal node
+        as a result of sucessful curation. If we're short circuiting after filtering, then it doesn't
         matter.
         """
-        aes = {} ## Default is no extensions
+        aes = {}  ## Default is no extensions
         annotation = None
         logging.info(self.current_node)
         if self.current_node.node_type == "terminal":
@@ -361,8 +382,11 @@ class ComputationGraph:
             if self.current_node.prompt_name is None:
                 prompt = None
             else:
-                prompt = list(  
-                    filter(lambda p: p.name == self.current_node.prompt_name, prompts.prompts)
+                prompt = list(
+                    filter(
+                        lambda p: p.name == self.current_node.prompt_name,
+                        prompts.prompts,
+                    )
                 )[0]
             logging.info(f"prompt: {prompt}")
             if prompt is None:
@@ -378,8 +402,10 @@ class ComputationGraph:
 
             else:
                 ## Only lookup the target section name if we are actually going to use it
-                target_section_name = self.infer_target_section_name(llm, prompt, article)
-                
+                target_section_name = self.infer_target_section_name(
+                    llm, prompt, article
+                )
+
                 annotation = prompt.annotation
                 logging.info(prompts.detectors)
                 detector = list(
@@ -406,7 +432,7 @@ class ComputationGraph:
                         config=self.run_config,
                     )
                     self.loaded_sections.append(target_section_name)
-                
+
                 ## extract results from the LLM
                 aes[detector.name] = llm["protein_name"].strip()
                 target_name = llm["protein_name"].strip()
@@ -416,7 +442,7 @@ class ComputationGraph:
             self.visit_results.append(target_name)
             self.visit_evidences.append(node_evidence)
             self.visit_reasonings.append(node_reasoning)
-            
+
             curation_tracer.log_event(
                 "flowchart_terminal",
                 step=self.current_node.name,
@@ -429,7 +455,6 @@ class ComputationGraph:
         self.node_idx += 1
         ## These will only have something in if the node was a terminal
         return annotation, aes
-
 
     def execute_graph(
         self,
@@ -461,13 +486,16 @@ class ComputationGraph:
 
         self.run_filters(llm, article, prompts, rna_id)
 
-        annotation, aes = self.terminal_node_check(llm, article, prompts, rna_id, paper_id)
+        annotation, aes = self.terminal_node_check(
+            llm, article, prompts, rna_id, paper_id
+        )
         if annotation is None:
-            ## means the filtering steps did not end on a terminal node, so continue curation  
+            ## means the filtering steps did not end on a terminal node, so continue curation
             llm += self.run_nodes(article, prompts, rna_id)
             ## Once this is done, we should have hit a terminal node, so we can update the annotation and aes
-            annotation, aes = self.terminal_node_check(llm, article, prompts, rna_id, paper_id)
-
+            annotation, aes = self.terminal_node_check(
+                llm, article, prompts, rna_id, paper_id
+            )
 
         curation_tracer.log_event(
             "flowchart_end",
@@ -482,7 +510,10 @@ class ComputationGraph:
         result = {n: None for n in all_nodes}
         result.update({f"{n}_result": None for n in all_nodes})
         for visited, visit_result, visit_evidence, visit_reasoning in zip(
-            self.visited_nodes, self.visit_results, self.visit_evidences, self.visit_reasonings
+            self.visited_nodes,
+            self.visit_results,
+            self.visit_evidences,
+            self.visit_reasonings,
         ):
             result[visited] = True
             result[f"{visited}_result"] = visit_result

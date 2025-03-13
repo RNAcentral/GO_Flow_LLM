@@ -9,7 +9,6 @@ from guidance.chat import (
     Mistral7BInstructChatTemplate,
     Gemma29BInstructChatTemplate,
     # Qwen2dot5ChatTemplate,
-    
 )
 
 TEMPLATE_LOOKUP = {

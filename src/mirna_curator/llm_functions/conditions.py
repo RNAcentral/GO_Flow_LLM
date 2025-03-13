@@ -54,10 +54,8 @@ def prompted_flowchart_step_bool(
         f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
     )
     with assistant():
-        llm += (
-            "Reasoning:\n"
-        )
-        if config['deepseek_mode']:
+        llm += "Reasoning:\n"
+        if config["deepseek_mode"]:
             llm += "<think>\n"
         llm += (
             with_temperature(
@@ -78,7 +76,9 @@ def prompted_flowchart_step_bool(
         )
         logger.info("Selected answer ok")
 
-    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
+    llm += extract_evidence(
+        article_text, mode=config.get("evidence_mode", "single-sentence")
+    )
     logger.info("Evidence extracted, ready to return")
 
     return llm
@@ -171,10 +171,8 @@ def prompted_flowchart_step_tool(
         f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
     )
     with assistant():
-        llm += (
-            "Reasoning:\n"
-        )
-        if config['deepseek_mode']:
+        llm += "Reasoning:\n"
+        if config["deepseek_mode"]:
             llm += "<think>\n"
         llm += (
             with_temperature(
@@ -193,7 +191,9 @@ def prompted_flowchart_step_tool(
             select(["yes", "no"], name="answer"), temperature_selection
         )
 
-    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
+    llm += extract_evidence(
+        article_text, mode=config.get("evidence_mode", "single-sentence")
+    )
 
     return llm
 
@@ -216,9 +216,11 @@ def prompted_flowchart_terminal(
     """
     epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
     with user():
-        llm += (f"You will be asked a question which you must answer using text you have been given. "
-                "The answer could be in the text you have already seen, or in the new text below. "
-                "If no new text is given, refer to the text you have already seen.\n")
+        llm += (
+            f"You will be asked a question which you must answer using text you have been given. "
+            "The answer could be in the text you have already seen, or in the new text below. "
+            "If no new text is given, refer to the text you have already seen.\n"
+        )
         if load_article_text:
             logger.info(
                 f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal node)"
@@ -237,10 +239,8 @@ def prompted_flowchart_terminal(
         f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
     )
     with assistant():
-        llm += (
-            "Reasoning:\n"
-        )
-        if config['deepseek_mode']:
+        llm += "Reasoning:\n"
+        if config["deepseek_mode"]:
             llm += "<think>\n"
         llm += (
             with_temperature(
@@ -259,6 +259,8 @@ def prompted_flowchart_terminal(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
 
-    llm += extract_evidence(article_text, mode=config.get("evidence_mode", "single-sentence"))
+    llm += extract_evidence(
+        article_text, mode=config.get("evidence_mode", "single-sentence")
+    )
 
     return llm

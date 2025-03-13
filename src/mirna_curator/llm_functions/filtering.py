@@ -8,10 +8,11 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def prompted_filter(
     llm: guidance.models.Model,
     article_text: str,
-    _load_article_text: bool, ## Always load it, but keep this argument for signature compatibility
+    _load_article_text: bool,  ## Always load it, but keep this argument for signature compatibility
     filter_prompt: str,
     rna_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
@@ -50,5 +51,5 @@ def prompted_filter(
             select(["yes", "no"], name="answer"), temperature_selection
         )
         logger.debug("Selected answer ok")
-    
-    return llm['answer'], llm['reasoning']
+
+    return llm["answer"], llm["reasoning"]

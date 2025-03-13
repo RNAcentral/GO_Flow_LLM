@@ -9,19 +9,20 @@ import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class EventLogger:
     """Logger for event sourcing pattern that writes to NDJSON files"""
-    
+
     # Class variable to hold the single instance
     _instance = None
-    
+
     # Using __new__ to implement the singleton pattern
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(EventLogger, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(
         self,
         output_dir: str = "curation_traces",
@@ -31,7 +32,7 @@ class EventLogger:
         # Only initialize once
         if getattr(self, "_initialized", False):
             return
-            
+
         self.output_dir = Path(output_dir)
         self.filename_prefix = filename_prefix
         self.encoding = encoding
@@ -52,7 +53,7 @@ class EventLogger:
         """Generate filename for current day's events"""
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         return str(self.output_dir / f"{self.filename_prefix}_{date_str}.ndjson")
-    
+
     def initialize_run(self) -> None:
         self.run_id = str(uuid.uuid4())
 
@@ -88,4 +89,3 @@ class EventLogger:
 
 # Create singleton object when this module is imported
 curation_tracer = EventLogger()
-
