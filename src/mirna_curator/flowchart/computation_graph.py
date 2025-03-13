@@ -359,7 +359,6 @@ class ComputationGraph:
             ## Terminal node handling -
             if self.current_node.node_type == "terminal":
                 logger.info(f"Hit terminal node {self.current_node.name}")
-                logger.info("Breaking from node running")
                 break
         return llm
 
@@ -376,7 +375,6 @@ class ComputationGraph:
         """
         aes = None  ## Default is no extensions
         annotation = None
-        logging.info(self.current_node)
         if self.current_node.node_type == "terminal":
             self.visited_nodes.append(self.current_node.name)
             if self.current_node.prompt_name is None:
@@ -388,7 +386,6 @@ class ComputationGraph:
                         prompts.prompts,
                     )
                 )[0]
-            logging.info(f"prompt: {prompt}")
             if prompt is None:
                 annotation = None
                 node_reasoning = ""
@@ -407,11 +404,9 @@ class ComputationGraph:
                 )
 
                 annotation = prompt.annotation
-                logging.info(prompts.detectors)
                 detector = list(
                     filter(lambda d: d.name == prompt.detector, prompts.detectors)
                 )[0]
-                logging.info(f"detector: {detector}")
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += self.current_node.function(
