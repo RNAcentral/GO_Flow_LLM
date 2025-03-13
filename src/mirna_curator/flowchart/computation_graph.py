@@ -363,7 +363,7 @@ class ComputationGraph:
                 prompt = list(  
                     filter(lambda p: p.name == self.current_node.prompt_name, prompts.prompts)
                 )[0]
-
+            logging.info(f"prompt: {prompt}")
             if prompt is None:
                 annotation = None
                 node_reasoning = ""
@@ -384,6 +384,7 @@ class ComputationGraph:
                 detector = list(
                     filter(lambda d: d.name == prompt.detector, prompts.detectors)
                 )[0]
+                logging.info(f"detector: {detector}")
                 ## Now we load a section to the context only once, we have to get the node result here.
                 if target_section_name in self.loaded_sections:
                     llm += self.current_node.function(
