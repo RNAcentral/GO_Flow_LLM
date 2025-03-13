@@ -36,13 +36,14 @@ def prompted_flowchart_step_bool(
     """
 
     with user():
+        llm += f"You will be asked a yes/no question. The answer could be in following text, or it could be in some text you have already seen.\n"
         if load_article_text:
             logger.info(
                 f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (internal node)"
             )
-            llm += f"You will be asked a yes/no question. The answer could be in following text, or it could be in some text you have already seen: \n{article_text}\n\n"
+            llm += f"Text to consider: \n{article_text}\n\n"
         else:
-            llm += "\n\n"
+            llm += "Text to consider is included above\n\n"
         llm += f"Question: {step_prompt}\nRestrict your considerations to {rna_id} if there are multiple RNAs mentioned\n"
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
@@ -215,13 +216,14 @@ def prompted_flowchart_terminal(
     """
     epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
     with user():
+        llm += f"You will be asked a question which you must answer using text you have been given. The answer could be in the text you have already seen, or in the new text below.\n"
         if load_article_text:
             logger.info(
                 f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal node)"
             )
-            llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
+            llm += f"New text: \n{article_text}\n\n"
         else:
-            llm += "\n\n"
+            llm += "New text: \n\n"
         llm += (
             f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
             "Give some reasoning for your answer, then state the miRNA's target protein name as it appears in the paper.\n"
