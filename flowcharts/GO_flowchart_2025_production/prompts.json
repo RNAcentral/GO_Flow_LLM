@@ -92,7 +92,7 @@
       "name": "validated_binding_only",
       "type": "terminal_full",
       "prompt": "",
-      "target_section": null,
+      "target_section": "results",
       "detector": "target",
       "annotation": "GO:0035195"
     },
@@ -100,7 +100,7 @@
       "name": "validated_binding_mrna",
       "type": "terminal_full",
       "prompt": "",
-      "target_section": null,
+      "target_section": "results",
       "detector": "target",
       "annotation": "GO:0035279"
     },
@@ -108,7 +108,7 @@
       "name": "validated_binding_translation",
       "type": "terminal_full",
       "prompt": "",
-      "target_section": null,
+      "target_section": "results",
       "detector": "target",
       "annotation": "GO:0035278"
     },
@@ -116,7 +116,7 @@
       "name": "no_validated_binding",
       "type": "terminal_conditional",
       "prompt": "",
-      "target_section": null,
+      "target_section": "results",
       "detector": null,
       "annotation": null
     },
