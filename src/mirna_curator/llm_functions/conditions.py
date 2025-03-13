@@ -216,7 +216,9 @@ def prompted_flowchart_terminal(
     """
     epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
     with user():
-        llm += f"You will be asked a question which you must answer using text you have been given. The answer could be in the text you have already seen, or in the new text below.\n"
+        llm += (f"You will be asked a question which you must answer using text you have been given. "
+                "The answer could be in the text you have already seen, or in the new text below. "
+                "If no new text is given, refer to the text you have already seen.\n")
         if load_article_text:
             logger.info(
                 f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal node)"
