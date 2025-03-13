@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 import signal
 import traceback
+import faulthandler
 import sys
 import time
 
@@ -242,6 +243,7 @@ def main(
         except Exception as e:
             logger.error(e)
             logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
+            faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
             continue
         logger.info(
             f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
