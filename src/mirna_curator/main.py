@@ -288,9 +288,9 @@ def main(
         logger.info(
             f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
         )
-        logger.info(
-            f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
-        )
+        # logger.info(
+        #     f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
+        # )
         _curation_end = time.time()
         logger.info(
             f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
