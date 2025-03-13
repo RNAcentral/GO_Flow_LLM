@@ -54,6 +54,11 @@ def prompted_flowchart_step_bool(
     )
     with assistant():
         llm += (
+            "Reasoning:\n"
+        )
+        if config['deepseek_mode']:
+            llm += "<think>\n"
+        llm += (
             with_temperature(
                 gen(
                     "reasoning",
@@ -166,6 +171,11 @@ def prompted_flowchart_step_tool(
     )
     with assistant():
         llm += (
+            "Reasoning:\n"
+        )
+        if config['deepseek_mode']:
+            llm += "<think>\n"
+        llm += (
             with_temperature(
                 gen(
                     "reasoning",
@@ -215,6 +225,7 @@ def prompted_flowchart_terminal(
         llm += (
             f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
             "Give some reasoning for your answer, then state the miRNA's target protein name as it appears in the paper.\n"
+            "Remember: we are looking for the target of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n"
         )
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
@@ -223,8 +234,12 @@ def prompted_flowchart_terminal(
     )
     with assistant():
         llm += (
-            "Reasoning: "
-            + with_temperature(
+            "Reasoning:\n"
+        )
+        if config['deepseek_mode']:
+            llm += "<think>\n"
+        llm += (
+            with_temperature(
                 gen(
                     "detector_reasoning",
                     max_tokens=1024,
