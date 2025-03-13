@@ -10,5 +10,6 @@
     "max_papers": 10,
     "evidence_type": "full-substring",
     "deepseek_mode": true, 
-    "checkpoint_frequency": 1
+    "checkpoint_frequency": 1,
+    "checkpoint_file_path": "gfllm_qwq_checkpoint.parquet"
 }

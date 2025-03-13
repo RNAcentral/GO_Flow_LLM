@@ -22,6 +22,7 @@ import traceback
 import faulthandler
 import sys
 import time
+from pathlib import Path
 
 curation_output = []
 
@@ -143,6 +144,9 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--checkpoint_frequency", help="How often to write a results checkpoint", default=-1
 )
+@click.option(
+    "--checkpoint_file_path", help="Name of the file to checkpoint into", default="curation_results_checkpoint.parquet"
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -160,6 +164,7 @@ def main(
     evidence_type: Optional[str] = "single-sentence",
     deepseek_mode: Optional[bool] = False,
     checkpoint_frequency: Optional[int] = -1,
+    checkpoint_file_path: Optional[str] = None,
 ):
     curation_tracer.set_model_name(model_path)
 
@@ -238,7 +243,13 @@ def main(
         f"Graph constructed in {_graph_construction_end - _graph_construction_start:.2f} seconds"
     )
 
+    ## Get the curation input data and resume if there's a valid checkpoint
     curation_input = pl.read_parquet(input_data)
+    if Path(checkpoint_file_path).exists():
+        logger.info("Resuming from checkpoint %s", checkpoint_file_path)
+        done = pl.read_parquet(checkpoint_file_path)
+        curation_input = curation_input.join(done, on="PMCID", how="anti")
+        
     if annot_class is not None:
         logger.info(f"Restricting processing to annotation class {annot_class}")
         curation_input = curation_input.filter(pl.col("class") == annot_class)
@@ -258,10 +269,10 @@ def main(
             logger.info(
                 f"Curation of {len(curation_output)} articles completed in {time.time()-_bulk_processing_start:.2f} seconds"
             )
-            logger.info(curation_output)
             if len(curation_output) > 0:
                 curation_output_df = pl.DataFrame(curation_output)
-                curation_output_df.write_parquet(f"curation_results_checkpoint_{i}.parquet")
+                ## Overwrite the checkpoint to save space
+                curation_output_df.write_parquet(checkpoint_file_path)
 
         logger.info("Starting curation for paper %s", row["PMCID"])
         _paper_fetch_start = time.time()
