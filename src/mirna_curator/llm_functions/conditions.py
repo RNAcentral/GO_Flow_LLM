@@ -225,7 +225,7 @@ def prompted_flowchart_terminal(
             )
             llm += f"New text: \n{article_text}\n\n"
         else:
-            llm += "New text: \n\n"
+            llm += "\n\n"
         llm += (
             f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
             "Give some reasoning for your answer, then state the miRNA's target protein name as it appears in the paper.\n"
