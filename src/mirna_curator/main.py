@@ -264,7 +264,7 @@ def main(
             break
 
         ## See if we need to checkpoint, then write output
-        if checkpoint_frequency > 0 and i % checkpoint_frequency == 0:
+        if checkpoint_frequency > 0 and i > 0 and i % checkpoint_frequency == 0:
             logger.info("Checkpointing results")
             logger.info(
                 f"Curation of {len(curation_output)} articles completed in {time.time()-_bulk_processing_start:.2f} seconds"
@@ -274,11 +274,15 @@ def main(
                 ## Overwrite the checkpoint to save space
                 curation_output_df.write_parquet(checkpoint_file_path)
 
-        logger.info("Starting curation for paper %s", row["PMCID"])
-        _paper_fetch_start = time.time()
-        article = fetch.article(row["PMCID"])
-        article.add_figures_section()
-        _paper_fetch_end = time.time()
+        try:
+            logger.info("Starting curation for paper %s", row["PMCID"])
+            _paper_fetch_start = time.time()
+            article = fetch.article(row["PMCID"])
+            article.add_figures_section()
+            _paper_fetch_end = time.time()
+        except:
+            logger.error(f"Failed to fetch/parse {row['PMCID']}, skipping it")
+            continue
 
         logger.info(
             f"Fetched and parsed paper in {_paper_fetch_end - _paper_fetch_start:.2f} seconds"
