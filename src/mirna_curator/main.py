@@ -271,6 +271,9 @@ def main(
             )
             if len(curation_output) > 0:
                 curation_output_df = pl.DataFrame(curation_output)
+                if Path(checkpoint_file_path).exists():
+                    prev = pl.read_parquet(checkpoint_file_path)
+                    curation_output_df = curation_output_df.vstack(prev)
                 ## Overwrite the checkpoint to save space
                 curation_output_df.write_parquet(checkpoint_file_path)
 
