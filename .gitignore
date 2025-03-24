@@ -4,3 +4,4 @@
 *.txt
 traces/*
 curation_traces/*
+kubernetes/secrets
