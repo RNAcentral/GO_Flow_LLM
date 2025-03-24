@@ -1,0 +1,14 @@
+# create the namespace using:
+# kubectl apply -f argilla-namespace.yaml
+# kubectl config set-context argilla --namespace=argilla --cluster=cluster-name --user=team-name
+# cluster-name and team-name can be extracted from the k8 config file
+{
+  "apiVersion": "v1",
+  "kind": "Namespace",
+  "metadata": {
+    "name": "argilla",
+    "labels": {
+      "name": "argilla"
+    }
+  }
+}
