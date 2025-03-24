@@ -7,5 +7,5 @@
     "chat_template": "chatml",
     "input_data": "development_set.parquet",
     "output_data": "disease_node_QwQ.parquet",
-    "max_papers": 500
+    "max_papers": 10
 }
