@@ -1,0 +1,15 @@
+{
+    "model_path":  "Qwen/QwQ-32B-GGUF",
+    "flowchart": "flowcharts/GO_flowchart_2025_production/flowchart.json",
+    "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
+    "context_length": 65536,
+    "quantization": "q8_0",
+    "chat_template": "qwen",
+    "input_data": "production_test_data_2025-03-13.parquet",
+    "output_data": "baseline_output_2025-03-13.parquet",
+    "max_papers": 4500,
+    "evidence_type": "full-substring",
+    "deepseek_mode": true, 
+    "checkpoint_frequency": 100,
+    "checkpoint_file_path": "gfllm_qwq_checkpoint.parquet"
+}
