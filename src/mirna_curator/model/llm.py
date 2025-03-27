@@ -202,12 +202,12 @@ def get_model(
         n_gpu_layers=-1,
         n_ctx=context_length,
         flash_attention=True,
-        temperature=0.2,
+        temperature=0.6,
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
         seed=-1,
-        min_p=0.05,
-        top_k=0,
-        top_p=1.0, # This configuration from danhanchen of Unsloth, should
+        min_p=0.00,
+        top_k=40,
+        top_p=0.95, # This configuration from danhanchen of Unsloth, should
         repeat_penalty=1.1, # reduce the repetition on reasoning
         dry_multiplier=0.5,
         samplers="top_k;top_p;min_p;temperature;dry;typ_p;xtc",
