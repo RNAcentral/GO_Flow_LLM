@@ -201,6 +201,7 @@ def main(config: Optional[str] = None,
                 "reasoning": reasoning,
             }
         )
+        logger.info(curation_output[-1])
     _bulk_processing_end = time.time()
     _bulk_processing_total = _bulk_processing_end - _bulk_processing_start
     _bulk_processing_average = _bulk_processing_total / len(curation_output)
