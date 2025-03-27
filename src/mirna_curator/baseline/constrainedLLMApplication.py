@@ -17,7 +17,7 @@ import click
 from mirna_curator.model.llm import get_model
 from functools import wraps
 from epmc_xml import fetch
-
+import json
 from typing import Optional, Callable
 import time
 import logging
