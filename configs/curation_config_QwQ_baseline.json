@@ -3,7 +3,7 @@
     "context_length": 65536,
     "quantization": "q8_0",
     "chat_template": "qwen",
-    "input_data": "production_test_data_2025-03-13.parquet",
+    "input_data": "development_set.parquet",
     "output_data": "baseline_output_2025-03-13.parquet",
     "deepseek_mode": true
 }
