@@ -214,3 +214,5 @@ def main(config: Optional[str] = None,
     curation_output_df.write_parquet(output_data)
 
 
+if __name__ == "__main__":
+    main()
