@@ -217,6 +217,9 @@ def main(config: Optional[str] = None,
         f"Average time to curate one paper: {_bulk_processing_average:.2f} seconds"
     )
     curation_output_df = pl.DataFrame(curation_output)
+    if Path(output_data).exists():
+        checkpoint = pl.read_parquet(output_data)
+        curation_output_df = pl.concat((checkpoint, curation_output_df))
     curation_output_df.write_parquet(output_data)
 
 
