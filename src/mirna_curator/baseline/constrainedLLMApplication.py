@@ -162,11 +162,11 @@ def main(config: Optional[str] = None,
 
 
     curation_input = pl.read_parquet(input_data)
-    if Path(curation_output).exists():
-        logger.info("Resuming from checkpoint %s", curation_output)
-        done = pl.read_parquet(curation_output)
+    if Path(output_data).exists():
+        logger.info("Resuming from checkpoint %s", output_data)
+        done = pl.read_parquet(output_data)
         curation_input = curation_input.join(done, on="PMCID", how="anti")
-        
+
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
 
