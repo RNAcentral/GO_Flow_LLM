@@ -23,6 +23,7 @@ import faulthandler
 import sys
 import time
 from pathlib import Path
+import os
 
 curation_output = []
 
@@ -147,6 +148,9 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--checkpoint_file_path", help="Name of the file to checkpoint into", default="curation_results_checkpoint.parquet"
 )
+@click.option(
+    "--gpu", help="Which gpu ID to run on, if there are several available", default='0'
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -165,6 +169,7 @@ def main(
     deepseek_mode: Optional[bool] = False,
     checkpoint_frequency: Optional[int] = -1,
     checkpoint_file_path: Optional[str] = None,
+    gpu: Optional[str] = None,
 ):
     curation_tracer.set_model_name(model_path)
 
@@ -203,6 +208,10 @@ def main(
         logger.info("Validation only, exiting now")
         return 0
 
+    if gpu is not None:
+        ## Set which GPU to use
+        logger.info("Selecting %s gpu for this process", gpu)
+        os.environ['CUDA_VISIBLE_DEVICES'] = gpu
     _model_load_start = time.time()
     llm = get_model(
         model_path,
