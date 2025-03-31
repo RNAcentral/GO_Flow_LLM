@@ -23,7 +23,7 @@ import time
 import logging
 from guidance import user, assistant, gen, select
 from mirna_curator.model.llm import STOP_TOKENS
-
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -162,6 +162,11 @@ def main(config: Optional[str] = None,
 
 
     curation_input = pl.read_parquet(input_data)
+    if Path(curation_output).exists():
+        logger.info("Resuming from checkpoint %s", curation_output)
+        done = pl.read_parquet(curation_output)
+        curation_input = curation_input.join(done, on="PMCID", how="anti")
+        
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
 
