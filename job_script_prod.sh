@@ -28,3 +28,4 @@ python src/mirna_curator/main.py --config configs/curation_config_QwQ_prod.json 
 python src/mirna_curator/main.py --config configs/curation_config_QwQ_prod.json --checkpoint_file_path gfllm_qwq_checkpoint_split_2.parquet --input_data production_test_data_2025-03-31_split_2.parquet --output_data production_data_output_2025-03-31_chunk_2.parquet --gpu 2 &
 python src/mirna_curator/main.py --config configs/curation_config_QwQ_prod.json --checkpoint_file_path gfllm_qwq_checkpoint_split_3.parquet --input_data production_test_data_2025-03-31_split_3.parquet --output_data production_data_output_2025-03-31_chunk_3.parquet --gpu 3 
 
+wait
