@@ -6,7 +6,7 @@
     "quantization": "q8_0",
     "chat_template": "qwen",
     "input_data": "development_set.parquet",
-    "output_data": "development_results_all_class_QwQ_updated_fc.parquet",
+    "output_data": "development_results_all_class_QwQ_20250407.parquet",
     "max_papers": 500,
     "evidence_type": "full-substring"
 }
