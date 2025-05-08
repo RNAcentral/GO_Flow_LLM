@@ -5,3 +5,8 @@
 traces/*
 curation_traces/*
 kubernetes/secrets
+data/PMID_PMCID_DOI.csv
+data/id_mapping.tsv
+data/bhf_ucl*
+data/aruk_ucl*
+*.gpa
