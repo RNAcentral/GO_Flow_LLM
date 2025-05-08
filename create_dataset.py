@@ -46,6 +46,8 @@ def search_protein_id(args):
 
 @lru_cache
 def lookup_rnac_names(rna_id):
+    ## ID mapping is from RNAcentral, maps URS_taxid to extennal ID, and RNA type
+    ## https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/id_mapping.tsv.gz
     rnacentral_ids = pl.scan_csv(
         "data/id_mapping.tsv",
         separator="\t",
@@ -228,7 +230,8 @@ def assign_classes(df):
             r_cols.append(rdata)
     return r_cols
 
-
+## This is processed out of the goa_rna_all.gpa file from here:
+## https://ftp.ebi.ac.uk/pub/contrib/goa/goa_rna_all.gpa.gz
 raw = pl.read_csv(
     "data/bhf_ucl_annotations.tsv",
     # "data/aruk_ucl_annotations.tsv",
@@ -260,6 +263,7 @@ raw = raw.with_columns(
     )
 ).unnest("res")
 
+## Downloaded from https://ftp.ncbi.nlm.nih.gov/pub/pmc/PMC-ids.csv.gz
 pmid_pmcid_mapping = pl.scan_csv(
     "data/PMID_PMCID_DOI.csv",
 )
@@ -306,6 +310,7 @@ else:
 
 targets = targets.with_columns(pl.col("rna_id").str.split("|")).explode("rna_id")
 
+## paper and targets is the manually checked rna, and protein ISd for each paper
 if not Path("data/paper_and_targets.csv").exists():
     paper_searching = (
         targets.group_by("PMCID")
