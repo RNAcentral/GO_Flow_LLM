@@ -1,0 +1,12 @@
+{
+    "model_path":  "Qwen/QwQ-32B-GGUF",
+    "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
+    "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
+    "context_length": 65536,
+    "quantization": "q8_0",
+    "chat_template": "qwen",
+    "input_data": "multi_target_test_set.parquet",
+    "output_data": "multi_target_test_20250513.parquet",
+    "max_papers": 500,
+    "evidence_type": "full-substring"
+}
