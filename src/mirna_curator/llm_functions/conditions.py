@@ -254,7 +254,7 @@ def prompted_flowchart_terminal(
             + "\n"
         )
     with assistant():
-        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name', list_append=True)}"
+        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name', recurse=True)}"
         # with_temperature(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
