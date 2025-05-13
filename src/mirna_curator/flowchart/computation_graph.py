@@ -432,7 +432,7 @@ class ComputationGraph:
                 ## handle multiple targets
                 if len(llm['protein_name']) > 1:
                     targets = [t.strip() for t in llm['protein_name']]
-                    aes = {detector.name: t for t in targets}
+                    aes = { f"{detector.name}_{idx}" : t  for idx, t in enumerate(targets) }
                 else:
                     aes = {detector.name : llm["protein_name"][0].strip()}
                 target_name = llm["protein_name"][0].strip()
