@@ -435,7 +435,7 @@ class ComputationGraph:
                     aes = {detector.name: t for t in targets}
                 else:
                     aes = {detector.name : llm["protein_name"][0].strip()}
-                target_name = llm["protein_name"].strip()
+                target_name = llm["protein_name"][0].strip()
                 node_reasoning = llm["detector_reasoning"]
                 node_evidence = llm["evidence"]
 
