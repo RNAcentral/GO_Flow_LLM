@@ -254,7 +254,12 @@ def prompted_flowchart_terminal(
             + "\n"
         )
     with assistant():
-        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name', recurse=True)}"
+        llm += "Protein name(s): "
+        while True:
+            llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
+            llm += select([" and ", "."], name="multi_target_conjunction")
+            if llm["multi_target_conjunction"] == ".":
+                break
         # with_temperature(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )
