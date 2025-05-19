@@ -16,7 +16,7 @@ class Prompt(BaseModel):
     prompt: str = ""
     target_section: Optional[str] = None
     detector: Optional[str] = None
-    annotation: Optional[Dict[str, str]] = None
+    annotation: Optional[Dict[str, Dict]] = None
     legacy_annotation: Optional[str] = None
 
 
