@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict
 from pydantic import BaseModel, Field
 
 
@@ -16,7 +16,8 @@ class Prompt(BaseModel):
     prompt: str = ""
     target_section: Optional[str] = None
     detector: Optional[str] = None
-    annotation: Optional[str] = None
+    annotation: Optional[Dict[str, str]] = None
+    legacy_annotation: Optional[str] = None
 
 
 class Detector(BaseModel):
