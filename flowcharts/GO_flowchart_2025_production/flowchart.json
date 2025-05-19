@@ -19,7 +19,18 @@
       },
       "transitions": {
         "true": "no_annotation",
-        "false": "functional_interaction"
+        "false": "binding_type_filter"
+      }
+    },
+    "binding_type_filter": {
+      "type": "filter",
+      "data": {
+        "desc": "Is the binding between a miRNA and an mRNA?",
+        "prompt_name": "binding_type_filter"
+      },
+      "transitions": {
+        "true": "experimental_evidence",
+        "false": "no_annotation"
       }
     },
     "experimental_evidence": {
