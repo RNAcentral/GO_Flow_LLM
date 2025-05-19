@@ -70,7 +70,7 @@
       "prompt": "",
       "target_section": null,
       "detector": null,
-      "annotation": null
+      "annotation": {"no_annotation": {"reason":"in_flowchart_no_annotation"}}
     },
     {
       "name": "validated_binding_only",
