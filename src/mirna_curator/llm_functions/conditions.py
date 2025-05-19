@@ -264,7 +264,7 @@ def prompted_flowchart_terminal(
             if llm['protein_name'][-1] == "None of the above":
                 logger.warning("LLM is selecting a protein name not in the EPMC list!")
                 with_temperature(
-                    gen(max_tokens=10, name="protein_name", stop=, list_append=True), temperature_selection
+                    gen(max_tokens=10, name="protein_name", stop=STOP_TOKENS, list_append=True), temperature_selection
                 )
 
     llm += extract_evidence(
