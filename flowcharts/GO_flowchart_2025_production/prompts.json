@@ -6,7 +6,7 @@
       "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
       "target_section": "methods",
       "detector": null,
-      "annotation": "miRNA_cluster"
+      "annotation": {"no_annotation": "no_binding"}
     },
     {
       "name": "mirna_cluster",
@@ -14,7 +14,15 @@
       "prompt": "Does this paper present an experiment on a miRNA cluster? miRNA clusters are defined as miRNA genes, which are located on a chromosome at the maximum inter-miRNA distance (MID) of 10 kb.",
       "target_section": "methods",
       "detector": null,
-      "annotation": "miRNA_cluster"
+      "annotation": {"no_annotation": "miRNA_cluster"}
+    },
+    {
+      "name": "binding_type_filter",
+      "type": "condition_prompt_boolean",
+      "prompt": "Is the binding between a miRNA and an mRNA? If the binding is between a miRNA and anything else (e.g. circRNA or lncRNA) select 'no'.",
+      "target_section": "methods",
+      "detector": null,
+      "annotation": {"no_annotation": "miRNA_binding_other"}
     },
     {
       "name": "experimental_evidence",
