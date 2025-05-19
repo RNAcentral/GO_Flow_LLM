@@ -156,7 +156,7 @@
       "name": "mrna_expression_assay",
       "type": "condition_prompt_boolean",
       "prompt": "Does the paper include an assay for the miRNA effect on the target gene mRNA expression? This must be a direct assay of the levels of mRNA for the gene identified as a target of the miRNA, not inferred from a binding assay or other measurement. If other things are measured with qRT-PCR, such as to confirm the expression of the miRNA, you should ignore them.",
-      "target_section": "conclusions",
+      "target_section": "results",
       "detector": null,
       "annotation": null
     }
