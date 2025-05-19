@@ -229,9 +229,9 @@ def prompted_flowchart_terminal(
         else:
             llm += "\n\n"
         llm += (
-            f"Question: {detector_prompt}. Restrict your answer to the target of {rna_id}. "
-            "Give some reasoning for your answer, then state the miRNA's target protein name as it appears in the paper.\n"
-            "Remember: we are looking for the target of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n"
+            f"Question: {detector_prompt}. Restrict your answer to the target(s) of {rna_id}. "
+            "Give some reasoning for your answer, then state the miRNA's target protein name(s) as it/they appear in the paper.\n"
+            "Remember: we are looking for the target(s) of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n"
         )
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
@@ -254,7 +254,12 @@ def prompted_flowchart_terminal(
             + "\n"
         )
     with assistant():
-        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name')}"
+        llm += "Protein name(s): "
+        while True:
+            llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
+            llm += select([" and ", "."], name="multi_target_conjunction")
+            if llm["multi_target_conjunction"] == ".":
+                break
         # with_temperature(
         #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
         # )

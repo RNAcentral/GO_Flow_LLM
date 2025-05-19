@@ -117,7 +117,7 @@
     {
       "name": "target",
       "type": "AE",
-      "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
+      "prompt": "What is the gene name of the mRNA targeted by this miRNA? If there are multiple genes, you should list them all."
     }
   ]
 }
