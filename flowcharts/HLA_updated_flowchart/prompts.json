@@ -70,7 +70,7 @@
       "prompt": "",
       "target_section": null,
       "detector": null,
-      "annotation": null
+      "annotation": {"no_annotation": {"reason":"in_flowchart_no_annotation"}}
     },
     {
       "name": "validated_binding_only",
@@ -78,7 +78,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035195"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035195"
+        },
+        "BP": {
+          "involved_in": "GO:0035195"
+        }
+      }
     },
     {
       "name": "validated_binding_mrna",
@@ -86,7 +94,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035279"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035279"
+        },
+        "BP": {
+          "involved_in": "GO:0035279"
+        }
+      }
     },
     {
       "name": "validated_binding_translation",
@@ -94,7 +110,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035278"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035278"
+        },
+        "BP": {
+          "involved_in": "GO:0035278"
+        }
+      }
     },
     {
       "name": "no_validated_binding",
@@ -117,7 +141,7 @@
     {
       "name": "target",
       "type": "AE",
-      "prompt": "What is the gene name of the mRNA targeted by this miRNA?"
+      "prompt": "What is the gene name of the mRNA targeted by this miRNA? If there are multiple genes, you should list them all."
     }
   ]
 }

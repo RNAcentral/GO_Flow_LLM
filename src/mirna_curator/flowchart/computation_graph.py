@@ -429,8 +429,13 @@ class ComputationGraph:
                     self.loaded_sections.append(target_section_name)
 
                 ## extract results from the LLM
-                aes = {detector.name : llm["protein_name"].strip()}
-                target_name = llm["protein_name"].strip()
+                ## handle multiple targets
+                if len(llm['protein_name']) > 1:
+                    targets = [t.strip() for t in llm['protein_name']]
+                    aes = { f"{detector.name}_{idx}" : t  for idx, t in enumerate(targets) }
+                else:
+                    aes = {detector.name : llm["protein_name"][0].strip()}
+                target_name = llm["protein_name"][0].strip()
                 node_reasoning = llm["detector_reasoning"]
                 node_evidence = llm["evidence"]
 
