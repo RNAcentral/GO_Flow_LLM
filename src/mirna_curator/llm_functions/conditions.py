@@ -215,6 +215,7 @@ def prompted_flowchart_terminal(
 
     """
     epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
+    epmc_annotated_genes.append("None of the above")
     with user():
         llm += (
             f"You will be asked a question which you must answer using text you have been given. "
@@ -254,13 +255,21 @@ def prompted_flowchart_terminal(
             + "\n"
         )
     with assistant():
-        llm += f"Protein name: {select(epmc_annotated_genes, name='protein_name')}"
-        # with_temperature(
-        #     gen(max_tokens=10, name="protein_name", stop=["<|end|>", "<|eot_id|>"]), temperature_selection
-        # )
+        llm += "Protein name(s): "
+        while True:
+            llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
+            llm += select([" and ", "."], name="multi_target_conjunction")
+            if llm["multi_target_conjunction"] == ".":
+                break
+            if llm['protein_name'][-1] == "None of the above":
+                logger.warning("LLM is selecting a protein name not in the EPMC list!")
+                with_temperature(
+                    gen(max_tokens=10, name="protein_name", stop=, list_append=True), temperature_selection
+                )
 
     llm += extract_evidence(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
 
     return llm
+
