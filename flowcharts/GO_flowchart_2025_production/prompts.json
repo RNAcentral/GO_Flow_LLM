@@ -6,7 +6,7 @@
       "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": "no_binding"}
+      "annotation": {"no_annotation": {"reason": "no_binding"}}
     },
     {
       "name": "mirna_cluster",
@@ -14,7 +14,7 @@
       "prompt": "Does this paper present an experiment on a miRNA cluster? miRNA clusters are defined as miRNA genes, which are located on a chromosome at the maximum inter-miRNA distance (MID) of 10 kb.",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": "miRNA_cluster"}
+      "annotation": {"no_annotation": {"reason": "miRNA_cluster"}}
     },
     {
       "name": "binding_type_filter",
@@ -22,7 +22,7 @@
       "prompt": "Is the binding between a miRNA and an mRNA? If the binding is between a miRNA and anything else (e.g. circRNA or lncRNA) select 'no'.",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": "miRNA_binding_other"}
+      "annotation": {"no_annotation": {"reason":"miRNA_binding_other"}}
     },
     {
       "name": "experimental_evidence",
@@ -94,7 +94,7 @@
       "prompt": "",
       "target_section": null,
       "detector": null,
-      "annotation": null
+      "annotation": {"no_annotation": {"reason":"in_flowchart_no_annotation"}}
     },
     {
       "name": "validated_binding_only",
@@ -102,7 +102,15 @@
       "prompt": "",
       "target_section": "conclusions",
       "detector": "target",
-      "annotation": "GO:0035195"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035195"
+        },
+        "BP": {
+          "involved_in": "GO:0035195"
+        }
+      }
     },
     {
       "name": "validated_binding_mrna",
@@ -110,7 +118,15 @@
       "prompt": "",
       "target_section": "conclusions",
       "detector": "target",
-      "annotation": "GO:0035279"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035279"
+        },
+        "BP": {
+          "involved_in": "GO:0035279"
+        }
+      }
     },
     {
       "name": "validated_binding_translation",
@@ -118,7 +134,15 @@
       "prompt": "",
       "target_section": "conclusions",
       "detector": "target",
-      "annotation": "GO:0035278"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035278"
+        },
+        "BP": {
+          "involved_in": "GO:0035278"
+        }
+      }
     },
     {
       "name": "no_validated_binding",
