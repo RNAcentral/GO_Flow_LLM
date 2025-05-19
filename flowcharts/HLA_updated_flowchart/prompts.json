@@ -78,7 +78,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035195"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035195"
+        },
+        "BP": {
+          "involved_in": "GO:0035195"
+        }
+      }
     },
     {
       "name": "validated_binding_mrna",
@@ -86,7 +94,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035279"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035279"
+        },
+        "BP": {
+          "involved_in": "GO:0035279"
+        }
+      }
     },
     {
       "name": "validated_binding_translation",
@@ -94,7 +110,15 @@
       "prompt": "",
       "target_section": "results",
       "detector": "target",
-      "annotation": "GO:0035278"
+      "annotation": {
+        "MF":{
+          "enables": "GO:1903231",
+          "part_of": "GO:0035278"
+        },
+        "BP": {
+          "involved_in": "GO:0035278"
+        }
+      }
     },
     {
       "name": "no_validated_binding",
