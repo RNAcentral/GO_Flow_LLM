@@ -16,7 +16,7 @@ join litscan_job lsj
 where name in ('mirbase', 'mirgenedb')
 and hit_count > 0
 and retracted = false
-and type = 'Research article
+and type = 'Research article'
 
 group by pmcid
 having cardinality(array_agg(lsdb.job_id)) = 1
