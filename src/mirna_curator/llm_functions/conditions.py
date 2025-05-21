@@ -234,6 +234,11 @@ def prompted_flowchart_terminal(
             "Give some reasoning for your answer, then state the miRNA's target protein name(s) as it/they appear in the paper.\n"
             "Remember: we are looking for the target(s) of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n"
         )
+        llm += (
+            "Here is a list of protein names we found mentioned in the paper:\n"
+            "\n".join(epmc_annotated_genes[:-1])
+            "If the protein name does not appear in the list, select 'None of the above'\n"
+        )
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
     logger.info(
@@ -258,15 +263,13 @@ def prompted_flowchart_terminal(
         llm += "Protein name(s): "
         while True:
             llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
-            if llm['protein_name'][-1] == "None of the above":
-                logger.warning("LLM is selecting a protein name not in the EPMC list!")
-                with_temperature(
-                    gen(max_tokens=10, name="protein_name", stop=STOP_TOKENS, list_append=True), temperature_selection
-                )
+            
             llm += select([" and ", "."], name="multi_target_conjunction")
             if llm["multi_target_conjunction"] == ".":
                 break
 
+    if "None of the above" in llm['protein_name']:
+        logger.warning("LLM was unable to find at least one target protein name for this paper!")
     llm += extract_evidence(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
