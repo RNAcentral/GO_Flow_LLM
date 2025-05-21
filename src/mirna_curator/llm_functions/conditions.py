@@ -234,11 +234,10 @@ def prompted_flowchart_terminal(
             "Give some reasoning for your answer, then state the miRNA's target protein name(s) as it/they appear in the paper.\n"
             "Remember: we are looking for the target(s) of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n"
         )
-        llm += (
-            "Here is a list of protein names we found mentioned in the paper:\n"
-            "\n".join(epmc_annotated_genes[:-1])
-            "If the protein name does not appear in the list, select 'None of the above'\n"
-        )
+        llm += "Here is a list of protein names we found mentioned in the paper:\n"
+        llm +="\n".join(epmc_annotated_genes[:-1])
+        llm += "If the protein name does not appear in the list, select 'None of the above'\n"
+        
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
     logger.info(
