@@ -229,7 +229,9 @@ def prompted_flowchart_terminal(
         else:
             llm += "\n\n"
         llm += (
-            f"Question: {detector_prompt}. Restrict your answer to the target(s) of {rna_id}. "
+            f"Question: {detector_prompt}. Restrict your answer to the target(s) of {rna_id}.\n"
+            f"Select targets from the following list: {','.join(epmc_annotated_genes)}\n"
+            "Ignore targets which do not appear in this list."
         )
     logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
     logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
