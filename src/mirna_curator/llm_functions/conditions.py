@@ -255,6 +255,8 @@ def prompted_flowchart_terminal(
         llm += "Protein name(s): "
         while True:
             llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
+            last_target = llm['protein_name'][-1]
+            epmc_annotated_genes.remove(last_target)
             llm += select([" and ", "."], name="multi_target_conjunction")
             if llm["multi_target_conjunction"] == ".":
                 break
