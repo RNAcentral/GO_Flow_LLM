@@ -6,7 +6,12 @@
       "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": {"reason": "no_binding"}}
+      "annotation": {
+        "no_annotation": {
+          "reason": "no_binding"
+        }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "mirna_cluster",
@@ -14,7 +19,12 @@
       "prompt": "Does this paper present an experiment on a miRNA cluster? miRNA clusters are defined as miRNA genes, which are located on a chromosome at the maximum inter-miRNA distance (MID) of 10 kb.",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": {"reason": "miRNA_cluster"}}
+      "annotation": {
+        "no_annotation": {
+          "reason": "miRNA_cluster"
+        }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "binding_type_filter",
@@ -22,7 +32,12 @@
       "prompt": "Is the binding between a miRNA and an mRNA? If the binding is between a miRNA and anything else (e.g. circRNA or lncRNA) select 'no'.",
       "target_section": "methods",
       "detector": null,
-      "annotation": {"no_annotation": {"reason":"miRNA_binding_other"}}
+      "annotation": {
+        "no_annotation": {
+          "reason": "miRNA_binding_other"
+        }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "experimental_evidence",
@@ -30,7 +45,8 @@
       "prompt": "Does the paper have experimental evidence? This must be from reporter assays, in-vivo protein level measurements, qRT-PCR, Western Blot or similar techniques.",
       "target_section": "methods",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "functional_interaction",
@@ -38,7 +54,8 @@
       "prompt": "Does the paper have a functional interaction between the miRNA and an mRNA, determined by a reporter assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
       "target_section": "methods",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "mirna_mrna_binding",
@@ -46,7 +63,8 @@
       "prompt": "Does the paper have a miRNA-mRNA binding assay? Acceptable assays include: Luciferase reporter assays where a luciferase reporter gene is fused to the 3'UTR of the target mRNA; and CRISPR/CAS9 deletion of the miRNA response element with subsequent measurement of protein levels.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "effect_endogenous_1",
@@ -54,7 +72,8 @@
       "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "effect_endogenous_2",
@@ -62,7 +81,8 @@
       "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "computational_prediction",
@@ -70,7 +90,8 @@
       "prompt": "Does the paper make a computational target prediction in addition to the binding assays?",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "effect_endogenous_3",
@@ -78,7 +99,8 @@
       "prompt": "Does the paper directly demonstrate changes in endogenous target gene expression through either:\n1. Western blot showing protein level changes after transfection or inhibition, OR\n2. qRT-PCR measurements of mRNA levels after transfection or inhibition\n\nThe changes must be measured after perturbation of the proposed regulator (e.g., knockdown, overexpression). Reporter assays or measurements in artificial systems are not sufficient evidence.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "mirna_changes",
@@ -86,7 +108,8 @@
       "prompt": "After transfecting the miRNA and observing decreased protein levels, did the authors observe decreased mRNA levels of the miRNA target gene? This must be an observed change in the mRNA levels of the target gene using a technique such as qRT-PCR, not an inference from other measurements. Make sure the qRT-PCR is used to measure the target gene mRNA level, not just the miRNA level.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "no_annotation",
@@ -94,7 +117,12 @@
       "prompt": "",
       "target_section": null,
       "detector": null,
-      "annotation": {"no_annotation": {"reason":"in_flowchart_no_annotation"}}
+      "annotation": {
+        "no_annotation": {
+          "reason": "in_flowchart_no_annotation"
+        }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "validated_binding_only",
@@ -103,14 +131,15 @@
       "target_section": "conclusions",
       "detector": "target",
       "annotation": {
-        "MF":{
+        "MF": {
           "enables": "GO:1903231",
           "part_of": "GO:0035195"
         },
         "BP": {
           "involved_in": "GO:0035195"
         }
-      }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "validated_binding_mrna",
@@ -119,14 +148,15 @@
       "target_section": "conclusions",
       "detector": "target",
       "annotation": {
-        "MF":{
+        "MF": {
           "enables": "GO:1903231",
           "part_of": "GO:0035279"
         },
         "BP": {
           "involved_in": "GO:0035279"
         }
-      }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "validated_binding_translation",
@@ -135,14 +165,15 @@
       "target_section": "conclusions",
       "detector": "target",
       "annotation": {
-        "MF":{
+        "MF": {
           "enables": "GO:1903231",
           "part_of": "GO:0035278"
         },
         "BP": {
           "involved_in": "GO:0035278"
         }
-      }
+      },
+      "legacy_annotation": null
     },
     {
       "name": "no_validated_binding",
@@ -150,7 +181,8 @@
       "prompt": "",
       "target_section": "conclusions",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     },
     {
       "name": "mrna_expression_assay",
@@ -158,14 +190,15 @@
       "prompt": "Does the paper include an assay for the miRNA effect on the target gene mRNA expression? This must be a direct assay of the levels of mRNA for the gene identified as a target of the miRNA, not inferred from a binding assay or other measurement. If other things are measured with qRT-PCR, such as to confirm the expression of the miRNA, you should ignore them.",
       "target_section": "results",
       "detector": null,
-      "annotation": null
+      "annotation": null,
+      "legacy_annotation": null
     }
   ],
   "detectors": [
     {
       "name": "target",
       "type": "AE",
-      "prompt": "What is the gene name of the mRNA targeted by this miRNA? If there are multiple genes, you should list them all."
+      "prompt": "What is the gene name of the mRNA targeted by this miRNA? If there are multiple genes, you should list them all.\nGive some reasoning for your answer, then state the miRNA's target protein name(s) as it/they appear in the paper.\nRemember: \n    - We are looking for the target(s) of the miRNA mentioned in this paper, do not recall what you know about the miRNA.\n    - The target must be demonstrated in the paper. Ignore cases where the target is only predicted, or mentioned from previous work.\n"
     }
   ]
 }
