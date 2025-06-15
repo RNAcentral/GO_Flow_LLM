@@ -178,10 +178,18 @@
     {
       "name": "no_validated_binding",
       "type": "terminal_conditional",
-      "prompt": "",
+      "prompt": [
+        "Does the paper measure, and observe a decrease in the protein level?",
+        "Does the paper measure, and observe a decrease in the mRNA level?",
+        "Does the paper measure, and observe a decrease in the protein level without a decrease in mRNA level?"
+    ],
       "target_section": "conclusions",
-      "detector": null,
-      "annotation": null,
+      "detector": "target",
+      "annotation": {
+        "ynn": {"BP": {"involved_in": "GO:0035195"}},
+        "yyn": {"BP": {"involved_in": "GO:0035279"}},
+        "yny": {"BP": {"involved_in": "GO:0035278"}}
+      },
       "legacy_annotation": null
     },
     {
