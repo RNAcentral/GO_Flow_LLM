@@ -290,6 +290,8 @@ class ComputationGraph:
                 target_section_name = self.infer_target_section_name(
                     llm, prompt, article
                 )
+            else:
+                target_section_name = prompt.target_section
 
             try:
                 ## Now we load a section to the context only once, we have to get the node result here.
