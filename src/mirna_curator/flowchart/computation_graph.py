@@ -13,6 +13,7 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_step_bool,
     prompted_flowchart_terminal,
     prompted_flowchart_step_tool,
+    prompted_flowchart_terminal_conditional,
 )
 from mirna_curator.llm_functions.filtering import prompted_filter
 from mirna_curator.model.llm import STOP_TOKENS
@@ -124,7 +125,7 @@ class ComputationGraph:
                 prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
             elif flow_node_props.type == NodeType("terminal_conditional"):
-                function = prompted_flowchart_terminal
+                function = prompted_flowchart_terminal_conditional
                 prompt = flow_node_props.data.terminal_name
                 node_type = "terminal"
             elif flow_node_props.type == NodeType("filter"):
@@ -403,42 +404,109 @@ class ComputationGraph:
                 target_section_name = self.infer_target_section_name(
                     llm, prompt, article
                 )
+                if self.current_node == NodeType("prompted_flowchart_terminal"):
+                    annotation = prompt.annotation
+                    detector = list(
+                        filter(lambda d: d.name == prompt.detector, prompts.detectors)
+                    )[0]
+                    ## Now we load a section to the context only once, we have to get the node result here.
+                    if target_section_name in self.loaded_sections:
+                        llm += self.current_node.function(
+                            article.sections[target_section_name],
+                            False,
+                            detector.prompt,
+                            rna_id,
+                            paper_id,
+                            config=self.run_config,
+                        )
+                    else:
+                        llm += self.current_node.function(
+                            article.sections[target_section_name],
+                            True,
+                            detector.prompt,
+                            rna_id,
+                            paper_id,
+                            config=self.run_config,
+                        )
+                        self.loaded_sections.append(target_section_name)
 
-                annotation = prompt.annotation
-                detector = list(
-                    filter(lambda d: d.name == prompt.detector, prompts.detectors)
-                )[0]
-                ## Now we load a section to the context only once, we have to get the node result here.
-                if target_section_name in self.loaded_sections:
-                    llm += self.current_node.function(
-                        article.sections[target_section_name],
-                        False,
-                        detector.prompt,
-                        rna_id,
-                        paper_id,
-                        config=self.run_config,
-                    )
-                else:
-                    llm += self.current_node.function(
-                        article.sections[target_section_name],
-                        True,
-                        detector.prompt,
-                        rna_id,
-                        paper_id,
-                        config=self.run_config,
-                    )
-                    self.loaded_sections.append(target_section_name)
+                    ## extract results from the LLM
+                    ## handle multiple targets
+                    if len(llm['protein_name']) > 1:
+                        targets = [t.strip() for t in llm['protein_name']]
+                        aes = { f"{detector.name}_{idx}" : t  for idx, t in enumerate(targets) }
+                    else:
+                        aes = {detector.name : llm["protein_name"][0].strip()}
+                    target_name = llm["protein_name"][0].strip()
+                    node_reasoning = llm["detector_reasoning"]
+                    node_evidence = llm["evidence"]
+                else: ## conditional terminal annotation - quite rare!
+                    annotations = prompt.annotation ## This will be a dictionary now
+                    detector = list(
+                        filter(lambda d: d.name == prompt.detector, prompts.detectors)
+                    )[0]
+                    conditional_prompts = prompt.prompt ## This is a list of N questions
+                    decisions = ""
+                    for p in conditional_prompts:
+                        ## Now we load a section to the context only once, we have to get the node result here.
+                        if target_section_name in self.loaded_sections:
+                            llm += self.current_node.function(
+                                article.sections[target_section_name],
+                                False,
+                                p,
+                                rna_id,
+                                paper_id,
+                                config=self.run_config,
+                            )
+                        else:
+                            llm += self.current_node.function(
+                                article.sections[target_section_name],
+                                True,
+                                p,
+                                rna_id,
+                                paper_id,
+                                config=self.run_config,
+                            )
+                            self.loaded_sections.append(target_section_name)
+                        decisions += "y" if llm['answer'] == "yes" else "n"
 
-                ## extract results from the LLM
-                ## handle multiple targets
-                if len(llm['protein_name']) > 1:
-                    targets = [t.strip() for t in llm['protein_name']]
-                    aes = { f"{detector.name}_{idx}" : t  for idx, t in enumerate(targets) }
-                else:
-                    aes = {detector.name : llm["protein_name"][0].strip()}
-                target_name = llm["protein_name"][0].strip()
-                node_reasoning = llm["detector_reasoning"]
-                node_evidence = llm["evidence"]
+                    ## Use decisions string to lookup the right annotation
+                    annotation = annotations.get(decisions, None)
+                    
+                    ## Now get the target
+                    if target_section_name in self.loaded_sections:
+                        llm += self.current_node.function(
+                            article.sections[target_section_name],
+                            False,
+                            detector.prompt,
+                            rna_id,
+                            paper_id,
+                            config=self.run_config,
+                            detector=True
+                        )
+                    else:
+                        llm += self.current_node.function(
+                            article.sections[target_section_name],
+                            True,
+                            detector.prompt,
+                            rna_id,
+                            paper_id,
+                            config=self.run_config,
+                            detector=True
+                        )
+                        self.loaded_sections.append(target_section_name)
+
+                    ## extract results from the LLM
+                    ## handle multiple targets
+                    if len(llm['protein_name']) > 1:
+                        targets = [t.strip() for t in llm['protein_name']]
+                        aes = { f"{detector.name}_{idx}" : t  for idx, t in enumerate(targets) }
+                    else:
+                        aes = {detector.name : llm["protein_name"][0].strip()}
+                    target_name = llm["protein_name"][0].strip()
+                    node_reasoning = llm["detector_reasoning"]
+                    node_evidence = llm["evidence"]
+
 
             self.visit_results.append(target_name)
             self.visit_evidences.append(node_evidence)
