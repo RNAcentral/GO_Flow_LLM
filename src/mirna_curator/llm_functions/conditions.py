@@ -271,3 +271,103 @@ def prompted_flowchart_terminal(
     )
 
     return llm
+
+
+
+
+@guidance
+def prompted_flowchart_terminal_conditional(
+    llm: guidance.models.Model,
+    article_text: str,
+    load_article_text: bool,
+    prompt: str,
+    rna_id: str,
+    paper_id: str,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = {},
+    temperature_reasoning: ty.Optional[float] = 0.6,
+    temperature_selection: ty.Optional[float] = 0.1,
+    detector=False,
+):
+    """
+    Use the LLM to find the targets and AEs for the GO annotation
+
+    """
+    epmc_annotated_genes = epmc.get_gene_name_annotations(paper_id)
+    with user():
+        llm += (
+            f"You will be asked a series of questions which you must answer using text you have been given. "
+            "The answer could be in the text you have already seen, or in the new text below. "
+            "If no new text is given, refer to the text you have already seen.\n"
+        )
+        if load_article_text:
+            logger.info(
+                f"Appending {len(llm.engine.tokenizer.encode(article_text.encode('utf-8')))} tokens (terminal conditional node)"
+            )
+            llm += f"New text: \n{article_text}\n\n"
+        else:
+            llm += "\n\n"
+
+        if detector:
+            llm += (
+            f"Question: {prompt}. Restrict your answer to the target(s) of {rna_id}.\n"
+            f"Select targets from the following list: {','.join(epmc_annotated_genes)}\n"
+            "Ignore targets which do not appear in this list."
+            )
+        else:
+            llm += (
+                f"Question: {prompt}. Restrict your answer to the target(s) of {rna_id}.\n"
+            )
+    
+    with assistant():
+        if detector:
+            llm += "Reasoning:\n"
+            if config["deepseek_mode"]:
+                llm += "<think>\n"
+            llm += (
+                with_temperature(
+                    gen(
+                        "detector_reasoning",
+                        max_tokens=1024,
+                        stop=STOP_TOKENS,
+                    ),
+                    temperature_reasoning,
+                )
+                + "\n"
+            )
+            llm += "Protein name(s): "
+            while True:
+                llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
+                last_target = llm['protein_name'][-1]
+                epmc_annotated_genes.remove(last_target)
+                llm += select([" and ", "."], name="multi_target_conjunction")
+                if llm["multi_target_conjunction"] == ".":
+                    break
+        else:
+            llm += "Reasoning:\n"
+            if config["deepseek_mode"]:
+                llm += "<think>\n"
+            llm += (
+                with_temperature(
+                    gen(
+                        "reasoning",
+                        max_tokens=1024,
+                        stop=STOP_TOKENS,
+                    ),
+                    temperature_reasoning,
+                )
+                + "\n"
+            )
+            llm += f"The final answer, based on my reasoning above is: " + with_temperature(
+            select(["yes", "no"], name="answer"), temperature_selection)
+            logger.info("Selected answer ok")
+
+    llm += extract_evidence(
+        article_text, mode=config.get("evidence_mode", "single-sentence")
+    )
+
+    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
+    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(
+        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+    )
+    return llm
