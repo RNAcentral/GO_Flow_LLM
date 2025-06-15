@@ -269,6 +269,7 @@ class ComputationGraph:
         This will just keep advancing the state until it hits a terminal node
         Therefore, it doesn't return anything
         """
+        error_count = 0
         while self.current_node.node_type == "internal":
             print(self.current_node.name)
             ## Have to filter to get the prompt named by the flowchart node
