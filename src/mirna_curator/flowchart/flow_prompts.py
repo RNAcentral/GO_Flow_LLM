@@ -1,5 +1,6 @@
 from typing import List, Optional, Literal, Dict
 from pydantic import BaseModel, Field
+from typing import Union
 
 
 class Prompt(BaseModel):
@@ -13,7 +14,7 @@ class Prompt(BaseModel):
         "terminal_conditional",
         "system",
     ]
-    prompt: str = ""
+    prompt: Union[str, List[str]] = ""
     target_section: Optional[str] = None
     detector: Optional[str] = None
     annotation: Optional[Dict[str, Dict]] = None
