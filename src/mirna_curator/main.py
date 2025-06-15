@@ -282,7 +282,7 @@ def main(
                 curation_output_df = pl.DataFrame(curation_output)
                 if Path(checkpoint_file_path).exists():
                     prev = pl.read_parquet(checkpoint_file_path)
-                    pl.concat([curation_output_df, prev], how="diagonal")
+                    pl.concat([curation_output_df, prev], how="diagonal_relaxed")
                 ## Overwrite the checkpoint to save space
                 curation_output_df.write_parquet(checkpoint_file_path)
 
