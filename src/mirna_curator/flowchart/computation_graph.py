@@ -406,7 +406,7 @@ class ComputationGraph:
                 target_section_name = self.infer_target_section_name(
                     llm, prompt, article
                 )
-                if self.current_node == NodeType("prompted_flowchart_terminal"):
+                if self.current_node == NodeType("terminal_full"):
                     annotation = prompt.annotation
                     detector = list(
                         filter(lambda d: d.name == prompt.detector, prompts.detectors)
