@@ -209,6 +209,7 @@ def prompted_flowchart_terminal(
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     temperature_reasoning: ty.Optional[float] = 0.6,
     temperature_selection: ty.Optional[float] = 0.1,
+    detector=True
 ):
     """
     Use the LLM to find the targets and AEs for the GO annotation
