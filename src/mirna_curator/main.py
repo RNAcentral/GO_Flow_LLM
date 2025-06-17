@@ -207,6 +207,19 @@ def main(
     if validate_only:
         logger.info("Validation only, exiting now")
         return 0
+    
+    ## Validate arguments - exit if something required is set to None
+    if any([
+        model_path is None,
+        flowchart is None,
+        prompts is None,
+        input_data is None,
+        output_data is None,
+        chat_template is None
+    ]):
+        logger.error("A required argument is se to None, check your config!")
+        return 1
+
 
     if gpu is not None:
         ## Set which GPU to use
@@ -253,7 +266,15 @@ def main(
     )
 
     ## Get the curation input data and resume if there's a valid checkpoint
-    curation_input = pl.read_parquet(input_data)
+    if input_data.endswith("parquet") or input_data.endswith("pq"):
+        curation_input = pl.read_parquet(input_data)
+    elif input_data.endswith("csv"):
+        curation_input = pl.read_csv(input_data)
+    else:
+        logger.error("Unsupported input data format for %s", input_data)
+        return 1
+
+
     if Path(checkpoint_file_path).exists():
         logger.info("Resuming from checkpoint %s", checkpoint_file_path)
         done = pl.read_parquet(checkpoint_file_path)
