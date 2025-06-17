@@ -119,15 +119,15 @@ class ComputationGraph:
             elif flow_node_props.type == NodeType("terminal_full"):
                 function = prompted_flowchart_terminal
                 prompt = flow_node_props.data.terminal_name
-                node_type = "terminal"
+                node_type = "terminal_full"
             elif flow_node_props.type == NodeType("terminal_short_circuit"):
                 function = prompted_flowchart_terminal
                 prompt = flow_node_props.data.terminal_name
-                node_type = "terminal"
+                node_type = "terminal_short_circuit"
             elif flow_node_props.type == NodeType("terminal_conditional"):
                 function = prompted_flowchart_terminal_conditional
                 prompt = flow_node_props.data.terminal_name
-                node_type = "terminal"
+                node_type = "terminal_conditional"
             elif flow_node_props.type == NodeType("filter"):
                 function = prompted_filter
                 node_type = "filter"
@@ -251,7 +251,7 @@ class ComputationGraph:
                 ## node from a filter, there will be no annotation. This just allows us to
                 ## record the reason as an annotation and skip to the next paper.
                 ## Actual handling of the terminal node will be done elsewhere
-                if self.current_node.node_type == "terminal":
+                if "terminal" in self.current_node.node_type:
                     break
                 self.node_idx += 1
 
@@ -361,7 +361,7 @@ class ComputationGraph:
                 break
             self.node_idx += 1
             ## Terminal node handling -
-            if self.current_node.node_type == "terminal":
+            if "terminal" in self.current_node.node_type:
                 logger.info(f"Hit terminal node {self.current_node.name}")
                 break
         return llm
@@ -379,7 +379,7 @@ class ComputationGraph:
         """
         aes = None  ## Default is no extensions
         annotation = None
-        if self.current_node.node_type == "terminal":
+        if "terminal" in self.current_node.node_type:
             self.visited_nodes.append(self.current_node.name)
             if self.current_node.prompt_name is None:
                 prompt = None
@@ -390,6 +390,8 @@ class ComputationGraph:
                         prompts.prompts,
                     )
                 )[0]
+
+
             if prompt is None:
                 annotation = None
                 node_reasoning = ""
@@ -406,7 +408,7 @@ class ComputationGraph:
                 target_section_name = self.infer_target_section_name(
                     llm, prompt, article
                 )
-                if self.current_node == NodeType("terminal_full"):
+                if self.current_node.node_type == "terminal_full":
                     annotation = prompt.annotation
                     detector = list(
                         filter(lambda d: d.name == prompt.detector, prompts.detectors)
