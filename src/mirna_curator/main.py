@@ -313,7 +313,8 @@ def main(
             article = fetch.article(row["PMCID"])
             article.add_figures_section()
             _paper_fetch_end = time.time()
-        except:
+        except Exception as e:
+            logger.error(e)
             logger.error(f"Failed to fetch/parse {row['PMCID']}, skipping it")
             continue
 
