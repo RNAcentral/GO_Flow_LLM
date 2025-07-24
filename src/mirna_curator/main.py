@@ -323,35 +323,41 @@ def main(
         )
 
         _curation_start = time.time()
-        try:
-            llm_trace, curation_result = graph.execute_graph(
-                row["PMCID"],
-                llm,
-                article,
-                row["rna_id"],
-                prompt_data,
+        if isinstance(row["rna_id"], list):
+            rna_ids = row["rna_id"]
+        else:
+            rna_ids = [row["rna_id"]]
+
+        for rna_id in rna_ids:
+            try:
+                llm_trace, curation_result = graph.execute_graph(
+                    row["PMCID"],
+                    llm,
+                    article,
+                    rna_id,
+                    prompt_data,
+                )
+            except Exception as e:
+                logger.error(e)
+                logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
+                faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
+                continue
+            logger.info(
+                f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
             )
-        except Exception as e:
-            logger.error(e)
-            logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
-            faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
-            continue
-        logger.info(
-            f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
-        )
-        # logger.info(
-        #     f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
-        # )
+            curation_output.append(
+                {
+                    "PMCID": row["PMCID"],
+                    "rna_id": rna_id,
+                    "curation_result": curation_result,
+                }
+            )
         _curation_end = time.time()
         logger.info(
-            f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
+                f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
         )
-        curation_output.append(
-            {
-                "PMCID": row["PMCID"],
-                "rna_id": row["rna_id"],
-                "curation_result": curation_result,
-            }
+        logger.info(
+                f"Curated {len(rna_ids)} RNAs"
         )
         # with open(f"{row['PMCID']}_{row['rna_id']}_llm_trace.txt", "w") as f:
         #     f.write(llm_trace)
