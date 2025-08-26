@@ -352,13 +352,29 @@ def main(
             ## Check here if we get filtered, and if so, break the loop and only record filtering
             ## in the curation result. Set RNA id to concatenated string of all ids maybe?
             ## Will require a new terminal node with explicit mention of why no annotation.
-            curation_output.append(
-                {
-                    "PMCID": row["PMCID"],
-                    "rna_id": rna_id,
-                    "curation_result": curation_result,
-                }
-            )
+            if curation_result["annotation"].get("reason", None) is not None:
+                # This means the terminal was a no annotation node, check the reason
+                if "filtered" in curation_result["annotation"]["reason"]:
+                    logger.info(f"RNA {rna_id} filtered, skipping further RNAs in this paper")
+                    rna_id = "|".join(rna_ids)
+                    curation_result = {
+                        "annotation": {
+                            "type": "no_annotation",
+                            "reason": "filtered",
+                        },
+                        "evidence": [],
+                        "all_reasoning": curation_result.get("all_reasoning", [])
+                    }
+                    ## Done with this paper
+                    break
+            else:
+                curation_output.append(
+                    {
+                        "PMCID": row["PMCID"],
+                        "rna_id": rna_id,
+                        "curation_result": curation_result,
+                    }
+                )
         _curation_end = time.time()
         logger.info(
                 f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
