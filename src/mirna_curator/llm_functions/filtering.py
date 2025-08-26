@@ -35,9 +35,11 @@ def prompted_filter(
         f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
-        llm += (
-            "Reasoning: "
-            + with_temperature(
+        llm += "Reasoning: "
+        if config["deepseek_mode"]:
+            llm += "<think>\n"
+        llm +=  (
+            with_temperature(
                 gen(
                     "reasoning",
                     max_tokens=1024,
