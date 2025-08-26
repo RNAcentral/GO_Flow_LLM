@@ -29,10 +29,10 @@ def prompted_filter(
         )
         llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         llm += f"Question: {filter_prompt}. Restrict your answer to the target of {rna_id}. "
-    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
-    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
+    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
     logger.info(
-        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
         llm += (

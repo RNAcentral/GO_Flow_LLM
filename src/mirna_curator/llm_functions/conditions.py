@@ -48,10 +48,10 @@ def prompted_flowchart_step_bool(
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
-    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
-    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
+    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
     logger.info(
-        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
         llm += "Reasoning:\n"
@@ -165,10 +165,10 @@ def prompted_flowchart_step_tool(
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
-    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
-    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
+    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
     logger.info(
-        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
         llm += "Reasoning:\n"
@@ -234,10 +234,10 @@ def prompted_flowchart_terminal(
             f"Select targets from the following list: {','.join(epmc_annotated_genes)}\n"
             "Ignore targets which do not appear in this list."
         )
-    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
-    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
+    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
     logger.info(
-        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
         llm += "Reasoning:\n"
@@ -366,9 +366,9 @@ def prompted_flowchart_terminal_conditional(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
 
-    logger.info(f"LLM input tokens: {llm.engine.metrics.engine_input_tokens}")
-    logger.info(f"LLM generated tokens: {llm.engine.metrics.engine_output_tokens}")
+    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
+    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
     logger.info(
-        f"LLM total tokens: {llm.engine.metrics.engine_input_tokens + llm.engine.metrics.engine_output_tokens}"
+        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     return llm
