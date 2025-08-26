@@ -30,7 +30,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>"]
+STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>"]
 
 
 def download_split_file(repo_id, filenames):
