@@ -125,6 +125,19 @@
       "legacy_annotation": null
     },
     {
+      "name": "no_annotation_filtered",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": null,
+      "annotation": {
+        "no_annotation": {
+          "reason": "filtered_no_annotation"
+        }
+      },
+      "legacy_annotation": null
+    },
+    {
       "name": "validated_binding_only",
       "type": "terminal_full",
       "prompt": "",
