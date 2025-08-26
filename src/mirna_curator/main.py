@@ -290,7 +290,7 @@ def main(
 
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
-
+    logger.info(f"{curation_input.select(pl.col("rna_id").list.len().sum())[0,0]} total graph runs to do (before filtering)")
     ## This is where we start riunning the curation graph for all the papers, one by one.
     _bulk_processing_start = time.time()
     for i, row in enumerate(curation_input.iter_rows(named=True)):
