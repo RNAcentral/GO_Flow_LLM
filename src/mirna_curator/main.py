@@ -270,6 +270,10 @@ def main(
         curation_input = pl.read_parquet(input_data)
     elif input_data.endswith("csv"):
         curation_input = pl.read_csv(input_data)
+        ## Split the rna_id column on | to get a list of IDs
+        curation_input = curation_input.with_columns(
+            pl.col("rna_id").str.split("|").alias("rna_id")
+        )
     else:
         logger.error("Unsupported input data format for %s", input_data)
         return 1
@@ -345,6 +349,9 @@ def main(
             logger.info(
                 f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
             )
+            ## Check here if we get filtered, and if so, break the loop and only record filtering
+            ## in the curation result. Set RNA id to concatenated string of all ids maybe?
+            ## Will require a new terminal node with explicit mention of why no annotation.
             curation_output.append(
                 {
                     "PMCID": row["PMCID"],
