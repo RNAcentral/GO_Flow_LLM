@@ -8,7 +8,7 @@
       },
       "transitions": {
         "true": "mirna_cluster",
-        "false": "no_annotation"
+        "false": "no_annotation_filtered"
       }
     },
     "mirna_cluster": {
@@ -18,7 +18,7 @@
         "prompt_name": "mirna_cluster"
       },
       "transitions": {
-        "true": "no_annotation",
+        "true": "no_annotation_filtered",
         "false": "binding_type_filter"
       }
     },
@@ -30,7 +30,7 @@
       },
       "transitions": {
         "true": "experimental_evidence",
-        "false": "no_annotation"
+        "false": "no_annotation_filtered"
       }
     },
     "experimental_evidence": {
@@ -115,6 +115,13 @@
       "data": {
         "desc": "No annotation",
         "terminal_name": "no_annotation"
+      }
+    },
+    "no_annotation_filtered": {
+      "type": "terminal_short_circuit",
+      "data": {
+        "desc": "No annotation",
+        "terminal_name": "no_annotation_filtered"
       }
     },
     "validated_binding_only": {
