@@ -34,7 +34,7 @@ from mirna_curator.utils.sampling import get_sampling_params
 logger = logging.getLogger(__name__)
 
 
-STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>"]
+STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>", '}']
 
 
 def download_split_file(repo_id, filenames):
