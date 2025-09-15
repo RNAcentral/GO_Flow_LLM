@@ -242,7 +242,7 @@ def main(
             "min_p" : 0.00,
             "top_k" : 40,
             "top_p" : 0.95, # This configuration from danhanchen of Unsloth, should
-            "repeat_penalty": 1.1, # reduce the repetition on reasoning
+            "repetition_penalty": 1.1, # reduce the repetition on reasoning
             "dry_multiplier" : 0.5,
         }
 
