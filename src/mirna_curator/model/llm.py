@@ -1,5 +1,4 @@
 from guidance.models import LlamaCpp
-
 from guidance.chat import (
     ChatMLTemplate,
     Llama2ChatTemplate,
@@ -26,6 +25,9 @@ from huggingface_hub import HfFileSystem, hf_hub_download
 from pathlib import Path
 import re
 import logging
+
+from mirna_curator.utils.sampling import get_sampling_params
+
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +87,7 @@ def get_model(
     chat_template: str = None,
     quantization: str = None,
     context_length: int = 16384,
+    run_config_options: dict = None,
 ):
     """
     Load a llama.cpp model, either locally or by downloading from huggingface
@@ -195,6 +198,8 @@ def get_model(
         raise FileNotFoundError(
             "Local model file does not exist, and is not a huggingface repo!"
         )
+    
+    sampling_params = get_sampling_params(run_config_options)
 
     model = LlamaCpp(
         model=model_path,
@@ -205,12 +210,9 @@ def get_model(
         temperature=0.6,
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
         seed=-1,
-        min_p=0.00,
-        top_k=40,
-        top_p=0.95, # This configuration from danhanchen of Unsloth, should
-        repeat_penalty=1.1, # reduce the repetition on reasoning
-        dry_multiplier=0.5,
+        dry_multiplier=run_config_options.get("dry_multiplier", 1.0),
         samplers="top_k;top_p;min_p;temperature;dry;typ_p;xtc",
+        sampling_params=sampling_params
     )
 
     return model
