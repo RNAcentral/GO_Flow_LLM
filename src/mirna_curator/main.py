@@ -151,6 +151,9 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--gpu", help="Which gpu ID to run on, if there are several available", default='0'
 )
+@click.option(
+    "--sampling_parameters_path", help="A JSON file containing the sampling parameters to set", default=None
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -170,6 +173,7 @@ def main(
     checkpoint_frequency: Optional[int] = -1,
     checkpoint_file_path: Optional[str] = None,
     gpu: Optional[str] = None,
+    sampling_parameters_path: Optional[str] = None,
 ):
     curation_tracer.set_model_name(model_path)
 
@@ -225,12 +229,31 @@ def main(
         ## Set which GPU to use
         logger.info("Selecting %s gpu for this process", gpu)
         os.environ['CUDA_VISIBLE_DEVICES'] = gpu
+
+    if sampling_parameters_path is not None:
+        try:
+            sampling_string = open(sampling_parameters_path, 'r').read()
+            sampling_parameters = json.loads(sampling_string)
+        except Exception as e:
+            logger.error(f"failed to fload sampling parameters from {sampling_parameters_path}, with error: {e}")
+    else:
+        sampling_parameters = {
+            "temperature" : 0.6,
+            "min_p" : 0.00,
+            "top_k" : 40,
+            "top_p" : 0.95, # This configuration from danhanchen of Unsloth, should
+            "repeat_penalty": 1.1, # reduce the repetition on reasoning
+            "dry_multiplier" : 0.5,
+        }
+
+    run_config_options.update(sampling_parameters)
     _model_load_start = time.time()
     llm = get_model(
         model_path,
         chat_template=chat_template,
         quantization=quantization,
         context_length=context_length,
+        sampling_parameters=run_config_options,
     )
     _model_load_end = time.time()
     logger.info(f"Loaded model from {model_path}")
