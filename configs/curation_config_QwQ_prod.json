@@ -4,7 +4,7 @@
     "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
     "context_length": 65536,
     "quantization": "q8_0",
-    "chat_template": "qwen",
+    "chat_template": "qwen3",
     "max_papers": 4500,
     "evidence_type": "full-substring",
     "deepseek_mode": true, 
