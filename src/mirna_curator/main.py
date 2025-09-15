@@ -253,7 +253,7 @@ def main(
         chat_template=chat_template,
         quantization=quantization,
         context_length=context_length,
-        sampling_parameters=run_config_options,
+        run_config_options=run_config_options,
     )
     _model_load_end = time.time()
     logger.info(f"Loaded model from {model_path}")
