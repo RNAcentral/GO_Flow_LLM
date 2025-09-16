@@ -8,7 +8,7 @@
     {
       "name": "mirna_binding",
       "type": "condition_prompt_boolean",
-      "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
+      "prompt": "Does this paper present an experiment on miRNA binding to mRNA? If you can only find evidence of differential expression, you should answer no. Only answer yes if there is experimental validation of a miRNA binging, answer no for in-silico only studies.",
       "target_section": "methods",
       "detector": null,
       "annotation": {
