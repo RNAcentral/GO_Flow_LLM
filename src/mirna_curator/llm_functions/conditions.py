@@ -54,9 +54,10 @@ def prompted_flowchart_step_bool(
         f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
-        llm += "Reasoning:\n"
         if config["deepseek_mode"]:
             llm += "<think>\n"
+        else:
+            llm += "Reasoning: "
         llm += (
             with_temperature(
                 gen(
@@ -171,9 +172,10 @@ def prompted_flowchart_step_tool(
         f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
-        llm += "Reasoning:\n"
         if config["deepseek_mode"]:
             llm += "<think>\n"
+        else:
+            llm += "Reasoning: "
         llm += (
             with_temperature(
                 gen(
@@ -240,9 +242,10 @@ def prompted_flowchart_terminal(
         f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
     )
     with assistant():
-        llm += "Reasoning:\n"
         if config["deepseek_mode"]:
             llm += "<think>\n"
+        else:
+            llm += "Reasoning: "
         llm += (
             with_temperature(
                 gen(
@@ -321,9 +324,10 @@ def prompted_flowchart_terminal_conditional(
     
     with assistant():
         if detector:
-            llm += "Reasoning:\n"
             if config["deepseek_mode"]:
                 llm += "<think>\n"
+            else:
+                llm += "Reasoning: "
             llm += (
                 with_temperature(
                     gen(
@@ -344,9 +348,10 @@ def prompted_flowchart_terminal_conditional(
                 if llm["multi_target_conjunction"] == ".":
                     break
         else:
-            llm += "Reasoning:\n"
             if config["deepseek_mode"]:
                 llm += "<think>\n"
+            else:
+                llm += "Reasoning: "
             llm += (
                 with_temperature(
                     gen(
