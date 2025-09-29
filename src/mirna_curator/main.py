@@ -389,6 +389,13 @@ def main(
                         "all_reasoning": curation_result.get("all_reasoning", [])
                     }
                     ## Done with this paper
+                    curation_output.append(
+                    {
+                        "PMCID": row["PMCID"],
+                        "rna_id": rna_id,
+                        "curation_result": curation_result,
+                    }
+                    )
                     break
             else:
                 curation_output.append(
