@@ -5,7 +5,8 @@ from datetime import datetime
 query = """
 SELECT
     lsr.pmcid AS PMCID,
-    (ARRAY_AGG(lsdb.job_id))[1] AS rna_id
+    (ARRAY_AGG(lsdb.job_id)) AS rna_id,
+    COUNT(DISTINCT lsdb.job_id) AS rna_count
 FROM litscan_result lsr
 JOIN litscan_database lsdb ON lsdb.job_id = lsr.job_id
 JOIN litscan_article lsa ON lsa.pmcid = lsr.pmcid
@@ -19,8 +20,7 @@ WHERE lsdb.name IN ('mirbase', 'mirgenedb')
         AND lsj.hit_count > 0
     )
 GROUP BY lsr.pmcid
-HAVING COUNT(DISTINCT lsdb.job_id) = 1
-"""
+HAVING COUNT(DISTINCT lsdb.job_id) > 1
 
 prod_data = pl.read_database_uri(query, os.getenv("PGDATABASE"))
 prod_data = prod_data.rename({"pmcid": "PMCID"}).with_row_index()
