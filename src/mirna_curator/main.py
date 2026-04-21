@@ -357,6 +357,7 @@ def main(
 
         for rna_id in rna_ids:
             try:
+                logger.info("Curating %s in %s...", rna_id, row['PMCID'])
                 llm_trace, curation_result = graph.execute_graph(
                     row["PMCID"],
                     llm,
