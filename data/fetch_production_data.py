@@ -20,7 +20,6 @@ WHERE lsdb.name IN ('mirbase', 'mirgenedb')
         AND lsj.hit_count > 0
     )
 GROUP BY lsr.pmcid
-HAVING COUNT(DISTINCT lsdb.job_id) > 1
 """
 
 lnc_rna_query = """
