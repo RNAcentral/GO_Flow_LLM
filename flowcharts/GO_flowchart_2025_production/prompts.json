@@ -1,9 +1,18 @@
 {
   "prompts": [
     {
+      "name": "system_prompt",
+      "type": "system",
+      "prompt": "You are an expert biocurator specializing in miRNA-mRNA interactions. Your role is to provide precise, succinct answers about scientific papers.\nMANDATORY FORMAT:\n\nPresent your reasoning in <think></think> tags\nProvide your final answer in \\boxed{answer} format\n\nCORE PRINCIPLES:\n\nBe precise and concise in all responses\nTrust the user's prompt completely - assume no typos or ambiguities\nDraw on deep expertise in miRNA biology, target prediction, and regulatory mechanisms\nFocus on factual accuracy over hedging or uncertainty\n\nRESPONSE STRUCTURE:\n<think>\n[Your analytical reasoning about the question]\n</think>\n\\boxed{[Your definitive answer]}\n\nFollow this format without exception for every response.",
+      "target_section": null,
+      "detector": null,
+      "annotation": null,
+      "legacy_annotation": null
+    },
+    {
       "name": "mirna_binding",
       "type": "condition_prompt_boolean",
-      "prompt": "Does this paper present an experiment on miRNA binding to mRNA?",
+      "prompt": "Does this paper present an experiment on miRNA binding to mRNA? If you can only find evidence of differential expression, you should answer no. Only answer yes if there is experimental validation of a miRNA binging, answer no for in-silico only studies.",
       "target_section": "methods",
       "detector": null,
       "annotation": {
@@ -125,6 +134,19 @@
       "legacy_annotation": null
     },
     {
+      "name": "no_annotation_filtered",
+      "type": "terminal_full",
+      "prompt": "",
+      "target_section": null,
+      "detector": null,
+      "annotation": {
+        "no_annotation": {
+          "reason": "filtered_no_annotation"
+        }
+      },
+      "legacy_annotation": null
+    },
+    {
       "name": "validated_binding_only",
       "type": "terminal_full",
       "prompt": "",
@@ -182,13 +204,25 @@
         "Does the paper measure, and observe a decrease in the protein level?",
         "Does the paper measure, and observe a decrease in the mRNA level?",
         "Does the paper measure, and observe a decrease in the protein level without a decrease in mRNA level?"
-    ],
+      ],
       "target_section": "conclusions",
       "detector": "target",
       "annotation": {
-        "ynn": {"BP": {"involved_in": "GO:0035195"}},
-        "yyn": {"BP": {"involved_in": "GO:0035279"}},
-        "yny": {"BP": {"involved_in": "GO:0035278"}}
+        "ynn": {
+          "BP": {
+            "involved_in": "GO:0035195"
+          }
+        },
+        "yyn": {
+          "BP": {
+            "involved_in": "GO:0035279"
+          }
+        },
+        "yny": {
+          "BP": {
+            "involved_in": "GO:0035278"
+          }
+        }
       },
       "legacy_annotation": null
     },

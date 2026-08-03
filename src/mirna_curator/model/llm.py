@@ -1,5 +1,4 @@
 from guidance.models import LlamaCpp
-
 from guidance.chat import (
     ChatMLTemplate,
     Llama2ChatTemplate,
@@ -9,6 +8,7 @@ from guidance.chat import (
     Mistral7BInstructChatTemplate,
     Gemma29BInstructChatTemplate,
     Qwen2dot5ChatTemplate,
+    Qwen3ChatTemplate
 )
 
 TEMPLATE_LOOKUP = {
@@ -19,7 +19,8 @@ TEMPLATE_LOOKUP = {
     "phi3-med": Phi3SmallMediumChatTemplate,
     "mistral": Mistral7BInstructChatTemplate,
     "gemma": Gemma29BInstructChatTemplate,
-    "qwen": Qwen2dot5ChatTemplate,
+    "qwen25": Qwen2dot5ChatTemplate,
+    "qwen3": Qwen3ChatTemplate,
 }
 
 from huggingface_hub import HfFileSystem, hf_hub_download
@@ -27,10 +28,33 @@ from pathlib import Path
 import re
 import logging
 
+from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS, get_sampling_params
+
+
 logger = logging.getLogger(__name__)
 
 
-STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>"]
+STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>"]
+
+
+def log_usage(llm):
+    """
+    Log the running token totals for a model.
+
+    guidance's usage API is private, so it is wrapped here to give one place to fix
+    when guidance is upgraded. Counters are cumulative across the whole run, so call
+    this after generating to see the totals including the node that just ran.
+
+    Arguments:
+        llm: the guidance model to report usage for
+    """
+    usage = llm._get_usage()
+    logger.info(
+        "LLM tokens (cumulative) in/out/total: %d/%d/%d",
+        usage.input_tokens,
+        usage.output_tokens,
+        usage.input_tokens + usage.output_tokens,
+    )
 
 
 def download_split_file(repo_id, filenames):
@@ -85,6 +109,7 @@ def get_model(
     chat_template: str = None,
     quantization: str = None,
     context_length: int = 16384,
+    run_config_options: dict | None = None,
 ):
     """
     Load a llama.cpp model, either locally or by downloading from huggingface
@@ -196,21 +221,22 @@ def get_model(
             "Local model file does not exist, and is not a huggingface repo!"
         )
 
+    ## Callers that don't set sampling parameters fall back to get_sampling_params' defaults
+    run_config_options = run_config_options or {}
+    sampling_params = get_sampling_params(run_config_options)
+
     model = LlamaCpp(
         model=model_path,
         echo=False,
         n_gpu_layers=-1,
         n_ctx=context_length,
         flash_attention=True,
-        temperature=0.6,
+        temperature=run_config_options.get("temperature", DEFAULT_SAMPLING_PARAMS["temperature"]),
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
         seed=-1,
-        min_p=0.00,
-        top_k=40,
-        top_p=0.95, # This configuration from danhanchen of Unsloth, should
-        repeat_penalty=1.1, # reduce the repetition on reasoning
-        dry_multiplier=0.5,
+        dry_multiplier=run_config_options.get("dry_multiplier", DEFAULT_SAMPLING_PARAMS["dry_multiplier"]),
         samplers="top_k;top_p;min_p;temperature;dry;typ_p;xtc",
+        sampling_params=sampling_params
     )
 
     return model

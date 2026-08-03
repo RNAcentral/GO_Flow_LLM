@@ -397,7 +397,8 @@ class ComputationGraph:
                 node_reasoning = ""
                 node_evidence = ""
                 target_name = ""
-            elif prompt.name == "no_annotation":
+            elif prompt.name.startswith("no_annotation"):
+                ## There are two ways to get a no annotation - in flowchart or from filtering
                 annotation = prompt.annotation
                 node_reasoning = ""
                 node_evidence = ""
@@ -474,8 +475,13 @@ class ComputationGraph:
                             self.loaded_sections.append(target_section_name)
                         decisions += "y" if llm['answer'] == "yes" else "n"
 
+                    no_annotation = {
+                                    "no_annotation": {
+                                    "reason": "conditional_no_annotation"
+                                    }
+                                }
                     ## Use decisions string to lookup the right annotation
-                    annotation = annotations.get(decisions, None)
+                    annotation = annotations.get(decisions, no_annotation)
                     
                     ## Now get the target
                     if target_section_name in self.loaded_sections:

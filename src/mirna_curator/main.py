@@ -12,6 +12,7 @@ from typing import Optional, Callable
 import json
 import polars as pl
 from mirna_curator.utils.tracing import curation_tracer
+from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS
 from guidance import system, user
 
 logging.basicConfig(level=logging.INFO)
@@ -151,6 +152,9 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
 @click.option(
     "--gpu", help="Which gpu ID to run on, if there are several available", default='0'
 )
+@click.option(
+    "--sampling_parameters_path", help="A JSON file containing the sampling parameters to set", default=None
+)
 @mutually_exclusive_with_config()
 def main(
     config: Optional[str] = None,
@@ -170,6 +174,7 @@ def main(
     checkpoint_frequency: Optional[int] = -1,
     checkpoint_file_path: Optional[str] = None,
     gpu: Optional[str] = None,
+    sampling_parameters_path: Optional[str] = None,
 ):
     curation_tracer.set_model_name(model_path)
 
@@ -225,12 +230,25 @@ def main(
         ## Set which GPU to use
         logger.info("Selecting %s gpu for this process", gpu)
         os.environ['CUDA_VISIBLE_DEVICES'] = gpu
+
+    ## Defaults first, so a failed load still leaves us with something usable
+    sampling_parameters = dict(DEFAULT_SAMPLING_PARAMS)
+    if sampling_parameters_path is not None:
+        try:
+            sampling_string = open(sampling_parameters_path, 'r').read()
+            sampling_parameters.update(json.loads(sampling_string))
+        except Exception as e:
+            logger.error(f"failed to load sampling parameters from {sampling_parameters_path}, with error: {e}")
+            logger.error("Falling back to default sampling parameters")
+
+    run_config_options.update(sampling_parameters)
     _model_load_start = time.time()
     llm = get_model(
         model_path,
         chat_template=chat_template,
         quantization=quantization,
         context_length=context_length,
+        run_config_options=run_config_options,
     )
     _model_load_end = time.time()
     logger.info(f"Loaded model from {model_path}")
@@ -274,6 +292,11 @@ def main(
         logger.error("Unsupported input data format for %s", input_data)
         return 1
 
+    ## Normalise rna_id to a list column, so single-RNA and multi-RNA inputs are
+    ## handled identically downstream. CSVs can't hold lists, so they use | separation.
+    if curation_input["rna_id"].dtype == pl.String:
+        curation_input = curation_input.with_columns(pl.col("rna_id").str.split("|"))
+
 
     if Path(checkpoint_file_path).exists():
         logger.info("Resuming from checkpoint %s", checkpoint_file_path)
@@ -286,7 +309,7 @@ def main(
 
     logger.info(f"Loaded input data from {input_data}")
     logger.info(f"Processing up to {curation_input.height} papers")
-
+    logger.info(f"{curation_input.select(pl.col('rna_id').list.len().sum())[0,0]} total graph runs to do (before filtering)")
     ## This is where we start riunning the curation graph for all the papers, one by one.
     _bulk_processing_start = time.time()
     for i, row in enumerate(curation_input.iter_rows(named=True)):
@@ -323,35 +346,54 @@ def main(
         )
 
         _curation_start = time.time()
-        try:
-            llm_trace, curation_result = graph.execute_graph(
-                row["PMCID"],
-                llm,
-                article,
-                row["rna_id"],
-                prompt_data,
+        rna_ids = row["rna_id"]
+
+        for rna_id in rna_ids:
+            try:
+                logger.info("Curating %s in %s...", rna_id, row['PMCID'])
+                llm_trace, curation_result = graph.execute_graph(
+                    row["PMCID"],
+                    llm,
+                    article,
+                    rna_id,
+                    prompt_data,
+                )
+            except Exception as e:
+                logger.error(e)
+                logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
+                faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
+                continue
+            logger.info(
+                f"RNA ID: {rna_id} in {row['PMCID']} - Curation Result: {curation_result}"
             )
-        except Exception as e:
-            logger.error(e)
-            logger.error("Paper %s has exceeded context limit, skipping", row["PMCID"])
-            faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
-            continue
-        logger.info(
-            f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
-        )
-        # logger.info(
-        #     f"Manual Result - GO term: {row['go_term']}; Protein target: {row['protein_id']}"
-        # )
+            ## A no_annotation terminal can come from the flowchart or from filtering.
+            ## Only the filtered ones get flattened; everything else is recorded as-is,
+            ## so un-curated outcomes still make it into the output.
+            annotation = curation_result.get("annotation") or {}
+            no_annotation_reason = (annotation.get("no_annotation") or {}).get("reason", "")
+            if "filtered" in no_annotation_reason:
+                logger.info(f"RNA {rna_id} filtered")
+                curation_result = {
+                    "annotation": {
+                        "type": "no_annotation",
+                        "reason": "filtered",
+                    },
+                    "evidence": [],
+                    "all_reasoning": curation_result.get("all_reasoning", []),
+                }
+            curation_output.append(
+                {
+                    "PMCID": row["PMCID"],
+                    "rna_id": rna_id,
+                    "curation_result": curation_result,
+                }
+            )
         _curation_end = time.time()
         logger.info(
-            f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
+                f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
         )
-        curation_output.append(
-            {
-                "PMCID": row["PMCID"],
-                "rna_id": row["rna_id"],
-                "curation_result": curation_result,
-            }
+        logger.info(
+                f"Curated {len(rna_ids)} RNAs"
         )
         # with open(f"{row['PMCID']}_{row['rna_id']}_llm_trace.txt", "w") as f:
         #     f.write(llm_trace)
