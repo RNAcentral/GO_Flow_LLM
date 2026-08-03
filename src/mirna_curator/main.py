@@ -12,6 +12,7 @@ from typing import Optional, Callable
 import json
 import polars as pl
 from mirna_curator.utils.tracing import curation_tracer
+from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS
 from guidance import system, user
 
 logging.basicConfig(level=logging.INFO)
@@ -231,14 +232,7 @@ def main(
         os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 
     ## Defaults first, so a failed load still leaves us with something usable
-    sampling_parameters = {
-        "temperature" : 0.6,
-        "min_p" : 0.00,
-        "top_k" : 40,
-        "top_p" : 0.95, # This configuration from danhanchen of Unsloth, should
-        "repetition_penalty": 1.1, # reduce the repetition on reasoning
-        "dry_multiplier" : 0.5,
-    }
+    sampling_parameters = dict(DEFAULT_SAMPLING_PARAMS)
     if sampling_parameters_path is not None:
         try:
             sampling_string = open(sampling_parameters_path, 'r').read()

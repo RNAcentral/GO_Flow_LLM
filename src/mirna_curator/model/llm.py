@@ -211,10 +211,10 @@ def get_model(
         n_gpu_layers=-1,
         n_ctx=context_length,
         flash_attention=True,
-        temperature=run_config_options.get("temperature", 0.6),
+        temperature=run_config_options.get("temperature", DEFAULT_SAMPLING_PARAMS["temperature"]),
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
         seed=-1,
-        dry_multiplier=run_config_options.get("dry_multiplier", 1.0),
+        dry_multiplier=run_config_options.get("dry_multiplier", DEFAULT_SAMPLING_PARAMS["dry_multiplier"]),
         samplers="top_k;top_p;min_p;temperature;dry;typ_p;xtc",
         sampling_params=sampling_params
     )
