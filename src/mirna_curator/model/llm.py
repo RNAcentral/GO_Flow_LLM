@@ -89,7 +89,7 @@ def get_model(
     chat_template: str = None,
     quantization: str = None,
     context_length: int = 16384,
-    run_config_options: dict = None,
+    run_config_options: dict | None = None,
 ):
     """
     Load a llama.cpp model, either locally or by downloading from huggingface
@@ -200,7 +200,9 @@ def get_model(
         raise FileNotFoundError(
             "Local model file does not exist, and is not a huggingface repo!"
         )
-    
+
+    ## Callers that don't set sampling parameters fall back to get_sampling_params' defaults
+    run_config_options = run_config_options or {}
     sampling_params = get_sampling_params(run_config_options)
 
     model = LlamaCpp(
@@ -209,7 +211,7 @@ def get_model(
         n_gpu_layers=-1,
         n_ctx=context_length,
         flash_attention=True,
-        temperature=0.6,
+        temperature=run_config_options.get("temperature", 0.6),
         chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
         seed=-1,
         dry_multiplier=run_config_options.get("dry_multiplier", 1.0),
