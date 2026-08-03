@@ -294,13 +294,14 @@ def main(
         curation_input = pl.read_parquet(input_data)
     elif input_data.endswith("csv"):
         curation_input = pl.read_csv(input_data)
-        ## Split the rna_id column on | to get a list of IDs
-        curation_input = curation_input.with_columns(
-            pl.col("rna_id").str.split("|").alias("rna_id")
-        )
     else:
         logger.error("Unsupported input data format for %s", input_data)
         return 1
+
+    ## Normalise rna_id to a list column, so single-RNA and multi-RNA inputs are
+    ## handled identically downstream. CSVs can't hold lists, so they use | separation.
+    if curation_input["rna_id"].dtype == pl.String:
+        curation_input = curation_input.with_columns(pl.col("rna_id").str.split("|"))
 
 
     if Path(checkpoint_file_path).exists():
@@ -351,10 +352,7 @@ def main(
         )
 
         _curation_start = time.time()
-        if isinstance(row["rna_id"], list):
-            rna_ids = row["rna_id"]
-        else:
-            rna_ids = [row["rna_id"]]
+        rna_ids = row["rna_id"]
 
         for rna_id in rna_ids:
             try:
