@@ -1,8 +1,10 @@
 import polars as pl
 import os
+import click
 from datetime import datetime
+from math import ceil
 
-query = """
+mirna_query = """
 SELECT
     lsr.pmcid AS PMCID,
     (ARRAY_AGG(lsdb.job_id)) AS rna_id,
@@ -22,16 +24,16 @@ WHERE lsdb.name IN ('mirbase', 'mirgenedb')
 GROUP BY lsr.pmcid
 """
 
-lnc_rna_query = """
+lncrna_query = """
 SELECT lsr.pmcid as PMCID,
-(array_agg(distinct lsdb.job_id)) as rna_ids,
+(array_agg(distinct lsdb.job_id)) as rna_id,
 (array_agg(type))[1] as type,
 (array_agg(retracted))[1] as retracted
 
 from litscan_result lsr
 left join (select distinct lsdb.job_id, lsdb.name from litscan_database lsdb) lsdb
 	on lsdb.job_id = lsr.job_id
-join litscan_job lsj 
+join litscan_job lsj
 	on lsj.job_id = lsdb.job_id
 join litscan_article lsa
 	on lsa.pmcid = lsr.pmcid
@@ -49,17 +51,38 @@ and (retracted = false and type = 'Research article')
 
 group by lsr.pmcid"""
 
-prod_data = pl.read_database_uri(lnc_rna_query, os.getenv("PGDATABASE"))
-prod_data = prod_data.rename({"pmcid": "PMCID"}).with_row_index()
+QUERIES = {
+    "mirna": (mirna_query, "mirna"),
+    "lncrna": (lncrna_query, "lncrna"),
+}
 
-timestamp = datetime.today().strftime("%Y-%m-%d")
 
-print(prod_data.height)
-prod_data.write_parquet(f"lncrna_production_input_data_{timestamp}.parquet")
+@click.command()
+@click.option(
+    "--rna-type",
+    type=click.Choice(list(QUERIES)),
+    default="mirna",
+    help="Which RNA type to pull papers for",
+)
+@click.option("--n-splits", default=4, help="Number of split files to write")
+def main(rna_type, n_splits):
+    query, prefix = QUERIES[rna_type]
 
-n_splits = 4
-n_per_split = prod_data.height // n_splits
-splits = [prod_data.filter(pl.col("index").is_between((i-1)*n_per_split, i*n_per_split)) for i in range(1,n_splits+1)]
+    prod_data = pl.read_database_uri(query, os.getenv("PGDATABASE"))
+    prod_data = prod_data.rename({"pmcid": "PMCID"})
 
-for n, s in enumerate(splits):
-    s.write_parquet(f"lncrna_production_input_data_{timestamp}_split_{n}.parquet")
+    timestamp = datetime.today().strftime("%Y-%m-%d")
+    basename = f"{prefix}_production_input_data_{timestamp}"
+
+    print(prod_data.height)
+    prod_data.write_parquet(f"{basename}.parquet")
+
+    ## Round up so the remainder rows land in the last split rather than being dropped
+    n_per_split = ceil(prod_data.height / n_splits)
+    for n in range(n_splits):
+        split = prod_data.slice(n * n_per_split, n_per_split)
+        split.write_parquet(f"{basename}_split_{n}.parquet")
+
+
+if __name__ == "__main__":
+    main()
