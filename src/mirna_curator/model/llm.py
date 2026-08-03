@@ -28,13 +28,33 @@ from pathlib import Path
 import re
 import logging
 
-from mirna_curator.utils.sampling import get_sampling_params
+from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS, get_sampling_params
 
 
 logger = logging.getLogger(__name__)
 
 
 STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>"]
+
+
+def log_usage(llm):
+    """
+    Log the running token totals for a model.
+
+    guidance's usage API is private, so it is wrapped here to give one place to fix
+    when guidance is upgraded. Counters are cumulative across the whole run, so call
+    this after generating to see the totals including the node that just ran.
+
+    Arguments:
+        llm: the guidance model to report usage for
+    """
+    usage = llm._get_usage()
+    logger.info(
+        "LLM tokens (cumulative) in/out/total: %d/%d/%d",
+        usage.input_tokens,
+        usage.output_tokens,
+        usage.input_tokens + usage.output_tokens,
+    )
 
 
 def download_split_file(repo_id, filenames):
