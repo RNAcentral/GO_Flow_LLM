@@ -372,40 +372,30 @@ def main(
                 faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
                 continue
             logger.info(
-                f"RNA ID: {row['rna_id']} in {row['PMCID']} - Curation Result: {curation_result}"
+                f"RNA ID: {rna_id} in {row['PMCID']} - Curation Result: {curation_result}"
             )
-            ## Check here if we get filtered, and if so, break the loop and only record filtering
-            ## in the curation result. Set RNA id to concatenated string of all ids maybe?
-            ## Will require a new terminal node with explicit mention of why no annotation.
-            if curation_result["annotation"].get("no_annotation", None) is not None:
-                # This means the terminal was a no annotation node, check the reason
-                if "filtered" in curation_result["annotation"]["no_annotation"]["reason"]:
-                    logger.info(f"RNA {rna_id} filtered")
-                    curation_result = {
-                        "annotation": {
-                            "type": "no_annotation",
-                            "reason": "filtered",
-                        },
-                        "evidence": [],
-                        "all_reasoning": curation_result.get("all_reasoning", [])
-                    }
-                    ## Done with this paper
-                    curation_output.append(
-                    {
-                        "PMCID": row["PMCID"],
-                        "rna_id": rna_id,
-                        "curation_result": curation_result,
-                    }
-                    )
-                    
-            else:
-                curation_output.append(
-                    {
-                        "PMCID": row["PMCID"],
-                        "rna_id": rna_id,
-                        "curation_result": curation_result,
-                    }
-                )
+            ## A no_annotation terminal can come from the flowchart or from filtering.
+            ## Only the filtered ones get flattened; everything else is recorded as-is,
+            ## so un-curated outcomes still make it into the output.
+            annotation = curation_result.get("annotation") or {}
+            no_annotation_reason = (annotation.get("no_annotation") or {}).get("reason", "")
+            if "filtered" in no_annotation_reason:
+                logger.info(f"RNA {rna_id} filtered")
+                curation_result = {
+                    "annotation": {
+                        "type": "no_annotation",
+                        "reason": "filtered",
+                    },
+                    "evidence": [],
+                    "all_reasoning": curation_result.get("all_reasoning", []),
+                }
+            curation_output.append(
+                {
+                    "PMCID": row["PMCID"],
+                    "rna_id": rna_id,
+                    "curation_result": curation_result,
+                }
+            )
         _curation_end = time.time()
         logger.info(
                 f"Ran curation graph in {_curation_end - _curation_start:.2f} seconds"
