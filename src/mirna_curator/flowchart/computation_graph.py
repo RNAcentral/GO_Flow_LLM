@@ -397,7 +397,7 @@ class ComputationGraph:
                 node_reasoning = ""
                 node_evidence = ""
                 target_name = ""
-            elif "no_annotation" in prompt.name: 
+            elif prompt.name.startswith("no_annotation"):
                 ## There are two ways to get a no annotation - in flowchart or from filtering
                 annotation = prompt.annotation
                 node_reasoning = ""
