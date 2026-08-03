@@ -230,21 +230,22 @@ def main(
         logger.info("Selecting %s gpu for this process", gpu)
         os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 
+    ## Defaults first, so a failed load still leaves us with something usable
+    sampling_parameters = {
+        "temperature" : 0.6,
+        "min_p" : 0.00,
+        "top_k" : 40,
+        "top_p" : 0.95, # This configuration from danhanchen of Unsloth, should
+        "repetition_penalty": 1.1, # reduce the repetition on reasoning
+        "dry_multiplier" : 0.5,
+    }
     if sampling_parameters_path is not None:
         try:
             sampling_string = open(sampling_parameters_path, 'r').read()
-            sampling_parameters = json.loads(sampling_string)
+            sampling_parameters.update(json.loads(sampling_string))
         except Exception as e:
-            logger.error(f"failed to fload sampling parameters from {sampling_parameters_path}, with error: {e}")
-    else:
-        sampling_parameters = {
-            "temperature" : 0.6,
-            "min_p" : 0.00,
-            "top_k" : 40,
-            "top_p" : 0.95, # This configuration from danhanchen of Unsloth, should
-            "repetition_penalty": 1.1, # reduce the repetition on reasoning
-            "dry_multiplier" : 0.5,
-        }
+            logger.error(f"failed to load sampling parameters from {sampling_parameters_path}, with error: {e}")
+            logger.error("Falling back to default sampling parameters")
 
     run_config_options.update(sampling_parameters)
     _model_load_start = time.time()
