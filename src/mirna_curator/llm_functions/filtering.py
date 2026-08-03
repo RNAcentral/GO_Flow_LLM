@@ -1,7 +1,7 @@
 import guidance
 from guidance import user, assistant, gen, select, with_temperature
 import typing as ty
-from mirna_curator.model.llm import STOP_TOKENS
+from mirna_curator.model.llm import STOP_TOKENS, log_usage
 
 import logging
 
@@ -29,11 +29,6 @@ def prompted_filter(
         )
         llm += f"You will be asked a question about the following text: \n{article_text}\n\n"
         llm += f"Question: {filter_prompt}. Restrict your answer to the target of {rna_id}. "
-    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
-    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
-    logger.info(
-        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
-    )
     with assistant():
         if config["deepseek_mode"]:
             llm += "<think>\n"
@@ -54,5 +49,7 @@ def prompted_filter(
             select(["yes", "no"], name="answer"), temperature_selection
         )
         logger.debug("Selected answer ok")
+
+    log_usage(llm)
 
     return llm["answer"], llm["reasoning"]

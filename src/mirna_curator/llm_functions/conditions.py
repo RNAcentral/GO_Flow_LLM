@@ -9,7 +9,7 @@ from guidance import gen, select, system, user, assistant, with_temperature, sub
 
 from mirna_curator.llm_functions.evidence import extract_evidence
 from mirna_curator.apis import epmc
-from mirna_curator.model.llm import STOP_TOKENS
+from mirna_curator.model.llm import STOP_TOKENS, log_usage
 from mirna_curator.llm_functions.tools import safe_import
 import typing as ty
 
@@ -48,11 +48,6 @@ def prompted_flowchart_step_bool(
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
-    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
-    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
-    logger.info(
-        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
-    )
     with assistant():
         # if config["deepseek_mode"]:
         #     llm += "<think>\n"
@@ -81,6 +76,7 @@ def prompted_flowchart_step_bool(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
     logger.info("Evidence extracted, ready to return")
+    log_usage(llm)
 
     return llm
 
@@ -166,11 +162,6 @@ def prompted_flowchart_step_tool(
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
-    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
-    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
-    logger.info(
-        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
-    )
     with assistant():
         if config["deepseek_mode"]:
             llm += "<think>\n"
@@ -196,6 +187,7 @@ def prompted_flowchart_step_tool(
     llm += extract_evidence(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
+    log_usage(llm)
 
     return llm
 
@@ -236,11 +228,6 @@ def prompted_flowchart_terminal(
             f"Select targets from the following list: {','.join(epmc_annotated_genes)}\n"
             "Ignore targets which do not appear in this list."
         )
-    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
-    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
-    logger.info(
-        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
-    )
     with assistant():
         # if config["deepseek_mode"]:
         #     llm += "<think>\n"
@@ -273,6 +260,7 @@ def prompted_flowchart_terminal(
     llm += extract_evidence(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
+    log_usage(llm)
 
     return llm
 
@@ -370,10 +358,6 @@ def prompted_flowchart_terminal_conditional(
     llm += extract_evidence(
         article_text, mode=config.get("evidence_mode", "single-sentence")
     )
+    log_usage(llm)
 
-    logger.info(f"LLM input tokens: {llm._get_usage().input_tokens}")
-    logger.info(f"LLM generated tokens: {llm._get_usage().output_tokens}")
-    logger.info(
-        f"LLM total tokens: {llm._get_usage().input_tokens + llm._get_usage().output_tokens}"
-    )
     return llm
