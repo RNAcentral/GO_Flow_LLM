@@ -7,6 +7,6 @@
     "chat_template": "qwen3",
     "max_papers": 4500,
     "evidence_type": "full-substring",
-    "deepseek_mode": true, 
+    "reasoning_style": "think", 
     "checkpoint_frequency": 100
 }

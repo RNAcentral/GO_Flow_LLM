@@ -12,7 +12,12 @@ dependencies = [
   "requests>=2.32.3",
   "pyjats>=0.0.2",
   "epmc-xml>=0.1.13",
-  "guidance>=0.1.16",
+  # 0.3 floor is required: the code uses Model._get_usage() and guidance._schema.SamplingParams,
+  # neither of which exists in 0.1/0.2. Capped because both are private APIs.
+  # Pinned to a fork below: reasoning_style "gemma4" needs `gen(stop=special_token(...))`
+  # to stop on Gemma 4's `<channel|>` token, which is in no PyPI release yet. Drop the
+  # [tool.uv.sources] entry once that lands upstream.
+  "guidance>=0.3.1,<0.4",
   "llama-cpp-python>=0.3.2",
   "huggingface_hub>=0.26.2",
   "pydantic>=2.9.2",
@@ -25,6 +30,9 @@ dependencies = [
 [project.optional-dependencies]
 test = ["coverage", "pytest", "requests-mock"]
 evaluation = ["flask"]
+
+[tool.uv.sources]
+guidance = { git = "https://github.com/afg1/guidance.git", branch = "special-token-stop" }
 
 [build-system]
 requires = ["hatchling"]

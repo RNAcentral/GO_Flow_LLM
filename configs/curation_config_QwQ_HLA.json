@@ -4,7 +4,7 @@
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
     "quantization": "q8_0",
-    "chat_template": "qwen",
+    "chat_template": "qwen25",
     "input_data": "development_set.parquet",
     "output_data": "development_results_all_class_QwQ_20250407.parquet",
     "max_papers": 500,
