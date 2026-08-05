@@ -1,0 +1,13 @@
+{
+    "model_path": "/Users/agreen/LLMs/gemma-4-E2B_q4_0-it.gguf",
+    "flowchart": "flowcharts/GO_flowchart_2025_production/flowchart.json",
+    "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
+    "context_length": 32768,
+    "chat_template": "gemma4",
+    "reasoning_style": "gemma4",
+    "evidence_type": "full-substring",
+    "checkpoint_frequency": 10,
+    "checkpoint_file_path": "outputs/gemma4_goldset_ckp.parquet",
+    "output_data": "outputs/gemma4_E2B_goldset.parquet",
+    "input_data": "data/gold_set_curation_input.parquet"
+}

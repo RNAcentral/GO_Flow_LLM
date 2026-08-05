@@ -118,7 +118,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     "--input_data", help="The input data (PMCID and detected RNA ID) for the process"
 )
 @click.option("--output_data", help="The output data (curation result) for the process")
-@click.option("--max_papers", help="The maximum number of papers to process")
+@click.option("--max_papers", help="The maximum number of papers to process", type=int)
 @click.option(
     "--annot_class", help="Restrict processing to one class of annotation", type=int
 )
