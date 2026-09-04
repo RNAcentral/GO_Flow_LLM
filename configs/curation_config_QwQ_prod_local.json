@@ -1,0 +1,12 @@
+{
+    "model_path":  "Qwen/QwQ-32B-GGUF",
+    "flowchart": "flowcharts/GO_flowchart_2025_production/flowchart.json",
+    "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
+    "context_length": 32768,
+    "quantization": "q4_k_m",
+    "chat_template": "qwen25",
+    "max_papers": 4500,
+    "evidence_type": "full-substring",
+    "reasoning_style": "think", 
+    "checkpoint_frequency": 100
+}

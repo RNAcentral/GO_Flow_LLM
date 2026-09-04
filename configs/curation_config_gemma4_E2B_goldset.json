@@ -1,5 +1,5 @@
 {
-    "model_path": "/Users/agreen/LLMs/gemma-4-E2B_q4_0-it.gguf",
+    "model_path": "gemma-4-E2B_q4_0-it.gguf",
     "flowchart": "flowcharts/GO_flowchart_2025_production/flowchart.json",
     "prompts": "flowcharts/GO_flowchart_2025_production/prompts.json",
     "context_length": 32768,

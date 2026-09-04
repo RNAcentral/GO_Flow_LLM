@@ -1,5 +1,5 @@
 {
-    "model_path":  "/Users/agreen/tmp/Qwen2.5-0.5B-Instruct.Q4_K_M.gguf",
+    "model_path":  "Qwen2.5-0.5B-Instruct.Q4_K_M.gguf",
     "flowchart": "flowcharts/HLA_updated_flowchart/flowchart.json",
     "prompts": "flowcharts/HLA_updated_flowchart/prompts.json",
     "context_length": 65536,
