@@ -24,8 +24,14 @@ def w_pbar(pbar, func):
     return foo
 
 
-def run_one_paper(pmcid, prompts, llm, trace_connection):
-    article = fetch.article(pmcid)
+def run_one_paper(row, prompts, llm, trace_connection=None):
+    """
+    Run every non-terminal prompt against one paper.
+
+    `row` is a struct of the PMCID and the RNA id, because the step functions need the
+    RNA id to scope their question when a paper mentions more than one.
+    """
+    article = fetch.article(row["PMCID"])
     result_dict = {}
     for prompt in prompts:
         if prompt.type.startswith("terminal"):  ## for now
@@ -53,7 +59,11 @@ def run_one_paper(pmcid, prompts, llm, trace_connection):
             target_section_name = prompt.target_section
 
         llm = prompted_flowchart_step_bool(
-            llm, article.sections[target_section_name], prompt.prompt
+            llm,
+            article.sections[target_section_name],
+            True,  ## load_article_text - each prompt targets a different section
+            prompt.prompt,
+            row["rna_id"],
         )
 
         result_dict[prompt.name] = llm["answer"] == "yes"
@@ -98,7 +108,9 @@ def main(
     )
 
     papers = papers.with_columns(
-        res=pl.col("PMCID").map_elements(process_one, return_dtype=pl.Struct)
+        res=pl.struct(["PMCID", "rna_id"]).map_elements(
+            process_one, return_dtype=pl.Struct
+        )
     ).unnest("res")
 
     print(papers)

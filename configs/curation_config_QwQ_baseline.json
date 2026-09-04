@@ -2,8 +2,8 @@
     "model_path":  "Qwen/QwQ-32B-GGUF",
     "context_length": 65536,
     "quantization": "q8_0",
-    "chat_template": "qwen",
+    "chat_template": "qwen25",
     "input_data": "development_set.parquet",
     "output_data": "baseline_output_2025-03-13.parquet",
-    "deepseek_mode": true
+    "reasoning_style": "think"
 }

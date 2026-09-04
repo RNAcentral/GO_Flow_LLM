@@ -1,17 +1,18 @@
 from guidance._schema import SamplingParams
 
 
-## The single source of truth for sampling defaults - the CLI seeds its defaults from
-## this, and model loading falls back to it for the parameters guidance doesn't carry.
-## Only top_p/top_k/min_p/repetition_penalty fit in guidance's SamplingParams; the rest
-## are passed to LlamaCpp directly.
+## The single source of truth for sampling defaults - the CLI seeds its defaults from this.
+## Only top_p/top_k/min_p/repetition_penalty fit in guidance's SamplingParams and reach the
+## sampler that way. `temperature` is not one of them: guidance applies temperature per
+## generation via with_temperature(), so it is consumed by reasoning_block off the run
+## config instead. Anything else added here needs a real route to the sampler - passing it
+## to LlamaCpp does nothing, as llama_cpp.Llama silently swallows unknown kwargs.
 DEFAULT_SAMPLING_PARAMS = {
     "temperature": 0.6,
     "min_p": 0.00,
     "top_k": 40,
     "top_p": 0.95,  # This configuration from danhanchen of Unsloth, should
     "repetition_penalty": 1.1,  # reduce the repetition on reasoning
-    "dry_multiplier": 0.5,
 }
 
 

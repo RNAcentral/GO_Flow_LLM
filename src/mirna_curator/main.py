@@ -13,6 +13,11 @@ import json
 import polars as pl
 from mirna_curator.utils.tracing import curation_tracer
 from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS
+from mirna_curator.llm_functions.reasoning import (
+    REASONING_STYLES,
+    apply_reasoning_format,
+    get_reasoning_gate,
+)
 from guidance import system, user
 
 logging.basicConfig(level=logging.INFO)
@@ -113,7 +118,7 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     "--input_data", help="The input data (PMCID and detected RNA ID) for the process"
 )
 @click.option("--output_data", help="The output data (curation result) for the process")
-@click.option("--max_papers", help="The maximum number of papers to process")
+@click.option("--max_papers", help="The maximum number of papers to process", type=int)
 @click.option(
     "--annot_class", help="Restrict processing to one class of annotation", type=int
 )
@@ -138,10 +143,10 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     default="single-sentence",
 )
 @click.option(
-    "--deepseek_mode",
-    help="Tweak the reasoning generation for deepseek models",
-    is_flag=True,
-    default=False,
+    "--reasoning_style",
+    help="How the model delimits its thinking region. See REASONING_STYLES in llm_functions/reasoning.py",
+    type=click.Choice(sorted(REASONING_STYLES)),
+    default="none",
 )
 @click.option(
     "--checkpoint_frequency", help="How often to write a results checkpoint", default=-1
@@ -170,7 +175,7 @@ def main(
     annot_class: Optional[int] = None,
     validate_only: Optional[bool] = None,
     evidence_type: Optional[str] = "single-sentence",
-    deepseek_mode: Optional[bool] = False,
+    reasoning_style: Optional[str] = "none",
     checkpoint_frequency: Optional[int] = -1,
     checkpoint_file_path: Optional[str] = None,
     gpu: Optional[str] = None,
@@ -181,7 +186,7 @@ def main(
     ## Build the run config options dict from things in the config
     run_config_options = {
         "evidence_mode": evidence_type,
-        "deepseek_mode": deepseek_mode,
+        "reasoning_style": reasoning_style,
     }
     _flowchart_load_start = time.time()
     try:
@@ -255,21 +260,33 @@ def main(
     logger.info(f"Model loaded in {_model_load_end - _model_load_start:.2f} seconds")
 
     _system_prompt_start = time.time()
-    ## Look for a system prompt in the prompts, and apply it if found
-    for prompt in prompt_data.prompts:
-        if prompt.type == "system":
+    ## Look for a system prompt in the prompts, and apply it if found. Some reasoning
+    ## styles (Gemma 4) switch thinking on with a token in the system turn, so the turn
+    ## has to be emitted even when the flowchart supplies no system prompt of its own -
+    ## otherwise the model never thinks and the channel markers never appear.
+    gate = get_reasoning_gate(run_config_options)
+    system_prompt = next(
+        (p.prompt for p in prompt_data.prompts if p.type == "system"), ""
+    )
+    ## The prompt declares where its format contract goes; the reasoning style fills it in.
+    ## Hard-coding QwQ's <think>/\boxed{} contract here previously told every other model to
+    ## ignore its own markers, so its stop string never fired and reasoning ran to the cap.
+    if system_prompt:
+        system_prompt = apply_reasoning_format(system_prompt, run_config_options)
+    if gate or system_prompt:
+        if gate:
+            logger.info("Applying reasoning gate for style %s", reasoning_style)
+        if system_prompt:
             logger.info("Found system prompt, applying...")
-            try:
-                with system():
-                    llm += prompt.prompt
-            except Exception as e:
-                logger.warning(
-                    "Selected model does not have a system prompt mode, forward as user instead"
-                )
-                with user():
-                    llm += prompt.prompt
-
-            break
+        try:
+            with system():
+                llm += gate + system_prompt
+        except Exception:
+            logger.warning(
+                "Selected model does not have a system prompt mode, forward as user instead"
+            )
+            with user():
+                llm += gate + system_prompt
     _system_prompt_end = time.time()
     logger.info(
         f"System prompt (if present) applied in {_system_prompt_end - _system_prompt_start:.2f} seconds"
