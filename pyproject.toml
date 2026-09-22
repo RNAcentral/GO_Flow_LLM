@@ -18,7 +18,7 @@ dependencies = [
   # to stop on Gemma 4's `<channel|>` token, which is in no PyPI release yet. Drop the
   # [tool.uv.sources] entry once that lands upstream.
   "guidance>=0.3.1,<0.4",
-  "llama-cpp-python>=0.3.2",
+  "llama-cpp-python>=0.3.8",
   "huggingface_hub>=0.26.2",
   "pydantic>=2.9.2",
   "connectorx>=0.4.0",

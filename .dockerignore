@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+
+# Docker
+Dockerfile
+.dockerignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files (large, mounted at runtime)
+data/*.parquet
+data/*.csv
+
+# Logs
+logs/
+*.log
+
+# Kubernetes (not needed in the container)
+kubernetes/
+
+# Scripts unrelated to containerised run
+job_script*.sh
+run_test_all.sh
+create_dataset.py
