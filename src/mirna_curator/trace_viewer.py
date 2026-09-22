@@ -135,14 +135,17 @@ HTML_TEMPLATE = """
         <span class="counter">Trace {{ index + 1 }} of {{ total_traces }}</span>
         <a href="/?index={{ next_index }}{% if selected_run_id %}&run_id={{ selected_run_id }}{% endif %}{% if selected_paper_id %}&paper_id={{ selected_paper_id }}{% endif %}{% if selected_step %}&step={{ selected_step }}{% endif %}" class="nav-button">Next</a>
     </div>
-    <div class="trace-content">
-        {% for key, value in trace.items() %}
-        <div>
-            <span class="key">{{ key }}:</span>
-            <span class="value">{{ value }}</span>
+    <details>
+        <summary>Testing output</summary>
+        <div class="trace-content">
+            {% for key, value in trace.items() %}
+            <div>
+                <span class="key">{{ key }}:</span>
+                <span class="value">{{ value }}</span>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </details>
 </body>
 </html>
 """
