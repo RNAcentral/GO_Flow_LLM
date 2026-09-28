@@ -10,6 +10,7 @@ from guidance import gen, select, system, user, assistant, with_temperature, sub
 from mirna_curator.llm_functions.evidence import extract_evidence
 from mirna_curator.apis import epmc
 from mirna_curator.model.llm import STOP_TOKENS, log_usage
+from mirna_curator.llm_functions.reasoning import reasoning_block
 from mirna_curator.llm_functions.tools import safe_import
 import typing as ty
 
@@ -27,7 +28,7 @@ def prompted_flowchart_step_bool(
     step_prompt: str,
     rna_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
-    temperature_reasoning: ty.Optional[float] = 0.6,
+    temperature_reasoning: ty.Optional[float] = None,  ## None means "take it from the run config"
     temperature_selection: ty.Optional[float] = 0.4,
 ) -> guidance.models.Model:
     """
@@ -48,25 +49,11 @@ def prompted_flowchart_step_bool(
 
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
+    ## Reasoning and answer share one assistant turn, so that the thinking region is
+    ## opened and closed inside a single well-formed message
     with assistant():
-        # if config["deepseek_mode"]:
-        #     llm += "<think>\n"
-        # else:
-        #     llm += "Reasoning: "
-        llm += (
-            with_temperature(
-                gen(
-                    "reasoning",
-                    max_tokens=1024,
-                    stop=STOP_TOKENS,
-                ),
-                temperature_reasoning,
-            )
-            + "\n"
-        )
+        llm += reasoning_block(config, "reasoning", temperature=temperature_reasoning)
         logger.info("Generated reasoning ok")
-
-    with assistant():
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
@@ -90,7 +77,7 @@ def prompted_flowchart_step_tool(
     rna_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
     tools: ty.Optional[ty.List[str]] = [],
-    temperature_reasoning: ty.Optional[float] = 0.6,
+    temperature_reasoning: ty.Optional[float] = None,  ## None means "take it from the run config"
     temperature_selection: ty.Optional[float] = 0.4,
 ) -> guidance.models.Model:
     """
@@ -104,7 +91,8 @@ def prompted_flowchart_step_tool(
         step_prompt: str: The prompt read from the flowchart json file
         rna_id: str: The RNA id we are working on
         tools: ty.Optional[ty.List[str]] = []: A list of tools for the LLM to use
-        temperature_reasoning: ty.Optional[float] = 0.6: The reasoning temperature (0.6 is R1 reccomended)
+        temperature_reasoning: ty.Optional[float] = None: The reasoning temperature. None takes it
+            from the run config, which defaults to 0.6 (the R1 recommendation)
         temperature_selection: ty.Optional[float] = 0.4: The yes/no selection temperature
     """
 
@@ -163,23 +151,7 @@ def prompted_flowchart_step_tool(
         llm += "Explain your reasoning step-by-step. Be concise\n"
 
     with assistant():
-        if config["deepseek_mode"]:
-            llm += "<think>\n"
-        else:
-            llm += "Reasoning: "
-        llm += (
-            with_temperature(
-                gen(
-                    "reasoning",
-                    max_tokens=1024,
-                    stop=STOP_TOKENS,
-                ),
-                temperature_reasoning,
-            )
-            + "\n"
-        )
-
-    with assistant():
+        llm += reasoning_block(config, "reasoning", temperature=temperature_reasoning)
         llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection
         )
@@ -201,7 +173,7 @@ def prompted_flowchart_terminal(
     rna_id: str,
     paper_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
-    temperature_reasoning: ty.Optional[float] = 0.6,
+    temperature_reasoning: ty.Optional[float] = None,  ## None means "take it from the run config"
     temperature_selection: ty.Optional[float] = 0.1,
     detector=True
 ):
@@ -229,22 +201,9 @@ def prompted_flowchart_terminal(
             "Ignore targets which do not appear in this list."
         )
     with assistant():
-        # if config["deepseek_mode"]:
-        #     llm += "<think>\n"
-        # else:
-        #     llm += "Reasoning: "
-        llm += (
-            with_temperature(
-                gen(
-                    "detector_reasoning",
-                    max_tokens=1024,
-                    stop=STOP_TOKENS,
-                ),
-                temperature_reasoning,
-            )
-            + "\n"
+        llm += reasoning_block(
+            config, "detector_reasoning", temperature=temperature_reasoning
         )
-    with assistant():
         llm += "Protein name(s): "
         while True:
             llm += select(epmc_annotated_genes, name='protein_name', list_append=True)
@@ -276,7 +235,7 @@ def prompted_flowchart_terminal_conditional(
     rna_id: str,
     paper_id: str,
     config: ty.Optional[ty.Dict[str, ty.Any]] = {},
-    temperature_reasoning: ty.Optional[float] = 0.6,
+    temperature_reasoning: ty.Optional[float] = None,  ## None means "take it from the run config"
     temperature_selection: ty.Optional[float] = 0.1,
     detector=False,
 ):
@@ -312,20 +271,8 @@ def prompted_flowchart_terminal_conditional(
     
     with assistant():
         if detector:
-            # if config["deepseek_mode"]:
-            #     llm += "<think>\n"
-            # else:
-            #     llm += "Reasoning: "
-            llm += (
-                with_temperature(
-                    gen(
-                        "detector_reasoning",
-                        max_tokens=1024,
-                        stop=STOP_TOKENS,
-                    ),
-                    temperature_reasoning,
-                )
-                + "\n"
+            llm += reasoning_block(
+                config, "detector_reasoning", temperature=temperature_reasoning
             )
             llm += "Protein name(s): "
             while True:
@@ -336,21 +283,7 @@ def prompted_flowchart_terminal_conditional(
                 if llm["multi_target_conjunction"] == ".":
                     break
         else:
-            # if config["deepseek_mode"]:
-            #     llm += "<think>\n"
-            # else:
-            #     llm += "Reasoning: "
-            llm += (
-                with_temperature(
-                    gen(
-                        "reasoning",
-                        max_tokens=1024,
-                        stop=STOP_TOKENS,
-                    ),
-                    temperature_reasoning,
-                )
-                + "\n"
-            )
+            llm += reasoning_block(config, "reasoning", temperature=temperature_reasoning)
             llm += f"The final answer, based on my reasoning above is: " + with_temperature(
             select(["yes", "no"], name="answer"), temperature_selection)
             logger.info("Selected answer ok")

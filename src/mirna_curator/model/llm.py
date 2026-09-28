@@ -1,5 +1,7 @@
 from guidance.models import LlamaCpp
 from guidance.chat import (
+    ChatTemplate,
+    UnsupportedRoleException,
     ChatMLTemplate,
     Llama2ChatTemplate,
     Llama3ChatTemplate,
@@ -11,6 +13,33 @@ from guidance.chat import (
     Qwen3ChatTemplate
 )
 
+class Gemma4ChatTemplate(ChatTemplate):
+    """
+    Chat template for Gemma 4, which guidance does not ship a class for.
+
+    Nothing carries over from Gemma 2 - the turn markers changed from
+    `<start_of_turn>`/`<end_of_turn>` to `<|turn>`/`<turn|>`, so
+    Gemma29BInstructChatTemplate produces tokens that are not in Gemma 4's vocabulary
+    and the model never sees a turn boundary. Gemma 4 does support a system role, which
+    Gemma 2 did not. The assistant is still called `model`.
+
+    Markers extracted from google/gemma-4-E2B-it by scripts/extract_reasoning_style.py.
+    A ChatTemplate subclass is all guidance needs - load_template_class accepts one
+    directly - so this does not depend on anything landing upstream.
+    """
+
+    def get_role_start(self, role_name):
+        if role_name == "assistant":
+            return "<|turn>model\n"
+        elif role_name in ("system", "user"):
+            return f"<|turn>{role_name}\n"
+        else:
+            raise UnsupportedRoleException(role_name, self)
+
+    def get_role_end(self, role_name=None):  # noqa ARG002
+        return "<turn|>\n"
+
+
 TEMPLATE_LOOKUP = {
     "chatml": ChatMLTemplate,
     "llama2": Llama2ChatTemplate,
@@ -21,6 +50,7 @@ TEMPLATE_LOOKUP = {
     "gemma": Gemma29BInstructChatTemplate,
     "qwen25": Qwen2dot5ChatTemplate,
     "qwen3": Qwen3ChatTemplate,
+    "gemma4": Gemma4ChatTemplate,
 }
 
 from huggingface_hub import HfFileSystem, hf_hub_download
@@ -28,32 +58,75 @@ from pathlib import Path
 import re
 import logging
 
-from mirna_curator.utils.sampling import DEFAULT_SAMPLING_PARAMS, get_sampling_params
+from mirna_curator.utils.sampling import get_sampling_params
 
 
 logger = logging.getLogger(__name__)
 
 
-STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "</think>", "<|im_end|>", "<|endoftext|>"]
+## Model-independent turn-enders only. Anything specific to a reasoning style (e.g.
+## `</think>`) belongs in REASONING_STYLES in llm_functions/reasoning.py, so that a
+## non-thinking model doesn't carry stop strings it will never emit.
+STOP_TOKENS = ["<|end|>", "<|eot_id|>", "<|eom_id|>", "<|im_end|>", "<|endoftext|>"]
+
+
+def get_chat_template(name):
+    """
+    Look up a guidance ChatTemplate class by short name.
+
+    This raises rather than falling back to ChatML, because the fallback is silent and
+    a wrong template is not obviously wrong at runtime - it just quietly degrades the
+    output. A typo here previously sent a whole Qwen3 run through the ChatML template.
+
+    Arguments:
+        name: str - a key of TEMPLATE_LOOKUP
+
+    Returns:
+        The guidance ChatTemplate subclass for that model family
+    """
+    if name not in TEMPLATE_LOOKUP:
+        raise ValueError(
+            f"Unknown chat_template {name!r}. Known templates: {sorted(TEMPLATE_LOOKUP)}. "
+            "Role markers for a model guidance has no class for can be derived with "
+            "scripts/extract_reasoning_style.py"
+        )
+    return TEMPLATE_LOOKUP[name]
 
 
 def log_usage(llm):
     """
-    Log the running token totals for a model.
+    Log how full the context is, and how much has been generated.
 
-    guidance's usage API is private, so it is wrapped here to give one place to fix
-    when guidance is upgraded. Counters are cumulative across the whole run, so call
-    this after generating to see the totals including the node that just ran.
+    guidance's usage API is private, so it is wrapped here to give one place to fix when
+    guidance is upgraded.
+
+    Careful with `usage.input_tokens`: it is incremented per *forward pass*, so it
+    re-counts the whole KV cache for every token generated and reaches millions against
+    a 32k context. It is a billing-style "tokens processed" counter, not a prompt size.
+    The distinct tokens actually in the context are `input_tokens - cached_input_tokens`,
+    which is what matters for staying under n_ctx, and is free to compute (no
+    re-tokenising of the transcript).
 
     Arguments:
         llm: the guidance model to report usage for
     """
     usage = llm._get_usage()
+    prompt_tokens = usage.input_tokens - usage.cached_input_tokens
+
+    ## n_ctx comes off the underlying llama_cpp model; don't let a private-API change
+    ## take a run down over a log line
+    try:
+        n_ctx = llm.engine.model_obj.n_ctx()
+        fill = f" ({100 * prompt_tokens / n_ctx:.0f}% of {n_ctx})"
+    except Exception:  # noqa BLE001
+        fill = ""
+
     logger.info(
-        "LLM tokens (cumulative) in/out/total: %d/%d/%d",
-        usage.input_tokens,
+        "Context %d tokens%s; generated %d tokens so far (%d processed incl. cache re-reads)",
+        prompt_tokens,
+        fill,
         usage.output_tokens,
-        usage.input_tokens + usage.output_tokens,
+        usage.input_tokens,
     )
 
 
@@ -225,18 +298,21 @@ def get_model(
     run_config_options = run_config_options or {}
     sampling_params = get_sampling_params(run_config_options)
 
+    ## Only `sampling_params` and real llama_cpp.Llama arguments have any effect here.
+    ## LlamaCpp forwards anything it doesn't recognise to llama_cpp.Llama, whose __init__
+    ## ends in `**kwargs, # type: ignore` and silently discards them - which is how
+    ## `temperature`, `flash_attention` (the real spelling is `flash_attn`),
+    ## `dry_multiplier` and `samplers` sat here doing nothing. Temperature is applied by
+    ## guidance at each gen() site instead, via reasoning_block.
     model = LlamaCpp(
         model=model_path,
         echo=False,
         n_gpu_layers=-1,
         n_ctx=context_length,
-        flash_attention=True,
-        temperature=run_config_options.get("temperature", DEFAULT_SAMPLING_PARAMS["temperature"]),
-        chat_template=TEMPLATE_LOOKUP.get(chat_template, ChatMLTemplate),
+        flash_attn=True,
+        chat_template=get_chat_template(chat_template),
         seed=-1,
-        dry_multiplier=run_config_options.get("dry_multiplier", DEFAULT_SAMPLING_PARAMS["dry_multiplier"]),
-        samplers="top_k;top_p;min_p;temperature;dry;typ_p;xtc",
-        sampling_params=sampling_params
+        sampling_params=sampling_params,
     )
 
     return model

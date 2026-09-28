@@ -1,13 +1,19 @@
 from guidance import gen, select, system, user, assistant
 import guidance
+import typing as ty
 from mirna_curator.model.prompts import system_prompt_general
+from mirna_curator.llm_functions.reasoning import reasoning_block
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def assess_abstract(llm: guidance.models.LlamaCpp, abstract: str) -> bool:
+def assess_abstract(
+    llm: guidance.models.LlamaCpp,
+    abstract: str,
+    config: ty.Optional[ty.Dict[str, ty.Any]] = {},
+) -> bool:
     """
     Use the LLM to reason about an abstract and, based on the GO
     curation criteria, forward it for inclusion in the processing,
@@ -53,7 +59,7 @@ def assess_abstract(llm: guidance.models.LlamaCpp, abstract: str) -> bool:
         llm += curation_decision_prompt.format(abstract=abstract)
 
     with assistant():
-        llm += "Reasoning: " + gen("reasoning", max_tokens=512)
+        llm += reasoning_block(config, "reasoning", max_tokens=512)
 
     with user():
         llm += "Therefore, would you reccomend this abstract be forwarded to a curator for further investigation? Answer yes or no\n"

@@ -23,6 +23,7 @@ import time
 import logging
 from guidance import user, assistant, gen, select
 from mirna_curator.model.llm import STOP_TOKENS
+from mirna_curator.llm_functions.reasoning import REASONING_STYLES, reasoning_block
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
@@ -106,14 +107,14 @@ def mutually_exclusive_with_config(config_option: str = "config") -> Callable:
     return decorator
 
 
-def do_curation_constrained(llm, completed_prompt, choices):
+def do_curation_constrained(llm, completed_prompt, choices, config={}):
     with user():
         llm += completed_prompt
 
     with assistant():
-        llm += "<think>" + gen('reasoning', max_tokens=1024, stop=STOP_TOKENS)
+        llm += reasoning_block(config, "reasoning")
 
-        llm += "\nTherefore the most appropriate choice is " + select(choices, name="annotation")
+        llm += "Therefore the most appropriate choice is " + select(choices, name="annotation")
 
     return llm['annotation'], llm['reasoning']
 
@@ -132,10 +133,10 @@ def do_curation_constrained(llm, completed_prompt, choices):
 )
 @click.option("--output_data", help="The output data (curation result) for the process")
 @click.option(
-    "--deepseek_mode",
-    help="Tweak the reasoning generation for deepseek models",
-    is_flag=True,
-    default=False,
+    "--reasoning_style",
+    help="How the model delimits its thinking region. See REASONING_STYLES in llm_functions/reasoning.py",
+    type=click.Choice(sorted(REASONING_STYLES)),
+    default="none",
 )
 @mutually_exclusive_with_config()
 def main(config: Optional[str] = None,
@@ -143,7 +144,7 @@ def main(config: Optional[str] = None,
         context_length: Optional[int] = 16384,
         quantization: Optional[str] = None,
         chat_template: Optional[str] = None,
-        deepseek_mode: Optional[bool] = False,
+        reasoning_style: Optional[str] = "none",
         input_data: Optional[str] = None,
         output_data: Optional[str] = None,
         ):
@@ -192,7 +193,9 @@ def main(config: Optional[str] = None,
         _curation_start = time.time()
         completed_prompt = prompt_template.format(paper_text=article.get_body())
 
-        annotation, reasoning = do_curation_constrained(llm, completed_prompt, go_terms)
+        annotation, reasoning = do_curation_constrained(
+            llm, completed_prompt, go_terms, config={"reasoning_style": reasoning_style}
+        )
         
         _curation_end = time.time()
         logger.info(

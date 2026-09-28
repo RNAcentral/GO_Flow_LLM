@@ -1,4 +1,4 @@
-PMCID,used_protein_id,used_rna_id
+PMCID,protein_id,rna_id
 PMC1762435,VEGF,miR-106a
 PMC2655672,KIP2,miR-221
 PMC2760133,TGFBR1,let-7c

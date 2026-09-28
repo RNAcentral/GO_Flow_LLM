@@ -16,6 +16,7 @@ from mirna_curator.llm_functions.conditions import (
     prompted_flowchart_terminal_conditional,
 )
 from mirna_curator.llm_functions.filtering import prompted_filter
+from mirna_curator.llm_functions.reasoning import reasoning_block
 from mirna_curator.model.llm import STOP_TOKENS
 from time import time
 from functools import partial
@@ -24,7 +25,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def find_section_heading(llm, target, possibles):
+def find_section_heading(llm, target, possibles, config={}):
     """
     Finds the most likely section heading given the ones found in the paper.
 
@@ -57,13 +58,11 @@ def find_section_heading(llm, target, possibles):
             )
             llm += "\nThink about it briefly, then make a selection.\n"
         with assistant():
-            llm += (
-                f"The section heading {target} implies "
-                + with_temperature(
-                    gen("reasoning", max_tokens=512, stop=STOP_TOKENS), 0.6
-                )
-                + " therefore the most likely section heading is: "
-            )
+            ## The reasoning used to be spliced into the middle of a sentence, which
+            ## leaves nowhere to put a thinking marker. Generating it as its own block
+            ## first keeps this node's reasoning in the curation record like every other.
+            llm += reasoning_block(config, "reasoning", max_tokens=512)
+            llm += f"Therefore the most likely section heading for {target} is: "
             llm += select(possibles, name="target_section_name")
         target_section_name = llm["target_section_name"]
         curation_tracer.log_event(
@@ -178,7 +177,10 @@ class ComputationGraph:
             ]
             if not any(check_subtitles):
                 target_section_name = find_section_heading(
-                    llm, prompt.target_section, list(article.sections.keys())
+                    llm,
+                    prompt.target_section,
+                    list(article.sections.keys()),
+                    config=self.run_config,
                 )
             else:
                 target_section_name = list(article.sections.keys())[
